@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>leaperStuff</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e1e;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #f1c40f;
+      transition: transform 0.2s ease;
+    }
+    
+    header:hover {
+    	transform: scale(1.05);
+    	background: #1e1e1b
+    }
+
+    .search-container {
+      text-align: center;
+      margin: 1rem 0;
+      transition: transform 0.2s ease;
+    }
+    
+    .search-container:hover {
+    	transform: scale(1.05);
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      width: 80%;
+      max-width: 400px;
+      border: none;
+      border-radius: 5px;
+      background: #2a2a2a;
+      color: #eee;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .card {
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.2s ease;
+      max-width: 300px;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      background: #252525;
+    }
+
+    .card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .card h3 {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>leaperStuff</header>
+
+  <div class="search-container">
+    <input type="text" id="search" placeholder="Search projects...">
+  </div>
+
+  <div class="grid" id="projectGrid">
+    <div onclick="window.location.href='https://zencodeedit.vercel.app'" class="card">
+      <img src="https://blogger.googleusercontent.com/img/a/AVvXsEisOm2JaBLmGjCqIRCo68X9YYEbv_-v6EaII_8yJU83zppHMsBcTquG7WE7uE4TwKG2JXK2mGwQ_S5_OOev_t1r7cnbAvr8V3e6b6eS5j9fVM105MOQFTfFFVN-S2DnGWbtkhVXeYVH6jy6oT-oYOBmeF3C5qfDOqC4FHzDHxmiyqSj2c5TpHYGgPcaBfBx=w170-h159" alt="Project">
+      <h3>ZenCodeEdit</h3>
+      <p>ZenCodeEdit is now part of leaperstuff🎉</p>
+    </div>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById("search");
+    const projectGrid = document.getElementById("projectGrid");
+    const cards = projectGrid.getElementsByClassName("card");
+
+    searchInput.addEventListener("keyup", function() {
+      const query = searchInput.value.toLowerCase();
+      Array.from(cards).forEach(card => {
+        const title = card.querySelector("h3").textContent.toLowerCase();
+        card.style.display = title.includes(query) ? "block" : "none";
+      });
+    });
+  </script>
+
+</body>
+</html>
