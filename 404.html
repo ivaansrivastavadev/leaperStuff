@@ -1,1 +1,102 @@
-Silly Entered the wrong url :)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/gif" href="roundedlogo.gif">
+  <title>leaperStuff - 404</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e1e;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      padding: 1rem;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f1c40f;
+      transition: transform 0.2s ease;
+    }
+    header:hover { transform: scale(1.05); background: #1e1e1b; }
+
+    .message {
+      margin-top: 3rem;
+      font-size: 1.5rem;
+      color: #ddd;
+    }
+    .error-code {
+      font-size: 5rem;
+      font-weight: bold;
+      color: #f1c40f;
+      margin-top: 1rem;
+    }
+
+    .search-container { text-align: center; margin: 2rem 0; }
+    input[type="text"] {
+      padding: 0.7rem;
+      width: 80%;
+      max-width: 400px;
+      border: none;
+      border-radius: 5px;
+      background: #2a2a2a;
+      color: #eee;
+      font-size: 1rem;
+    }
+
+    .hint {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    /* Easter egg popup */
+    #secret {
+      display: none;
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #4caf50;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <header>leaperStuff 1.0</header>
+
+  <div class="message">Oops! The page you’re looking for doesn’t exist.</div>
+  <div class="error-code">404</div>
+
+  <div class="search-container">
+    <input type="text" placeholder="Search projects...">
+  </div>
+
+  <div class="hint">Tip: Try exploring the homepage or... maybe a secret code? Press ↑↑ 🎮</div>
+
+  <div id="secret">✨ You found the easter egg!✨</div>
+
+<script>
+  // Easter Egg: Konami Code
+  const secretEl = document.getElementById("secret");
+  const konami = [38,38]; // ↑↑
+  let entered = [];
+
+  window.addEventListener("keydown", e => {
+    entered.push(e.keyCode);
+    if (entered.toString().indexOf(konami.toString()) >= 0) {
+      secretEl.style.display = "block";
+      
+    }
+    if (entered.length > 10) entered.shift(); // keep buffer size
+  });
+</script>
+
+</body>
+</html>
