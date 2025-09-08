@@ -34,13 +34,54 @@
       font-size: 1.5rem;
       color: var(--accent);
     }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: var(--text);
+      transition: 0.3s;
+    }
+
+    /* Menu */
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
     nav a {
       color: var(--text);
-      margin-left: 1.5rem;
       text-decoration: none;
       transition: color 0.3s;
     }
     nav a:hover { color: var(--accent); }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        flex-direction: column;
+        background: var(--panel);
+        border-radius: 10px;
+        padding: 1rem;
+      }
+      nav.show {
+        display: flex;
+        background-color: black;
+      }
+      .hamburger {
+        display: flex;
+      }
+    }
+
     .hero {
       padding: 5rem 2rem;
       text-align: center;
@@ -70,9 +111,7 @@
       color: #000;
       font-size: 1rem;
       outline: none;
-      
     }
-
     .projects {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -90,7 +129,6 @@
       box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
     .project h3 { color: var(--accent); margin-bottom: 0.5rem; }
-    
     .contact {
       padding: 3rem 2rem;
       text-align: center;
@@ -109,11 +147,7 @@
       margin: 0.5rem 0;
       font-size: 1.1rem;
     }
-    
-    a {
-    	color: yellow;
-    }
-    
+    a { color: yellow; }
     footer {
       text-align: center;
       padding: 1rem;
@@ -121,7 +155,6 @@
       background: var(--panel);
       font-size: 0.9rem;
     }
-    
     .project button {
       margin-top: 5px;
    	  background: var(--accent);
@@ -138,7 +171,12 @@
 <body>
   <header>
     <h1>LeaperStuff</h1>
-    <nav>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav id="navMenu">
       <a href="index.html">Home</a>
       <a href="posts.html">Posts</a>
       <a href="#contact">Contact</a>
@@ -187,6 +225,8 @@
 <script>
   const searchInput = document.getElementById("searchInput");
   const projects = document.querySelectorAll(".project");
+  const hamburger = document.getElementById("hamburger");
+  const navMenu = document.getElementById("navMenu");
 
   searchInput.addEventListener("input", function () {
     const query = searchInput.value.toLowerCase();
@@ -199,7 +239,11 @@
       }
     });
   });
-</script>
 
+  // Hamburger toggle
+  hamburger.addEventListener("click", () => {
+    navMenu.classList.toggle("show");
+  });
+</script>
 </body>
 </html>
