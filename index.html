@@ -58,29 +58,21 @@
       display: flex;
       justify-content: center;
       margin: 2rem auto;
-      max-width: 500px;
+      max-width: 95%;
+      width: 500px;
     }
     .search-bar input {
       flex: 1;
       padding: 0.8rem;
       border: 2px solid var(--accent);
-      border-radius: 6px 0 0 6px;
+      border-radius: 6px;
       background: #fff;
       color: #000;
       font-size: 1rem;
       outline: none;
+      
     }
-    .search-bar button {
-      background: var(--accent);
-      border: none;
-      padding: 0 1.2rem;
-      border-radius: 0 6px 6px 0;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s;
-      max-width: 95%;
-    }
-    .search-bar button:hover { background: #e6c800; }
+
     .projects {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -160,7 +152,6 @@
 
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Search projects...">
-    <button onclick="searchProjects()">Search</button>
   </div>
 
   <section class="projects" id="projects">
@@ -193,16 +184,22 @@
     © 2025 LeaperStuff. All rights reserved.
   </footer>
 
-  <script>
-    function searchProjects() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const projects = document.querySelectorAll(".project");
-      projects.forEach(proj => {
-        const title = proj.getAttribute("data-title").toLowerCase();
-        proj.style.opacity = title.includes(query) ? "1" : "0";
-        proj.style.pointerEvents = title.includes(query) ? "auto" : "none";
-      });
-    }
-  </script>
+<script>
+  const searchInput = document.getElementById("searchInput");
+  const projects = document.querySelectorAll(".project");
+
+  searchInput.addEventListener("input", function () {
+    const query = searchInput.value.toLowerCase();
+    projects.forEach(proj => {
+      const title = proj.getAttribute("data-title").toLowerCase();
+      if (title.includes(query)) {
+        proj.style.display = "block";  // show
+      } else {
+        proj.style.display = "none";   // hide
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
