@@ -9,19 +9,16 @@
     :root {
       --bg: #0b0b12;
       --text: #f5f5f5;
-      --accent: #ffd600;
+      --accent: #ffd600; /* yellow accent */
       --panel: rgba(255, 255, 255, 0.05);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
     }
-
-    /* navbar */
     header {
       display: flex;
       justify-content: space-between;
@@ -31,26 +28,19 @@
       position: sticky;
       top: 0;
       backdrop-filter: blur(6px);
-      z-index: 1000;
+      z-index: 100;
     }
     header h1 {
       font-size: 1.5rem;
       color: var(--accent);
     }
-    nav { display: flex; gap: 1.5rem; }
-    nav a {
-      color: var(--text);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    nav a:hover { color: var(--accent); }
 
-    /* hamburger */
+    /* Hamburger */
     .hamburger {
       display: none;
       flex-direction: column;
-      gap: 5px;
       cursor: pointer;
+      gap: 5px;
     }
     .hamburger span {
       width: 25px;
@@ -58,6 +48,20 @@
       background: var(--text);
       transition: 0.3s;
     }
+
+    /* Menu */
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* Mobile styles */
     @media (max-width: 768px) {
       nav {
         display: none;
@@ -69,43 +73,49 @@
         border-radius: 10px;
         padding: 1rem;
       }
-      nav.show { display: flex; background-color: black;}
-      .hamburger { display: flex; }
-      
+      nav.show {
+        display: flex;
+        background-color: black;
+      }
+      .hamburger {
+        display: flex;
+      }
     }
 
-    /* hero */
-    .start {
-      height: 100vh;
+    .search-bar {
       display: flex;
-      flex-direction: column;
       justify-content: center;
-      align-items: center;
-      text-align: center;
+      margin: 2rem auto;
+      max-width: 95%;
+      width: 500px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 0.8rem;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      background: #fff;
+      color: #000;
+      font-size: 1rem;
+      outline: none;
+    }
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
       padding: 2rem;
     }
-    .start h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
+    .project {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 1.2rem;
+      transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
     }
-    .start ul {
-      text-align: left;
-      margin-top: 1rem;
+    .project:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
-
-    /* section */
-    section.content {
-      padding: 3rem 2rem;
-      text-align: center;
-    }
-    section.content h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
-    }
-
-    /* contact */
+    .project h3 { color: var(--accent); margin-bottom: 0.5rem; }
     .contact {
       padding: 3rem 2rem;
       text-align: center;
@@ -116,10 +126,15 @@
       margin-bottom: 1rem;
       color: var(--accent);
     }
-    .contact ul { list-style: none; padding: 0; }
-    .contact li { margin: 0.5rem 0; font-size: 1.1rem; }
-    .contact a { color: var(--accent); }
-
+    .contact ul {
+      list-style: none;
+      padding: 0;
+    }
+    .contact li {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+    a { color: yellow; }
     footer {
       text-align: center;
       padding: 1rem;
@@ -127,64 +142,90 @@
       background: var(--panel);
       font-size: 0.9rem;
     }
-    
-    button {
-    	border: none;
-        border-radius: 12px;
-        color: black;
-        background-color: yellow;
-        padding: 1rem;
-        margin-top: 10px;
-        margin-bottom: 10px;
+    .project button {
+      margin-top: 5px;
+   	  background: var(--accent);
+      border: none;
+      padding: 0 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+      height: 30px;
     }
   </style>
 </head>
 <body>
-
   <header>
     <h1>LeaperStuff</h1>
     <div class="hamburger" id="hamburger">
-      <span></span><span></span><span></span>
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
     <nav id="navMenu">
-      <a href="tools.html">Tools</a>
+      <a href="about.html">About</a>
+      <a href="posts.html">Posts</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
 
-  <section class="start" id="home">
-    <h1>Welcome to <br> LeaperStuff</h1>
-    <p>Your hub for tools, posts, and projects.</p>
-    <ul>
-      <li>Smart toolbox</li>
-      <li>Fresh posts</li>
-      <li>Cool projects</li>
-    </ul>
-    <button onclick="window.location.href='tools.html'">Go to toolbox</button>
-    <p>Scroll Down to learn more.</p>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search projects...">
+  </div>
+
+  <section class="projects" id="projects">
+    <div class="project" data-title="ZenCodeEdit Zen Code Edit Editor ">
+      <h3>ZenCodeEdit</h3>
+      <p>The Editor for Peace.</p>
+      <button onclick="window.location.href='https://zencodeedit.vercel.app'">Go</button>
+    </div>
+    <div class="project" data-title="Chat Gun leaperchatgun">
+      <h3>leaperChatGun</h3>
+      <p>Chat to friend without login🎉.</p>
+      <button onclick="window.location.href='leaperchatgun.html'">Go</button>
+    </div>
+    <div class="project" data-title="Cava WEB">
+      <h3>CAVA Web</h3>
+      <p>UnOfficial CAVA Web.</p>
+      <button onclick="window.location.href='cava_web_unofficial.html'">Go</button>
+    </div>
   </section>
 
   <section class="contact" id="contact">
     <h3>Contact</h3>
     <ul>
       <li><b>Email:</b> <a href="mailto:ivaansri.contact@gmail.com">ivaansri.contact@gmail.com</a></li>
-      <li><b>GitHub:</b> <a href="https://github.com/ivaansrivastavadev" target="_blank">ivaansrivastavadev</a></li>
+      <li><b>GitHub:</b> <a href="github.com/ivaansrivastavadev">ivaansrivastavadev</a></li>
     </ul>
   </section>
 
-  <!-- Footer -->
   <footer>
     © 2025 LeaperStuff. All rights reserved.
   </footer>
 
-  <script>
-    const hamburger = document.getElementById("hamburger");
-    const navMenu = document.getElementById("navMenu");
+<script>
+  const searchInput = document.getElementById("searchInput");
+  const projects = document.querySelectorAll(".project");
+  const hamburger = document.getElementById("hamburger");
+  const navMenu = document.getElementById("navMenu");
 
-    hamburger.addEventListener("click", () => {
-      navMenu.classList.toggle("show");
+  searchInput.addEventListener("input", function () {
+    const query = searchInput.value.toLowerCase();
+    projects.forEach(proj => {
+      const title = proj.getAttribute("data-title").toLowerCase();
+      if (title.includes(query)) {
+        proj.style.display = "block";  // show
+      } else {
+        proj.style.display = "none";   // hide
+      }
     });
-  </script>
+  });
 
+  // Hamburger toggle
+  hamburger.addEventListener("click", () => {
+    navMenu.classList.toggle("show");
+  });
+</script>
 </body>
 </html>
