@@ -1,1 +1,159 @@
-Work in progress
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/x-icon" href="roundedlogo.gif" />
+  <title>About - LeaperStuff</title>
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --text: #f5f5f5;
+      --accent: #ffd600;
+      --panel: rgba(255, 255, 255, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--panel);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(6px);
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: var(--text);
+      transition: 0.3s;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        flex-direction: column;
+        background: var(--panel);
+        border-radius: 10px;
+        padding: 1rem;
+      }
+      nav.show {
+        display: flex;
+        background-color: black;
+      }
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    .about-section {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 2rem;
+      background: var(--panel);
+      border-radius: 12px;
+    }
+
+    .about-section h2 {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .about-section p {
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+      background: var(--panel);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LeaperStuff</h1>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav id="navMenu">
+      <a href="index.html">Home</a>
+      <a href="https://leaperstuff.blogspot.com">Posts</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section class="about-section">
+    <h2>About LeaperStuff</h2>
+    <p><strong>LeaperStuff</strong> is a personal and creative web space built to share simple, fun, and useful web tools, experiments, and projects. Whether it's a text editor, a no-login chat, or a visualizer – it's all here under one roof.</p>
+
+    <p>This site is driven by a love for coding and clean, accessible design. It aims to offer lightweight apps and pages that just work — no logins, no bloat, just quick ideas brought to life.</p>
+
+    <p>Projects like <strong>ZenCodeEdit</strong> and <strong>LeaperChatGun</strong> are examples of the goal: minimalist tools with purpose.</p>
+
+    <h3 style="margin-top:2rem; color: var(--accent);">Who Made This?</h3>
+    <p>Hey! I'm <strong>Ivaan Srivastava</strong>, a developer who enjoys making small things that feel big. I build tools, tweak ideas, and experiment with tech just to see what happens.</p>
+
+    <p>Got feedback or an idea? Reach out via the <a href="index.html#contact" style="color: var(--accent); text-decoration: underline;">contact section</a>.</p>
+  </section>
+
+  <footer>
+    © 2025 LeaperStuff. All rights reserved.
+  </footer>
+
+  <script>
+    const hamburger = document.getElementById("hamburger");
+    const navMenu = document.getElementById("navMenu");
+
+    hamburger.addEventListener("click", () => {
+      navMenu.classList.toggle("show");
+    });
+  </script>
+</body>
+</html>
