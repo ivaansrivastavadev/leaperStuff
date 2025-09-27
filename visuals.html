@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>leprVisuals – leaperStuff</title>
+  <link rel="icon" type="image/x-icon" href="roundedlogo.gif">
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --text: #f5f5f5;
+      --accent: #2de2a6;
+      --panel: rgba(255,255,255,0.05);
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: var(--accent);
+    }
+    .spreadsheet {
+      background: var(--panel);
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      margin-bottom: 2rem;
+    }
+    .spreadsheet table {
+      border-collapse: collapse;
+      background: #fff;
+      color: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .spreadsheet th, .spreadsheet td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      min-width: 80px;
+      text-align: center;
+    }
+    .spreadsheet input {
+      width: 100%;
+      border: none;
+      text-align: center;
+    }
+    button, select {
+      margin: 0.5rem 0.2rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #chartWrapper {
+      width: 400px;
+      height: 400px;
+    }
+    #chartCanvas {
+      width: 100% !important;
+      height: 100% !important;
+      background-color: white;
+      padding: 1rem;
+      border-radius: 24px;
+    }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>leprVisuals</h1>
+    <p>by <strong>leaperStuff</strong></p>
+    <p>Create or upload data → Turn into stunning charts ✨</p>
+  </header>
+
+  <div class="spreadsheet">
+    <h3>Spreadsheet Maker</h3>
+    <table id="sheet">
+      <tr><th>Label</th><th>Value</th></tr>
+      <tr><td><input value="First"></td><td><input value="1"></td></tr>
+      <tr><td><input value="Second"></td><td><input value="2"></td></tr>
+    </table>
+    <div>
+      <button onclick="addRow()">+ Add Row</button>
+      <label for="chartType">Chart:</label>
+      <select id="chartType">
+        <option value="pie">Pie</option>
+        <option value="bar">Bar</option>
+        <option value="line">Line</option>
+      </select>
+      <button onclick="generateChartFromSheet()">Generate</button><br>
+      <button onclick="takeScreenshot()">Take Screenshot</button>
+      <button onclick="window.location.href='index.html'">Lepr Home/Back</button>
+
+    </div>
+  </div>
+
+  <div id="chartWrapper">
+    <canvas id="chartCanvas"></canvas>
+  </div>
+
+  <footer>© 2025 leaperStuff</footer>
+
+  <!-- Keep libraries for Excel parsing (future upload feature) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let chart;
+
+    function addRow() {
+      const table = document.getElementById("sheet");
+      const cols = table.rows[0].cells.length;
+      const row = table.insertRow();
+      for (let i = 0; i < cols; i++) {
+        const cell = row.insertCell();
+        cell.innerHTML = '<input>';
+      }
+    }
+
+    function generateChartFromSheet() {
+      const table = document.getElementById("sheet");
+      const rows = [];
+      for (let r = 0; r < table.rows.length; r++) {
+        const cells = [];
+        for (let c = 0; c < table.rows[r].cells.length; c++) {
+          const inp = table.rows[r].cells[c].querySelector("input");
+          cells.push(inp ? inp.value : table.rows[r].cells[c].innerText);
+        }
+        rows.push(cells);
+      }
+
+      if (rows.length < 2) {
+        alert("Need at least 1 data row.");
+        return;
+      }
+
+      const labels = rows.slice(1).map(r => r[0]);
+      const values = rows.slice(1).map(r => Number(r[1]));
+
+      const ctx = document.getElementById("chartCanvas").getContext("2d");
+      const chartType = document.getElementById("chartType").value;
+
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: chartType,
+        data: {
+          labels,
+          datasets: [{
+            label: rows[0][1] || "Values",
+            data: values,
+            backgroundColor: [
+              "#2de2a6", "#ff3864", "#f5f5f5", "#ffd600", "#00bcd4", "#8e44ad"
+            ],
+            borderColor: "#0b0b12",
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom", labels: { color: "#0b0b12" } }
+          },
+          scales: chartType !== "pie" ? {
+            x: { ticks: { color: "#0b0b12" } },
+            y: { ticks: { color: "#0b0b12" } }
+          } : {}
+        }
+      });
+    }
+    function takeScreenshot() {
+  if (!chart) {
+    alert("Generate a chart first!");
+    return;
+  }
+  const canvas = document.getElementById("chartCanvas");
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = "chart.png";
+  link.click();
+}
+
+  </script>
+</body>
+</html>
