@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>leprDash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #f5f5f5;
+            --text-secondary: #cccccc;
+            --accent-yellow: #ffcc00;
+            --accent-dark-yellow: #b38f00;
+            --accent-light-yellow: #ffdb4d;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        #top-bar {
+            background-color: var(--bg-secondary);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--accent-yellow);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: var(--accent-yellow);
+            color: var(--bg-primary);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: var(--accent-light-yellow);
+            transform: scale(1.05);
+        }
+
+        /* Main Area */
+        #main-area {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        /* Brick Styles */
+        .brick {
+            position: absolute;
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--accent-dark-yellow);
+            min-width: 250px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .brick-header {
+            background-color: var(--bg-tertiary);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-bottom: 1px solid var(--accent-dark-yellow);
+        }
+
+        .brick-title {
+            font-weight: 600;
+            color: var(--accent-yellow);
+            font-size: 0.9rem;
+        }
+
+        .brick-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .brick-control {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: color 0.2s;
+        }
+
+        .brick-control:hover {
+            color: var(--accent-yellow);
+        }
+
+        .brick-content {
+            flex-grow: 1;
+            padding: 15px;
+            overflow: auto;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 15px;
+            height: 15px;
+            cursor: nwse-resize;
+            background: linear-gradient(135deg, transparent 50%, var(--accent-yellow) 50%);
+        }
+
+        /* Brick Content Styles */
+        .webview-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .md-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .md-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .md-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--accent-dark-yellow);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .md-btn.active {
+            background: var(--accent-yellow);
+            color: var(--bg-primary);
+        }
+
+        .md-editor, .md-preview {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--accent-dark-yellow);
+            border-radius: 4px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: monospace;
+            resize: none;
+            width: 100%;
+        }
+
+        .md-preview {
+            overflow: auto;
+        }
+
+        .custom-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: var(--bg-primary);
+        }
+
+        .media-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .media-player {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .media-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .media-btn {
+            background: var(--accent-yellow);
+            color: var(--bg-primary);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .random-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 15px;
+        }
+
+        .random-btn {
+            background: var(--accent-yellow);
+            color: var(--bg-primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .random-result {
+            background: var(--bg-tertiary);
+            padding: 10px 15px;
+            border-radius: 4px;
+            min-height: 40px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 15px;
+        }
+
+        .time-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        /* Add Brick Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--accent-dark-yellow);
+            padding-bottom: 10px;
+        }
+
+        .modal-title {
+            color: var(--accent-yellow);
+            font-size: 1.3rem;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .brick-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .brick-type {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent-dark-yellow);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .brick-type:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-yellow);
+        }
+
+        .brick-type i {
+            font-size: 2rem;
+            color: var(--accent-yellow);
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .locked .brick-control.delete-btn,
+        .locked .resize-handle {
+            display: none;
+        }
+
+        .locked .brick-header {
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div id="top-bar">
+        <div class="logo">
+            <h1>leprDash</h1>
+            <span>by leaperStuff</span>
+        </div>
+        <div class="controls">
+            <button class="control-btn" id="add-brick-btn" title="Add Brick">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="control-btn" id="lock-btn" title="Lock/Unlock Dashboard">
+                <i class="fas fa-lock"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Area -->
+    <div id="main-area">
+        <!-- Bricks will be added here dynamically -->
+    </div>
+
+    <!-- Add Brick Modal -->
+    <div class="modal-overlay hidden" id="brick-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Brick</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="brick-types">
+                <div class="brick-type" data-type="webview">
+                    <i class="fas fa-globe"></i>
+                    <div>Webview</div>
+                </div>
+                <div class="brick-type" data-type="md">
+                    <i class="fas fa-markdown"></i>
+                    <div>MD Text</div>
+                </div>
+                <div class="brick-type" data-type="custom">
+                    <i class="fas fa-code"></i>
+                    <div>Custom</div>
+                </div>
+                <div class="brick-type" data-type="media">
+                    <i class="fas fa-play-circle"></i>
+                    <div>Media Player</div>
+                </div>
+                <div class="brick-type" data-type="random">
+                    <i class="fas fa-random"></i>
+                    <div>Random</div>
+                </div>
+                <div class="brick-type" data-type="clock">
+                    <i class="fas fa-clock"></i>
+                    <div>Clock</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard state
+        let isLocked = false;
+        let brickIdCounter = 0;
+        let bricks = [];
+
+        // DOM Elements
+        const topBar = document.getElementById('top-bar');
+        const mainArea = document.getElementById('main-area');
+        const addBrickBtn = document.getElementById('add-brick-btn');
+        const lockBtn = document.getElementById('lock-btn');
+        const brickModal = document.getElementById('brick-modal');
+        const closeModalBtn = document.querySelector('.close-modal');
+        const brickTypes = document.querySelectorAll('.brick-type');
+
+        // Initialize the dashboard
+        function initDashboard() {
+            // Load saved state from localStorage
+            const savedState = localStorage.getItem('leprDashState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                isLocked = state.isLocked || false;
+                bricks = state.bricks || [];
+                
+                // Update lock button icon
+                updateLockButton();
+                
+                // Recreate bricks
+                bricks.forEach(brickData => {
+                    createBrickElement(brickData);
+                });
+            } else {
+                // Create default bricks if no saved state
+                createDefaultBricks();
+            }
+            
+            // Update clock bricks every second
+            setInterval(updateClocks, 1000);
+        }
+
+        // Create default bricks for first-time users
+        function createDefaultBricks() {
+            addBrick('clock', { 
+                x: 50, 
+                y: 50, 
+                width: 300, 
+                height: 200 
+            });
+            
+            addBrick('webview', { 
+                x: 400, 
+                y: 50, 
+                width: 500, 
+                height: 400,
+                url: 'https://example.com'
+            });
+            
+            addBrick('md', { 
+                x: 50, 
+                y: 300, 
+                width: 300, 
+                height: 300,
+                content: '# Welcome to leprDash!\n\nThis is a **Markdown** brick. Click the edit button to change this text.'
+            });
+        }
+
+        // Update all clock bricks
+        function updateClocks() {
+            document.querySelectorAll('.clock-container').forEach(clock => {
+                const now = new Date();
+                const timeDisplay = clock.querySelector('.time-display');
+                const dateDisplay = clock.querySelector('.date-display');
+                
+                if (timeDisplay) {
+                    timeDisplay.textContent = now.toLocaleTimeString();
+                }
+                
+                if (dateDisplay) {
+                    dateDisplay.textContent = now.toLocaleDateString(undefined, { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                }
+            });
+        }
+
+        // Add a new brick
+        function addBrick(type, options = {}) {
+            const brickId = `brick-${brickIdCounter++}`;
+            const brickData = {
+                id: brickId,
+                type: type,
+                x: options.x || Math.random() * (mainArea.offsetWidth - 300),
+                y: options.y || Math.random() * (mainArea.offsetHeight - 200),
+                width: options.width || 300,
+                height: options.height || 200,
+                title: options.title || getDefaultTitle(type),
+                content: options.content || '',
+                url: options.url || ''
+            };
+            
+            bricks.push(brickData);
+            createBrickElement(brickData);
+            saveState();
+            return brickId;
+        }
+
+        // Create brick DOM element
+        function createBrickElement(brickData) {
+            const brick = document.createElement('div');
+            brick.id = brickData.id;
+            brick.className = 'brick';
+            brick.style.left = `${brickData.x}px`;
+            brick.style.top = `${brickData.y}px`;
+            brick.style.width = `${brickData.width}px`;
+            brick.style.height = `${brickData.height}px`;
+            
+            if (isLocked) {
+                brick.classList.add('locked');
+            }
+            
+            // Brick header
+            const brickHeader = document.createElement('div');
+            brickHeader.className = 'brick-header';
+            
+            const brickTitle = document.createElement('div');
+            brickTitle.className = 'brick-title';
+            brickTitle.textContent = brickData.title;
+            
+            const brickControls = document.createElement('div');
+            brickControls.className = 'brick-controls';
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'brick-control delete-btn';
+            deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteBrick(brickData.id);
+            });
+            
+            brickControls.appendChild(deleteBtn);
+            brickHeader.appendChild(brickTitle);
+            brickHeader.appendChild(brickControls);
+            
+            // Brick content
+            const brickContent = document.createElement('div');
+            brickContent.className = 'brick-content';
+            
+            // Add content based on brick type
+            switch (brickData.type) {
+                case 'webview':
+                    createWebviewContent(brickContent, brickData);
+                    break;
+                case 'md':
+                    createMDContent(brickContent, brickData);
+                    break;
+                case 'custom':
+                    createCustomContent(brickContent, brickData);
+                    break;
+                case 'media':
+                    createMediaContent(brickContent, brickData);
+                    break;
+                case 'random':
+                    createRandomContent(brickContent, brickData);
+                    break;
+                case 'clock':
+                    createClockContent(brickContent, brickData);
+                    break;
+            }
+            
+            // Resize handle
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'resize-handle';
+            
+            brick.appendChild(brickHeader);
+            brick.appendChild(brickContent);
+            brick.appendChild(resizeHandle);
+            
+            mainArea.appendChild(brick);
+            
+            // Add drag and resize functionality if not locked
+            if (!isLocked) {
+                makeDraggable(brick, brickHeader);
+                makeResizable(brick, resizeHandle);
+            }
+            
+            return brick;
+        }
+
+        // Create webview content
+        function createWebviewContent(container, brickData) {
+            container.className = 'brick-content webview-container';
+            
+            const urlInput = document.createElement('input');
+            urlInput.type = 'text';
+            urlInput.placeholder = 'Enter URL...';
+            urlInput.value = brickData.url || '';
+            urlInput.style.width = '100%';
+            urlInput.style.marginBottom = '10px';
+            urlInput.style.padding = '8px';
+            urlInput.style.borderRadius = '4px';
+            urlInput.style.border = `1px solid var(--accent-dark-yellow)`;
+            urlInput.style.backgroundColor = 'var(--bg-primary)';
+            urlInput.style.color = 'var(--text-primary)';
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = brickData.url || 'about:blank';
+            
+            urlInput.addEventListener('change', () => {
+                iframe.src = urlInput.value;
+                updateBrickData(brickData.id, { url: urlInput.value });
+            });
+            
+            container.appendChild(urlInput);
+            container.appendChild(iframe);
+        }
+
+        // Create markdown content
+        function createMDContent(container, brickData) {
+            container.className = 'brick-content md-container';
+            
+            const toolbar = document.createElement('div');
+            toolbar.className = 'md-toolbar';
+            
+            const editBtn = document.createElement('button');
+            editBtn.className = 'md-btn active';
+            editBtn.textContent = 'Edit';
+            
+            const previewBtn = document.createElement('button');
+            previewBtn.className = 'md-btn';
+            previewBtn.textContent = 'Preview';
+            
+            toolbar.appendChild(editBtn);
+            toolbar.appendChild(previewBtn);
+            
+            const editor = document.createElement('textarea');
+            editor.className = 'md-editor';
+            editor.value = brickData.content || '';
+            editor.placeholder = 'Enter your markdown here...';
+            
+            const preview = document.createElement('div');
+            preview.className = 'md-preview hidden';
+            
+            // Markdown to HTML conversion (simplified)
+            function renderMarkdown(text) {
+                return text
+                    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                    .replace(/\*(.*)\*/gim, '<em>$1</em>')
+                    .replace(/\n/gim, '<br>');
+            }
+            
+            editor.addEventListener('input', () => {
+                updateBrickData(brickData.id, { content: editor.value });
+                if (!preview.classList.contains('hidden')) {
+                    preview.innerHTML = renderMarkdown(editor.value);
+                }
+            });
+            
+            editBtn.addEventListener('click', () => {
+                editBtn.classList.add('active');
+                previewBtn.classList.remove('active');
+                editor.classList.remove('hidden');
+                preview.classList.add('hidden');
+            });
+            
+            previewBtn.addEventListener('click', () => {
+                previewBtn.classList.add('active');
+                editBtn.classList.remove('active');
+                preview.classList.remove('hidden');
+                editor.classList.add('hidden');
+                preview.innerHTML = renderMarkdown(editor.value);
+            });
+            
+            // If locked, disable editing
+            if (isLocked) {
+                editBtn.disabled = true;
+                previewBtn.disabled = true;
+                editor.disabled = true;
+                editBtn.classList.remove('active');
+                previewBtn.classList.add('active');
+                editor.classList.add('hidden');
+                preview.classList.remove('hidden');
+                preview.innerHTML = renderMarkdown(editor.value);
+            }
+            
+            container.appendChild(toolbar);
+            container.appendChild(editor);
+            container.appendChild(preview);
+        }
+
+        // Create custom content
+        function createCustomContent(container, brickData) {
+            container.className = 'brick-content custom-container';
+            
+            const info = document.createElement('p');
+            info.textContent = 'Custom HTML/CSS/JS brick - for developers';
+            info.style.marginBottom = '10px';
+            info.style.color = 'var(--text-secondary)';
+            
+            const iframe = document.createElement('iframe');
+            iframe.srcdoc = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { 
+                            margin: 0; 
+                            padding: 15px; 
+                            background: #1a1a1a; 
+                            color: #f5f5f5; 
+                            font-family: Arial, sans-serif; 
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h3>Custom Brick</h3>
+                    <p>Edit this content with your own HTML/CSS/JS</p>
+                </body>
+                </html>
+            `;
+            
+            container.appendChild(info);
+            container.appendChild(iframe);
+        }
+
+        // Create media player content
+        function createMediaContent(container, brickData) {
+            container.className = 'brick-content media-container';
+            
+            const player = document.createElement('div');
+            player.className = 'media-player';
+            player.innerHTML = '<p>Select a media file to play</p>';
+            
+            const controls = document.createElement('div');
+            controls.className = 'media-controls';
+            
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'audio/*,video/*';
+            fileInput.style.display = 'none';
+            
+            const selectBtn = document.createElement('button');
+            selectBtn.className = 'media-btn';
+            selectBtn.innerHTML = '<i class="fas fa-folder-open"></i>';
+            selectBtn.addEventListener('click', () => fileInput.click());
+            
+            const playBtn = document.createElement('button');
+            playBtn.className = 'media-btn';
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.disabled = true;
+            
+            const mediaElement = document.createElement('div');
+            let currentMedia = null;
+            
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Remove previous media
+                if (currentMedia) {
+                    currentMedia.remove();
+                }
+                
+                const url = URL.createObjectURL(file);
+                
+                if (file.type.startsWith('audio/')) {
+                    currentMedia = document.createElement('audio');
+                    currentMedia.controls = true;
+                    currentMedia.src = url;
+                    player.innerHTML = '';
+                    player.appendChild(currentMedia);
+                } else if (file.type.startsWith('video/')) {
+                    currentMedia = document.createElement('video');
+                    currentMedia.controls = true;
+                    currentMedia.src = url;
+                    currentMedia.style.maxWidth = '100%';
+                    player.innerHTML = '';
+                    player.appendChild(currentMedia);
+                }
+                
+                playBtn.disabled = false;
+            });
+            
+            playBtn.addEventListener('click', () => {
+                if (currentMedia) {
+                    if (currentMedia.paused) {
+                        currentMedia.play();
+                        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    } else {
+                        currentMedia.pause();
+                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                }
+            });
+            
+            controls.appendChild(selectBtn);
+            controls.appendChild(playBtn);
+            
+            container.appendChild(player);
+            container.appendChild(controls);
+            container.appendChild(fileInput);
+        }
+
+        // Create random content
+        function createRandomContent(container, brickData) {
+            container.className = 'brick-content random-container';
+            
+            const button = document.createElement('button');
+            button.className = 'random-btn';
+            button.textContent = 'Generate Random';
+            
+            const result = document.createElement('div');
+            result.className = 'random-result';
+            result.textContent = 'Click the button to generate a random value';
+            
+            const options = [
+                'Heads', 'Tails', 
+                'Yes', 'No', 'Maybe',
+                'Red', 'Blue', 'Green', 'Yellow',
+                'Option A', 'Option B', 'Option C'
+            ];
+            
+            button.addEventListener('click', () => {
+                const randomIndex = Math.floor(Math.random() * options.length);
+                result.textContent = options[randomIndex];
+            });
+            
+            container.appendChild(button);
+            container.appendChild(result);
+        }
+
+        // Create clock content
+        function createClockContent(container, brickData) {
+            container.className = 'brick-content clock-container';
+            
+            const timeDisplay = document.createElement('div');
+            timeDisplay.className = 'time-display';
+            
+            const dateDisplay = document.createElement('div');
+            dateDisplay.className = 'date-display';
+            
+            container.appendChild(timeDisplay);
+            container.appendChild(dateDisplay);
+            
+            // Initial update
+            updateClock(timeDisplay, dateDisplay);
+        }
+
+        // Update a single clock display
+        function updateClock(timeDisplay, dateDisplay) {
+            const now = new Date();
+            timeDisplay.textContent = now.toLocaleTimeString();
+            dateDisplay.textContent = now.toLocaleDateString(undefined, { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Get default title for brick type
+        function getDefaultTitle(type) {
+            const titles = {
+                webview: 'Web View',
+                md: 'Markdown Editor',
+                custom: 'Custom HTML',
+                media: 'Media Player',
+                random: 'Random Generator',
+                clock: 'Clock'
+            };
+            return titles[type] || 'New Brick';
+        }
+
+        // Make brick draggable
+        function makeDraggable(element, handle) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            handle.onmousedown = dragMouseDown;
+            
+            function dragMouseDown(e) {
+                if (isLocked) return;
+                
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+            
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                let newTop = element.offsetTop - pos2;
+                let newLeft = element.offsetLeft - pos1;
+                
+                // Constrain to main area
+                newTop = Math.max(0, Math.min(newTop, mainArea.offsetHeight - element.offsetHeight));
+                newLeft = Math.max(0, Math.min(newLeft, mainArea.offsetWidth - element.offsetWidth));
+                
+                element.style.top = newTop + "px";
+                element.style.left = newLeft + "px";
+            }
+            
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                
+                // Update brick data
+                updateBrickData(element.id, {
+                    x: parseInt(element.style.left),
+                    y: parseInt(element.style.top)
+                });
+            }
+        }
+
+        // Make brick resizable
+        function makeResizable(element, handle) {
+            let startX, startY, startWidth, startHeight;
+            
+            handle.onmousedown = initResize;
+            
+            function initResize(e) {
+                if (isLocked) return;
+                
+                e.preventDefault();
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
+                document.onmousemove = resize;
+                document.onmouseup = stopResize;
+            }
+            
+            function resize(e) {
+                e.preventDefault();
+                const width = startWidth + (e.clientX - startX);
+                const height = startHeight + (e.clientY - startY);
+                
+                // Minimum size constraints
+                if (width > 150 && height > 100) {
+                    element.style.width = width + 'px';
+                    element.style.height = height + 'px';
+                }
+            }
+            
+            function stopResize() {
+                document.onmousemove = null;
+                document.onmouseup = null;
+                
+                // Update brick data
+                updateBrickData(element.id, {
+                    width: parseInt(element.style.width),
+                    height: parseInt(element.style.height)
+                });
+            }
+        }
+
+        // Delete a brick
+        function deleteBrick(id) {
+            if (isLocked) return;
+            
+            const brickElement = document.getElementById(id);
+            if (brickElement) {
+                brickElement.remove();
+            }
+            
+            bricks = bricks.filter(brick => brick.id !== id);
+            saveState();
+        }
+
+        // Update brick data
+        function updateBrickData(id, updates) {
+            const brickIndex = bricks.findIndex(brick => brick.id === id);
+            if (brickIndex !== -1) {
+                bricks[brickIndex] = { ...bricks[brickIndex], ...updates };
+                saveState();
+            }
+        }
+
+        // Update lock button icon
+        function updateLockButton() {
+            const icon = lockBtn.querySelector('i');
+            if (isLocked) {
+                icon.className = 'fas fa-lock';
+                document.querySelectorAll('.brick').forEach(brick => {
+                    brick.classList.add('locked');
+                });
+            } else {
+                icon.className = 'fas fa-lock-open';
+                document.querySelectorAll('.brick').forEach(brick => {
+                    brick.classList.remove('locked');
+                });
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            const state = {
+                isLocked: isLocked,
+                bricks: bricks
+            };
+            localStorage.setItem('leprDashState', JSON.stringify(state));
+        }
+
+        // Event Listeners
+        addBrickBtn.addEventListener('click', () => {
+            brickModal.classList.remove('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            brickModal.classList.add('hidden');
+        });
+
+        brickModal.addEventListener('click', (e) => {
+            if (e.target === brickModal) {
+                brickModal.classList.add('hidden');
+            }
+        });
+
+        brickTypes.forEach(type => {
+            type.addEventListener('click', () => {
+                const brickType = type.getAttribute('data-type');
+                addBrick(brickType);
+                brickModal.classList.add('hidden');
+            });
+        });
+
+        lockBtn.addEventListener('click', () => {
+            isLocked = !isLocked;
+            updateLockButton();
+            saveState();
+        });
+
+        // Initialize the dashboard
+        initDashboard();
+    </script>
+</body>
+</html>
