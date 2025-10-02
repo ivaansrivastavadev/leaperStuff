@@ -7,113 +7,378 @@
   <link rel="icon" type="image/x-icon" href="roundedlogo.gif">
   <style>
     :root {
-      --bg: #0b0b12;
+      --bg: #1a1a1a;
+      --bg-secondary: #2a2a2a;
       --text: #f5f5f5;
-      --accent: #2de2a6;
+      --accent: #e6b422;
+      --accent-light: #f5c542;
+      --accent-dark: #b8940f;
       --panel: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.1);
     }
+    
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg);
       color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2rem;
+      min-height: 100vh;
     }
+    
     header {
       text-align: center;
       margin-bottom: 2rem;
+      width: 100%;
     }
+    
     header h1 {
-      font-size: 2rem;
+      font-size: 2.5rem;
       color: var(--accent);
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
     }
+    
+    .tagline {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+    
     .spreadsheet {
-      background: var(--panel);
+      background: var(--bg-secondary);
       padding: 1.5rem;
-      border-radius: 16px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       margin-bottom: 2rem;
+      width: 90%;
+      max-width: 1000px;
+      border: 1px solid var(--border);
     }
+    
+    .spreadsheet-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    
+    .spreadsheet-controls button, 
+    .spreadsheet-controls select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .spreadsheet-controls button:hover {
+      background: var(--accent);
+      color: #000;
+    }
+    
+    .presets-select {
+      flex-grow: 1;
+      max-width: 200px;
+    }
+    
     .spreadsheet table {
       border-collapse: collapse;
-      background: #fff;
-      color: #000;
+      background: var(--bg);
+      color: var(--text);
       border-radius: 8px;
       overflow: hidden;
+      width: 100%;
+      margin-bottom: 15px;
     }
-    .spreadsheet th, .spreadsheet td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      min-width: 80px;
+    
+    .spreadsheet th {
+      background: var(--accent-dark);
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
       text-align: center;
     }
+    
+    .spreadsheet td {
+      border: 1px solid var(--border);
+      padding: 0;
+    }
+    
     .spreadsheet input {
       width: 100%;
       border: none;
       text-align: center;
+      background: transparent;
+      color: var(--text);
+      padding: 8px;
+      box-sizing: border-box;
     }
+    
+    .spreadsheet input:focus {
+      outline: 2px solid var(--accent);
+      background: rgba(230, 180, 34, 0.1);
+    }
+    
     button, select {
       margin: 0.5rem 0.2rem;
-      padding: 0.4rem 0.8rem;
+      padding: 0.5rem 1rem;
       border-radius: 8px;
       border: none;
       background: var(--accent);
       color: #000;
       font-weight: bold;
       cursor: pointer;
+      transition: all 0.2s;
     }
+    
+    button:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .chart-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .chart-controls select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .size-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .custom-size-inputs {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .custom-size-inputs input {
+      width: 80px;
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+    }
+    
     #chartWrapper {
-  width: 90%;
-  height: 90vh; /* 90% of viewport height */
-  max-height: 90%;
+      width: 90%;
+      height: 90vh;
+      max-height: 90%;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 20px;
+      box-sizing: border-box;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      margin-bottom: 2rem;
     }
+    
     #chartCanvas {
       width: 100% !important;
       height: 100% !important;
       background-color: white;
-      padding: 1rem;
-      border-radius: 24px;
+      border-radius: 8px;
     }
+    
+    .screenshot-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .screenshot-options {
+      background: var(--bg-secondary);
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid var(--border);
+    }
+    
+    .screenshot-options h3 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+    
+    .option-group {
+      margin-bottom: 1rem;
+    }
+    
+    .option-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    .option-group input[type="number"] {
+      width: 80px;
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+    
     footer {
       margin-top: 2rem;
       font-size: 0.8rem;
       opacity: 0.7;
+      text-align: center;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .spreadsheet {
+        width: 95%;
+        padding: 1rem;
+      }
+      
+      .spreadsheet-controls, .chart-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .size-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 <body>
   <header>
     <h1>leprVisuals</h1>
-    <p>by <strong>leaperStuff</strong></p>
+    <p class="tagline">by <strong>leaperStuff</strong></p>
     <p>Create or upload data → Turn into stunning charts ✨</p>
   </header>
 
   <div class="spreadsheet">
     <h3>Spreadsheet Maker</h3>
-    <table id="sheet">
-      <tr><th>Label</th><th>Value</th></tr>
-      <tr><td><input value="First"></td><td><input value="1"></td></tr>
-      <tr><td><input value="Second"></td><td><input value="2"></td></tr>
-    </table>
-    <div>
+    
+    <div class="spreadsheet-controls">
       <button onclick="addRow()">+ Add Row</button>
-      <label for="chartType">Chart:</label>
-      <select id="chartType">
-        <option value="pie">Pie</option>
-        <option value="bar">Bar</option>
-        <option value="line">Line</option>
+      <button onclick="removeRow()">- Remove Row</button>
+      
+      <select id="presets" class="presets-select" onchange="loadPreset()">
+        <option value="">Select a preset...</option>
+        <option value="sales">Sales Data</option>
+        <option value="expenses">Monthly Expenses</option>
+        <option value="population">Population by Country</option>
+        <option value="website">Website Traffic</option>
+        <option value="product">Product Ratings</option>
       </select>
-      <button onclick="generateChartFromSheet()">Generate</button><br>
-      <button onclick="takeScreenshot()">Take Screenshot</button>
+      
+      <button onclick="downloadSpreadsheet()">Download as XLSX</button>
+      <button onclick="document.getElementById('fileInput').click()">Upload XLSX</button>
+      <input type="file" id="fileInput" accept=".xlsx" style="display: none" onchange="handleFileUpload(this.files)">
+    </div>
+    
+    <table id="sheet">
+      <tr>
+        <th>Label</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <td><input value="First"></td>
+        <td><input value="1"></td>
+      </tr>
+      <tr>
+        <td><input value="Second"></td>
+        <td><input value="2"></td>
+      </tr>
+    </table>
+    
+    <div class="chart-controls">
+      <label for="chartType">Chart Type:</label>
+      <select id="chartType">
+        <option value="pie">Pie Chart</option>
+        <option value="doughnut">Doughnut Chart</option>
+        <option value="bar">Bar Chart</option>
+        <option value="line">Line Chart</option>
+        <option value="radar">Radar Chart</option>
+        <option value="polarArea">Polar Area Chart</option>
+        <option value="scatter">Scatter Plot</option>
+        <option value="bubble">Bubble Chart</option>
+      </select>
+      
+      <label for="chartSize">Chart Size:</label>
+      <select id="chartSize" onchange="toggleCustomSize()">
+        <option value="window">Window Size</option>
+        <option value="square">Square (1:1)</option>
+        <option value="custom">Custom</option>
+      </select>
+      
+      <div class="custom-size-inputs" id="customSizeInputs" style="display: none;">
+        <input type="number" id="customWidth" placeholder="Width" value="800">
+        <input type="number" id="customHeight" placeholder="Height" value="600">
+      </div>
+      
+      <button onclick="generateChartFromSheet()">Generate Chart</button>
+      <button onclick="showScreenshotOptions()">Take Screenshot</button>
       <button onclick="window.location.href='index.html'">Lepr Home/Back</button>
-
     </div>
   </div>
+  
   <div id="chartWrapper">
     <canvas id="chartCanvas"></canvas>
+  </div>
+
+  <div class="screenshot-modal" id="screenshotModal">
+    <div class="screenshot-options">
+      <h3>Screenshot Options</h3>
+      <div class="option-group">
+        <label>
+          <input type="radio" name="bgType" value="white" checked> White Background
+        </label>
+        <label>
+          <input type="radio" name="bgType" value="transparent"> Transparent Background
+        </label>
+      </div>
+      <div class="option-group">
+        <label for="marginSize">Margin (px):</label>
+        <input type="number" id="marginSize" value="20" min="0" max="100">
+      </div>
+      <div class="modal-buttons">
+        <button onclick="takeScreenshot()">Download</button>
+        <button onclick="document.getElementById('screenshotModal').style.display = 'none'">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <footer>© 2025 leaperStuff</footer>
@@ -123,6 +388,61 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let chart;
+    const presetData = {
+      sales: {
+        headers: ["Month", "Sales"],
+        data: [
+          ["January", 12000],
+          ["February", 15000],
+          ["March", 18000],
+          ["April", 14000],
+          ["May", 21000],
+          ["June", 19000]
+        ]
+      },
+      expenses: {
+        headers: ["Category", "Amount"],
+        data: [
+          ["Housing", 1200],
+          ["Food", 500],
+          ["Transportation", 300],
+          ["Entertainment", 200],
+          ["Utilities", 150],
+          ["Healthcare", 100]
+        ]
+      },
+      population: {
+        headers: ["Country", "Population (millions)"],
+        data: [
+          ["China", 1412],
+          ["India", 1380],
+          ["USA", 331],
+          ["Indonesia", 273],
+          ["Pakistan", 225],
+          ["Brazil", 213]
+        ]
+      },
+      website: {
+        headers: ["Page", "Visits"],
+        data: [
+          ["Home", 15000],
+          ["About", 8000],
+          ["Products", 12000],
+          ["Contact", 3000],
+          ["Blog", 6000]
+        ]
+      },
+      product: {
+        headers: ["Product", "Rating"],
+        data: [
+          ["Product A", 4.5],
+          ["Product B", 3.8],
+          ["Product C", 4.2],
+          ["Product D", 4.7],
+          ["Product E", 3.9]
+        ]
+      }
+    };
 
     function addRow() {
       const table = document.getElementById("sheet");
@@ -134,9 +454,168 @@
       }
     }
 
+    function removeRow() {
+      const table = document.getElementById("sheet");
+      if (table.rows.length > 2) {
+        table.deleteRow(table.rows.length - 1);
+      } else {
+        alert("Need at least one data row.");
+      }
+    }
+
+    function addColumn() {
+      const table = document.getElementById("sheet");
+      for (let i = 0; i < table.rows.length; i++) {
+        const cell = table.rows[i].insertCell();
+        if (i === 0) {
+          cell.outerHTML = '<th>New Column</th>';
+        } else {
+          cell.innerHTML = '<input>';
+        }
+      }
+    }
+
+    function removeColumn() {
+      const table = document.getElementById("sheet");
+      if (table.rows[0].cells.length > 2) {
+        for (let i = 0; i < table.rows.length; i++) {
+          table.rows[i].deleteCell(table.rows[i].cells.length - 1);
+        }
+      } else {
+        alert("Need at least two columns.");
+      }
+    }
+
+    function loadPreset() {
+      const preset = document.getElementById("presets").value;
+      if (!preset) return;
+      
+      const data = presetData[preset];
+      const table = document.getElementById("sheet");
+      
+      // Clear existing rows
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+      
+      // Update headers
+      for (let i = 0; i < data.headers.length; i++) {
+        if (i < table.rows[0].cells.length) {
+          table.rows[0].cells[i].innerText = data.headers[i];
+        } else {
+          const cell = table.rows[0].insertCell();
+          cell.outerHTML = `<th>${data.headers[i]}</th>`;
+        }
+      }
+      
+      // Add data rows
+      data.data.forEach(rowData => {
+        const row = table.insertRow();
+        rowData.forEach(cellData => {
+          const cell = row.insertCell();
+          cell.innerHTML = `<input value="${cellData}">`;
+        });
+      });
+      
+      // Remove extra columns if needed
+      while (table.rows[0].cells.length > data.headers.length) {
+        for (let i = 0; i < table.rows.length; i++) {
+          table.rows[i].deleteCell(table.rows[i].cells.length - 1);
+        }
+      }
+    }
+
+    function downloadSpreadsheet() {
+      const table = document.getElementById("sheet");
+      const data = [];
+      
+      // Get headers
+      const headers = [];
+      for (let i = 0; i < table.rows[0].cells.length; i++) {
+        headers.push(table.rows[0].cells[i].innerText);
+      }
+      data.push(headers);
+      
+      // Get data rows
+      for (let r = 1; r < table.rows.length; r++) {
+        const rowData = [];
+        for (let c = 0; c < table.rows[r].cells.length; c++) {
+          const inp = table.rows[r].cells[c].querySelector("input");
+          rowData.push(inp ? inp.value : table.rows[r].cells[c].innerText);
+        }
+        data.push(rowData);
+      }
+      
+      // Create worksheet and workbook
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+      
+      // Download the file
+      XLSX.writeFile(wb, "leprVisuals_Data.xlsx");
+    }
+
+    function handleFileUpload(files) {
+      if (!files.length) return;
+      
+      const file = files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        
+        // Get first worksheet
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        
+        // Convert to JSON (limit to first 365 rows)
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+        
+        // Update the table
+        const table = document.getElementById("sheet");
+        
+        // Clear existing rows
+        while (table.rows.length > 0) {
+          table.deleteRow(0);
+        }
+        
+        // Add new rows (limit to 365)
+        const maxRows = Math.min(jsonData.length, 366); // 1 header + 365 data rows
+        
+        for (let r = 0; r < maxRows; r++) {
+          const row = table.insertRow();
+          // Only use first two columns
+          const maxCols = Math.min(jsonData[r].length, 2);
+          
+          for (let c = 0; c < maxCols; c++) {
+            const cell = row.insertCell();
+            if (r === 0) {
+              cell.outerHTML = `<th>${jsonData[r][c] || `Column ${c+1}`}</th>`;
+            } else {
+              cell.innerHTML = `<input value="${jsonData[r][c] || ''}">`;
+            }
+          }
+        }
+      };
+      
+      reader.readAsArrayBuffer(file);
+    }
+
+    function toggleCustomSize() {
+      const sizeType = document.getElementById("chartSize").value;
+      const customInputs = document.getElementById("customSizeInputs");
+      
+      if (sizeType === "custom") {
+        customInputs.style.display = "flex";
+      } else {
+        customInputs.style.display = "none";
+      }
+    }
+
     function generateChartFromSheet() {
       const table = document.getElementById("sheet");
       const rows = [];
+      
       for (let r = 0; r < table.rows.length; r++) {
         const cells = [];
         for (let c = 0; c < table.rows[r].cells.length; c++) {
@@ -156,47 +635,165 @@
 
       const ctx = document.getElementById("chartCanvas").getContext("2d");
       const chartType = document.getElementById("chartType").value;
+      
+      // Handle chart size
+      const sizeType = document.getElementById("chartSize").value;
+      const chartWrapper = document.getElementById("chartWrapper");
+      
+      if (sizeType === "window") {
+        chartWrapper.style.width = "90%";
+        chartWrapper.style.height = "90vh";
+        chartWrapper.style.maxHeight = "90%";
+      } else if (sizeType === "square") {
+        const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9);
+        chartWrapper.style.width = `${size}px`;
+        chartWrapper.style.height = `${size}px`;
+        chartWrapper.style.maxHeight = "none";
+      } else if (sizeType === "custom") {
+        const width = document.getElementById("customWidth").value || 800;
+        const height = document.getElementById("customHeight").value || 600;
+        chartWrapper.style.width = `${width}px`;
+        chartWrapper.style.height = `${height}px`;
+        chartWrapper.style.maxHeight = "none";
+      }
 
       if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: chartType,
-        data: {
+      
+      // Prepare chart data based on type
+      let chartData;
+      if (chartType === "bubble") {
+        // For bubble charts, we need x, y, and r values
+        chartData = {
+          datasets: [{
+            label: rows[0][1] || "Values",
+            data: values.map((v, i) => ({
+              x: i,
+              y: v,
+              r: Math.min(Math.max(v / Math.max(...values) * 20, 5), 30)
+            })),
+            backgroundColor: "#e6b422",
+            borderColor: "#000",
+            borderWidth: 1
+          }]
+        };
+      } else if (chartType === "scatter") {
+        // For scatter plots, we need x and y values
+        chartData = {
+          datasets: [{
+            label: rows[0][1] || "Values",
+            data: values.map((v, i) => ({
+              x: i,
+              y: v
+            })),
+            backgroundColor: "#e6b422",
+            borderColor: "#000",
+            borderWidth: 1
+          }]
+        };
+      } else {
+        // For other chart types
+        chartData = {
           labels,
           datasets: [{
             label: rows[0][1] || "Values",
             data: values,
             backgroundColor: [
-              "#2de2a6", "#ff3864", "#f5f5f5", "#ffd600", "#00bcd4", "#8e44ad"
+              "#e6b422", "#2de2a6", "#ff3864", "#f5f5f5", "#ffd600", "#00bcd4", "#8e44ad"
             ],
             borderColor: "#0b0b12",
             borderWidth: 1
           }]
-        },
+        };
+      }
+
+      chart = new Chart(ctx, {
+        type: chartType,
+        data: chartData,
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: "bottom", labels: { color: "#0b0b12" } }
+            legend: { 
+              position: "bottom", 
+              labels: { 
+                color: "#0b0b12",
+                font: {
+                  size: 14
+                }
+              } 
+            },
+            title: {
+              display: true,
+              text: 'leprVisuals Chart',
+              color: "#0b0b12",
+              font: {
+                size: 18
+              }
+            }
           },
-          scales: chartType !== "pie" ? {
-            x: { ticks: { color: "#0b0b12" } },
-            y: { ticks: { color: "#0b0b12" } }
+          scales: (chartType !== "pie" && chartType !== "doughnut" && chartType !== "polarArea") ? {
+            x: { 
+              ticks: { color: "#0b0b12" },
+              grid: {
+                color: "rgba(0,0,0,0.1)"
+              }
+            },
+            y: { 
+              ticks: { color: "#0b0b12" },
+              grid: {
+                color: "rgba(0,0,0,0.1)"
+              }
+            }
           } : {}
         }
       });
+      
+      // Scroll to chart
+      document.getElementById("chartWrapper").scrollIntoView({ 
+        behavior: 'smooth' 
+      });
     }
-    function takeScreenshot() {
-  if (!chart) {
-    alert("Generate a chart first!");
-    return;
-  }
-  const canvas = document.getElementById("chartCanvas");
-  const link = document.createElement("a");
-  link.href = canvas.toDataURL("image/png");
-  link.download = "chart.png";
-  link.click();
-}
 
+    function showScreenshotOptions() {
+      if (!chart) {
+        alert("Generate a chart first!");
+        return;
+      }
+      document.getElementById("screenshotModal").style.display = "flex";
+    }
+
+    function takeScreenshot() {
+      const canvas = document.getElementById("chartCanvas");
+      const bgType = document.querySelector('input[name="bgType"]:checked').value;
+      const margin = parseInt(document.getElementById("marginSize").value) || 0;
+      
+      // Create a temporary canvas with margin
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      
+      tempCanvas.width = canvas.width + margin * 2;
+      tempCanvas.height = canvas.height + margin * 2;
+      
+      // Fill background
+      if (bgType === 'white') {
+        tempCtx.fillStyle = '#ffffff';
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      } else {
+        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+      }
+      
+      // Draw the chart with margin
+      tempCtx.drawImage(canvas, margin, margin);
+      
+      // Download the image
+      const link = document.createElement("a");
+      link.href = tempCanvas.toDataURL("image/png");
+      link.download = `leprVisuals_chart_${new Date().getTime()}.png`;
+      link.click();
+      
+      // Close the modal
+      document.getElementById("screenshotModal").style.display = "none";
+    }
   </script>
 </body>
 </html>
