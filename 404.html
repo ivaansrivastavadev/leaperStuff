@@ -5,98 +5,494 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/gif" href="roundedlogo.gif">
   <title>leaperStuff - 404</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --bg: #0b0b12;
+      --text: #f5f5f5;
+      --accent: #ffd600;
+      --glass: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: rgba(0, 0, 0, 0.1);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 30px;
+    }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: #1e1e1e;
-      color: #eee;
-      margin: 0;
-      padding: 0;
-      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0b0b12 0%, #151522 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-x: hidden;
     }
+    
+    /* Liquid glass effect background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 214, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 214, 0, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    
     header {
-      padding: 1rem;
-      font-size: 2rem;
-      font-weight: bold;
-      color: #f1c40f;
-      transition: transform 0.2s ease;
+      text-align: center;
+      margin-bottom: 2rem;
     }
-    header:hover { transform: scale(1.05); background: #1e1e1b; }
-
-    .message {
-      margin-top: 3rem;
-      font-size: 1.5rem;
-      color: #ddd;
+    
+    header h1 {
+      font-size: 2.5rem;
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(255, 214, 0, 0.3);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
     }
+    
+    .error-container {
+      background: var(--glass);
+      border-radius: var(--radius-md);
+      padding: 3rem 2rem;
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px var(--glass-shadow);
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    
+    .error-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255, 214, 0, 0.05) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    
+    .error-container:hover::before {
+      opacity: 1;
+    }
+    
     .error-code {
-      font-size: 5rem;
+      font-size: 8rem;
       font-weight: bold;
-      color: #f1c40f;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(255, 214, 0, 0.5);
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+    
+    .message {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .hint {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .home-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 2rem;
+      border-radius: var(--radius-sm);
+      background: var(--accent);
+      color: #0b0b12;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 214, 0, 0.3);
+      position: relative;
+      overflow: hidden;
       margin-top: 1rem;
     }
-
-    .search-container { text-align: center; margin: 2rem 0; }
-    input[type="text"] {
-      padding: 0.7rem;
-      width: 80%;
-      max-width: 400px;
-      border: none;
-      border-radius: 5px;
-      background: #2a2a2a;
-      color: #eee;
-      font-size: 1rem;
+    
+    .home-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
     }
-
-    .hint {
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #777;
+    
+    .home-button:hover::before {
+      left: 100%;
     }
-
+    
+    .home-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 214, 0, 0.5);
+    }
+    
     /* Easter egg popup */
     #secret {
       display: none;
       margin-top: 2rem;
       font-size: 1.2rem;
-      color: #4caf50;
+      color: var(--accent);
       animation: fadeIn 1s ease-in-out;
+      padding: 1.5rem;
+      background: var(--glass);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px var(--glass-shadow);
+      max-width: 500px;
+      width: 90%;
     }
-
+    
+    #secret.show {
+      display: block;
+    }
+    
+    .game-container {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .game-title {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    
+    .game-instructions {
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 0 auto;
+      max-width: 300px;
+    }
+    
+    .game-cell {
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .game-cell:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
+    
+    .game-cell.active {
+      background: var(--accent);
+      color: #0b0b12;
+    }
+    
+    .game-controls {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    .game-button {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      background: var(--glass);
+      color: var(--text);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .game-button:hover {
+      background: var(--accent);
+      color: #0b0b12;
+    }
+    
+    .game-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.8); }
       to { opacity: 1; transform: scale(1); }
     }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .error-code {
+        font-size: 6rem;
+      }
+      
+      .message {
+        font-size: 1.2rem;
+      }
+      
+      .game-board {
+        max-width: 250px;
+      }
+    }
   </style>
 </head>
 <body>
-  <header>leaperStuff 1.0</header>
+  <header>
+    <h1>leaperStuff</h1>
+  </header>
 
-  <div class="message">Oops! The page you’re looking for doesn’t exist.</div>
-  <div class="error-code">404</div>
-
-  <div class="search-container">
-    <input type="text" placeholder="Type Type Type...">
+  <div class="error-container">
+    <div class="error-code">404</div>
+    <div class="message">Oops! The page you're looking for doesn't exist.</div>
+    <div class="hint">
+      <i class="fas fa-lightbulb"></i> Tip: Try exploring the homepage or... maybe a secret code? Press down arrow 🎮
+    </div>
+    <a href="index.html" class="home-button">
+      <i class="fas fa-home"></i>
+      <span>Back to Home</span>
+    </a>
   </div>
 
-  <div class="hint">Tip: Try exploring the homepage or... maybe a secret code? Press ↑↑ 🎮</div>
-
-  <div id="secret">✨ You found the easter egg!✨</div>
-
-<script>
-  // Easter Egg: Konami Code
-  const secretEl = document.getElementById("secret");
-  const konami = [38,38]; // ↑↑
-  let entered = [];
-
-  window.addEventListener("keydown", e => {
-    entered.push(e.keyCode);
-    if (entered.toString().indexOf(konami.toString()) >= 0) {
-      secretEl.style.display = "block";
+  <div id="secret">
+    <div class="game-title">✨ You found the easter egg! ✨</div>
+    <p>Let's play a memory game! Match the pairs of icons.</p>
+    
+    <div class="game-container">
+      <div class="game-instructions">Click on cards to reveal icons. Match all pairs to win!</div>
       
-    }
-    if (entered.length > 10) entered.shift(); // keep buffer size
-  });
-</script>
+      <div class="game-board" id="gameBoard">
+        <!-- Game cells will be generated by JavaScript -->
+      </div>
+      
+      <div class="game-stats">
+        <div>Moves: <span id="movesCount">0</span></div>
+        <div>Pairs Found: <span id="pairsCount">0</span>/<span id="totalPairs">0</span></div>
+      </div>
+      
+      <div class="game-controls">
+        <button class="game-button" id="restartGame">Restart Game</button>
+        <button class="game-button" id="closeGame">Close</button>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    // Easter Egg: Konami Code
+    const secretEl = document.getElementById("secret");
+    const konami = [40]
+    let entered = [];
+
+    window.addEventListener("keydown", e => {
+      entered.push(e.keyCode);
+      if (entered.toString().indexOf(konami.toString()) >= 0) {
+        secretEl.classList.add('show');
+        initGame();
+      }
+      if (entered.length > 10) entered.shift(); // keep buffer size
+    });
+
+    // Memory Game Logic
+    let gameState = {
+      cards: [],
+      flippedCards: [],
+      matchedPairs: 0,
+      totalPairs: 0,
+      moves: 0,
+      canFlip: true
+    };
+
+    const icons = ['star', 'heart', 'bolt', 'gem', 'flag', 'key', 'bell', 'crown'];
+    
+    function initGame() {
+      const gameBoard = document.getElementById('gameBoard');
+      gameBoard.innerHTML = '';
+      
+      // Duplicate and shuffle icons
+      gameState.cards = [...icons, ...icons];
+      shuffleArray(gameState.cards);
+      
+      gameState.totalPairs = icons.length;
+      gameState.matchedPairs = 0;
+      gameState.moves = 0;
+      gameState.flippedCards = [];
+      gameState.canFlip = true;
+      
+      updateGameStats();
+      
+      // Create game cells
+      gameState.cards.forEach((icon, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'game-cell';
+        cell.dataset.index = index;
+        cell.dataset.icon = icon;
+        cell.innerHTML = '<i class="fas fa-question"></i>';
+        
+        cell.addEventListener('click', () => flipCard(index));
+        gameBoard.appendChild(cell);
+      });
+    }
+    
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+    
+    function flipCard(index) {
+      if (!gameState.canFlip || gameState.flippedCards.includes(index)) return;
+      
+      const cell = document.querySelector(`.game-cell[data-index="${index}"]`);
+      const icon = cell.dataset.icon;
+      
+      // Flip the card
+      cell.innerHTML = `<i class="fas fa-${icon}"></i>`;
+      cell.classList.add('active');
+      
+      gameState.flippedCards.push(index);
+      
+      if (gameState.flippedCards.length === 2) {
+        gameState.moves++;
+        updateGameStats();
+        
+        gameState.canFlip = false;
+        
+        // Check for match
+        const firstIndex = gameState.flippedCards[0];
+        const secondIndex = gameState.flippedCards[1];
+        
+        const firstCard = document.querySelector(`.game-cell[data-index="${firstIndex}"]`);
+        const secondCard = document.querySelector(`.game-cell[data-index="${secondIndex}"]`);
+        
+        if (firstCard.dataset.icon === secondCard.dataset.icon) {
+          // Match found
+          gameState.matchedPairs++;
+          updateGameStats();
+          
+          // Check for win
+          if (gameState.matchedPairs === gameState.totalPairs) {
+            setTimeout(() => {
+              alert('🎉 Congratulations! You won the game! 🎉');
+            }, 500);
+          }
+          
+          gameState.flippedCards = [];
+          gameState.canFlip = true;
+        } else {
+          // No match, flip back after a delay
+          setTimeout(() => {
+            firstCard.innerHTML = '<i class="fas fa-question"></i>';
+            secondCard.innerHTML = '<i class="fas fa-question"></i>';
+            firstCard.classList.remove('active');
+            secondCard.classList.remove('active');
+            
+            gameState.flippedCards = [];
+            gameState.canFlip = true;
+          }, 1000);
+        }
+      }
+    }
+    
+    function updateGameStats() {
+      document.getElementById('movesCount').textContent = gameState.moves;
+      document.getElementById('pairsCount').textContent = gameState.matchedPairs;
+      document.getElementById('totalPairs').textContent = gameState.totalPairs;
+    }
+    
+    // Event listeners for game controls
+    document.getElementById('restartGame').addEventListener('click', initGame);
+    document.getElementById('closeGame').addEventListener('click', () => {
+      secretEl.classList.remove('show');
+    });
+    
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      // Add subtle animation to the error code
+      const errorCode = document.querySelector('.error-code');
+      errorCode.classList.add('pulse');
+    });
+    
+// Scroll to secret div when down arrow is pressed
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.keyCode === 40) {
+        e.preventDefault(); // Prevent default arrow key behavior
+        
+        const secretDiv = document.getElementById('secret');
+        if (secretDiv) {
+            // Scroll to the secret div
+            secretDiv.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center' // or 'start', 'end', 'nearest'
+            });
+        }
+    }
+});
+  </script>
 </body>
 </html>
