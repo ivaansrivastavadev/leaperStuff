@@ -84,7 +84,7 @@
       z-index: 101;
       padding: 8px;
       border-radius: var(--radius-sm);
-      transition: background 0.3s;
+      transition: all 0.3s ease;
     }
     
     .hamburger:hover {
@@ -97,6 +97,19 @@
       background: var(--text);
       transition: 0.3s;
       border-radius: 2px;
+    }
+
+    /* Hamburger animation */
+    .hamburger.active span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .hamburger.active span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
     }
 
     /* Menu */
@@ -151,18 +164,20 @@
         right: 1.5rem;
         left: 1.5rem;
         flex-direction: column;
-        background: var(--glass);
+        background: rgba(20, 20, 30, 0.95);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-radius: var(--radius-md);
         padding: 1.5rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         border: 1px solid var(--glass-border);
         margin-top: 10px;
+        z-index: 99;
       }
       
       nav.show {
         display: flex;
+        animation: slideDown 0.3s ease forwards;
       }
       
       .hamburger {
@@ -174,6 +189,7 @@
         text-align: center;
         border-radius: var(--radius-sm);
         margin-bottom: 0.5rem;
+        background: rgba(255, 255, 255, 0.08);
       }
     }
 
@@ -466,10 +482,10 @@
       -webkit-backdrop-filter: blur(15px);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-md);
-      padding: 1.2rem;
+      padding: 1.5rem;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       z-index: 1000;
-      max-width: 300px;
+      max-width: 320px;
       animation: slideInUp 0.5s ease-out;
       display: none;
     }
@@ -487,43 +503,24 @@
       display: block;
     }
     
-    .youtube-prompt-content {
+    .youtube-prompt-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
     }
     
-    .youtube-prompt-text {
+    .youtube-prompt-title {
       display: flex;
       align-items: center;
       gap: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
     }
     
-    .youtube-prompt i {
+    .youtube-prompt-title i {
       color: #ff0000;
       font-size: 1.5rem;
-    }
-    
-    .youtube-prompt-link {
-      color: var(--text);
-      text-decoration: none;
-      position: relative;
-      font-weight: 500;
-    }
-    
-    .youtube-prompt-link::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 0;
-      height: 1px;
-      background: var(--text);
-      transition: width 0.3s ease;
-    }
-    
-    .youtube-prompt-link:hover::after {
-      width: 100%;
     }
     
     .youtube-prompt-close {
@@ -547,6 +544,40 @@
       color: var(--text);
     }
     
+    .youtube-prompt-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .youtube-prompt-text {
+      flex: 1;
+    }
+    
+    .youtube-prompt-text p {
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .youtube-prompt-link {
+      display: inline-block;
+      background: #ff0000;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+    }
+    
+    .youtube-prompt-link:hover {
+      background: #cc0000;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(255, 0, 0, 0.4);
+    }
+    
     /* Animation for page load */
     @keyframes fadeInUp {
       from {
@@ -563,6 +594,17 @@
       from {
         opacity: 0;
         transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
       }
       to {
         opacity: 1;
@@ -671,14 +713,19 @@
 
   <!-- YouTube Subscription Prompt -->
   <div class="youtube-prompt" id="youtubePrompt">
-    <div class="youtube-prompt-content">
-      <div class="youtube-prompt-text">
+    <div class="youtube-prompt-header">
+      <div class="youtube-prompt-title">
         <i class="fab fa-youtube"></i>
-        <a href="https://youtube.com/@ivaansridev" class="youtube-prompt-link">Subscribe to my YouTube</a>
+        <span>@ivaansridev</span>
       </div>
       <button class="youtube-prompt-close" id="hidePrompt">
         <i class="fas fa-times"></i>
       </button>
+    </div>
+    <div class="youtube-prompt-content">
+      <div class="youtube-prompt-text">
+        <a href="https://youtube.com/@ivaansridev" class="youtube-prompt-link">Subscribe on Youtube</a>
+      </div>
     </div>
   </div>
 
