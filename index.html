@@ -443,15 +443,15 @@
       transform: scale(1.2);
     }
     
-    /* YouTube specific styling */
-    .youtube-link {
-      background: rgba(255, 0, 0, 0.1);
-      border-color: rgba(255, 0, 0, 0.3);
+    /* Telegram specific styling */
+    .telegram-link {
+      background: rgba(0, 136, 204, 0.1);
+      border-color: rgba(0, 136, 204, 0.3);
     }
     
-    .youtube-link:hover {
-      background: rgba(255, 0, 0, 0.2);
-      box-shadow: 0 8px 20px rgba(255, 0, 0, 0.2);
+    .telegram-link:hover {
+      background: rgba(0, 136, 204, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 136, 204, 0.2);
     }
     
     .email-link {
@@ -472,15 +472,15 @@
       background: rgba(255, 214, 0, 0.1);
     }
     
-    /* YouTube subscription prompt */
-    .youtube-prompt {
+    /* Telegram subscription prompt */
+    .telegram-prompt {
       position: fixed;
       bottom: 2rem;
       right: 2rem;
       background: var(--glass);
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
-      border: 1px solid var(--glass-border);
+      border: 1px solid rgba(0, 136, 204, 0.3);
       border-radius: var(--radius-md);
       padding: 1.5rem;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -491,7 +491,7 @@
     }
     
     @media (max-width: 768px) {
-      .youtube-prompt {
+      .telegram-prompt {
         right: 1rem;
         left: 1rem;
         bottom: 1rem;
@@ -499,31 +499,31 @@
       }
     }
     
-    .youtube-prompt.show {
+    .telegram-prompt.show {
       display: block;
     }
     
-    .youtube-prompt-header {
+    .telegram-prompt-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
     }
     
-    .youtube-prompt-title {
+    .telegram-prompt-title {
       display: flex;
       align-items: center;
       gap: 0.8rem;
       font-weight: 600;
-      color: var(--accent);
+      color: #0088cc;
     }
     
-    .youtube-prompt-title i {
-      color: #ff0000;
+    .telegram-prompt-title i {
+      color: #0088cc;
       font-size: 1.5rem;
     }
     
-    .youtube-prompt-close {
+    .telegram-prompt-close {
       background: none;
       border: none;
       color: rgba(255, 255, 255, 0.6);
@@ -539,43 +539,43 @@
       transition: all 0.3s ease;
     }
     
-    .youtube-prompt-close:hover {
+    .telegram-prompt-close:hover {
       background: rgba(255, 255, 255, 0.1);
       color: var(--text);
     }
     
-    .youtube-prompt-content {
+    .telegram-prompt-content {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
     
-    .youtube-prompt-text {
+    .telegram-prompt-text {
       flex: 1;
     }
     
-    .youtube-prompt-text p {
+    .telegram-prompt-text p {
       margin-bottom: 0.5rem;
       font-size: 0.9rem;
       color: rgba(255, 255, 255, 0.8);
     }
     
-    .youtube-prompt-link {
+    .telegram-prompt-link {
       display: inline-block;
-      background: #ff0000;
+      background: #0088cc;
       color: white;
       padding: 0.5rem 1rem;
       border-radius: var(--radius-sm);
       text-decoration: none;
       font-weight: 500;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
     }
     
-    .youtube-prompt-link:hover {
-      background: #cc0000;
+    .telegram-prompt-link:hover {
+      background: #006699;
       transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(255, 0, 0, 0.4);
+      box-shadow: 0 6px 15px rgba(0, 136, 204, 0.4);
     }
     
     /* Animation for page load */
@@ -696,9 +696,9 @@
         <i class="fab fa-github"></i>
         <span>GitHub</span>
       </a>
-      <a href="https://youtube.com/@ivaansridev" class="social-link youtube-link">
-        <i class="fab fa-youtube"></i>
-        <span>YouTube</span>
+      <a href="https://t.me/leaperposts" class="social-link telegram-link">
+        <i class="fab fa-telegram"></i>
+        <span>Telegram</span>
       </a>
       <a href="faq.html" class="social-link faq-link">
         <i class="fas fa-question-circle"></i>
@@ -711,20 +711,21 @@
     © 2025 LeaperStuff. All rights reserved.
   </footer>
 
-  <!-- YouTube Subscription Prompt -->
-  <div class="youtube-prompt" id="youtubePrompt">
-    <div class="youtube-prompt-header">
-      <div class="youtube-prompt-title">
-        <i class="fab fa-youtube"></i>
-        <span>@ivaansridev</span>
+  <!-- Telegram Subscription Prompt -->
+  <div class="telegram-prompt" id="telegramPrompt">
+    <div class="telegram-prompt-header">
+      <div class="telegram-prompt-title">
+        <i class="fab fa-telegram"></i>
+        <span>@leaperposts</span>
       </div>
-      <button class="youtube-prompt-close" id="hidePrompt">
+      <button class="telegram-prompt-close" id="hidePrompt">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="youtube-prompt-content">
-      <div class="youtube-prompt-text">
-        <a href="https://youtube.com/@ivaansridev" class="youtube-prompt-link">Subscribe on Youtube</a>
+    <div class="telegram-prompt-content">
+      <div class="telegram-prompt-text">
+        <p>Join my Telegram channel for updates</p>
+        <a href="https://t.me/leaperposts" class="telegram-prompt-link">Join Now</a>
       </div>
     </div>
   </div>
@@ -734,7 +735,7 @@
   const projects = document.querySelectorAll(".project");
   const hamburger = document.getElementById("hamburger");
   const navMenu = document.getElementById("navMenu");
-  const youtubePrompt = document.getElementById("youtubePrompt");
+  const telegramPrompt = document.getElementById("telegramPrompt");
   const hidePrompt = document.getElementById("hidePrompt");
 
   // Search functionality
@@ -768,17 +769,16 @@
     }
   });
 
-  // Show YouTube prompt after a delay
+  // Show Telegram prompt after a delay
   setTimeout(() => {
-    youtubePrompt.classList.add('show');
+    telegramPrompt.classList.add('show');
   }, 3000);
 
-  // Hide YouTube prompt
+  // Hide Telegram prompt
   hidePrompt.addEventListener('click', () => {
-    youtubePrompt.classList.remove('show');
+    telegramPrompt.classList.remove('show');
   });
 
 </script>
 </body>
 </html>
-
