@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="roundedlogo.gif">
-  <title>LeaperStuff - IS</title>
+  <title>LeaperStuff</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
@@ -150,6 +150,17 @@
       background: rgba(255, 255, 255, 0.1);
       border-color: rgba(255, 214, 0, 0.3);
     }
+    
+    nav a.tools-btn {
+      background: var(--accent);
+      color: #0b0b12;
+      font-weight: 600;
+    }
+    
+    nav a.tools-btn:hover {
+      background: #ffed4e;
+      color: #0b0b12;
+    }
 
     /* Mobile styles */
     @media (max-width: 768px) {
@@ -193,51 +204,82 @@
       }
     }
 
-    .search-bar {
+    .hero {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      margin: 3rem auto;
-      max-width: 95%;
-      width: 500px;
+      text-align: center;
+      padding: 4rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      min-height: 70vh;
     }
     
-    .search-bar input {
-      flex: 1;
-      padding: 1.2rem 1.8rem;
-      border: 1px solid var(--glass-border);
+    .hero h2 {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+      text-shadow: 0 0 15px rgba(255, 214, 0, 0.4);
+      font-weight: 800;
+    }
+    
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 2.5rem;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent) 0%, #ffed4e 100%);
+      color: #0b0b12;
+      padding: 1.2rem 2.5rem;
       border-radius: var(--radius-lg);
-      background: var(--glass);
-      color: var(--text);
-      font-size: 1rem;
-      outline: none;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px var(--glass-shadow);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
       transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(255, 214, 0, 0.4);
+      position: relative;
+      overflow: hidden;
     }
     
-    .search-bar input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 4px 20px rgba(255, 214, 0, 0.2);
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
     }
     
-    .search-bar input::placeholder {
-      color: rgba(255, 255, 255, 0.6);
+    .cta-button:hover::before {
+      left: 100%;
     }
-
-    .projects {
+    
+    .cta-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(255, 214, 0, 0.6);
+    }
+    
+    .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 2rem;
-      padding: 2rem;
-      max-width: 1400px;
+      padding: 4rem 2rem;
+      max-width: 1200px;
       margin: 0 auto;
     }
     
-    .project {
+    .feature {
       background: var(--glass);
       border-radius: var(--radius-md);
-      padding: 2rem;
+      padding: 2.5rem 2rem;
       transition: all 0.4s ease;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -245,9 +287,10 @@
       box-shadow: 0 8px 32px var(--glass-shadow);
       position: relative;
       overflow: hidden;
+      text-align: center;
     }
     
-    .project::before {
+    .feature::before {
       content: '';
       position: absolute;
       top: 0;
@@ -259,23 +302,28 @@
       transition: opacity 0.4s ease;
     }
     
-    .project:hover {
+    .feature:hover {
       transform: translateY(-8px) scale(1.02);
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
     }
     
-    .project:hover::before {
+    .feature:hover::before {
       opacity: 1;
     }
     
-    .project h3 { 
+    .feature i {
+      font-size: 3rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    
+    .feature h3 { 
       color: var(--accent); 
       margin-bottom: 1rem;
       font-size: 1.5rem;
     }
     
-    .project p {
-      margin-bottom: 1.5rem;
+    .feature p {
       color: rgba(255, 255, 255, 0.8);
     }
     
@@ -350,41 +398,6 @@
       font-size: 0.9rem;
       color: rgba(255, 255, 255, 0.7);
       border-radius: 0 0 var(--radius-md) var(--radius-md);
-    }
-    
-    .project button {
-      margin-top: 10px;
-      background: linear-gradient(135deg, var(--accent) 0%, #ffed4e 100%);
-      border: none;
-      padding: 0.8rem 1.8rem;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      color: #0b0b12;
-      box-shadow: 0 4px 15px rgba(255, 214, 0, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .project button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: left 0.5s;
-    }
-    
-    .project button:hover::before {
-      left: 100%;
-    }
-    
-    .project button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 214, 0, 0.5);
     }
     
     /* Social links with icons */
@@ -466,10 +479,6 @@
     .github-link:hover {
       background: rgba(110, 84, 148, 0.2);
       box-shadow: 0 8px 20px rgba(110, 84, 148, 0.2);
-    }
-    
-    .faq-link {
-      background: rgba(255, 214, 0, 0.1);
     }
     
     /* Telegram subscription prompt */
@@ -612,20 +621,17 @@
       }
     }
     
-    .project, .contact, footer {
+    .hero, .feature, .contact, footer {
       animation: fadeInUp 0.6s ease forwards;
       opacity: 0;
     }
     
-    .project:nth-child(1) { animation-delay: 0.1s; }
-    .project:nth-child(2) { animation-delay: 0.2s; }
-    .project:nth-child(3) { animation-delay: 0.3s; }
-    .project:nth-child(4) { animation-delay: 0.4s; }
-    .project:nth-child(5) { animation-delay: 0.5s; }
-    .project:nth-child(6) { animation-delay: 0.6s; }
-    .project:nth-child(7) { animation-delay: 0.7s; }
-    .contact { animation-delay: 0.8s; }
-    footer { animation-delay: 0.9s; }
+    .hero { animation-delay: 0.1s; }
+    .feature:nth-child(1) { animation-delay: 0.2s; }
+    .feature:nth-child(2) { animation-delay: 0.3s; }
+    .feature:nth-child(3) { animation-delay: 0.4s; }
+    .contact { animation-delay: 0.5s; }
+    footer { animation-delay: 0.6s; }
   </style>
 </head>
 <body>
@@ -637,57 +643,39 @@
       <span></span>
     </div>
     <nav id="navMenu">
-      <a href="https://leaperstuff.blogspot.com">Posts</a>
+      <a href="tools.html" class="tools-btn">Tools</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
 
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search projects...">
-  </div>
+  <section class="hero">
+    <h2>LeaperStuff</h2>
+    <p>An open-source project made with love by Ivaan Srivastava</p>
+    <a href="tools.html" class="cta-button">Explore Tools</a>
+  </section>
 
-  <section class="projects" id="projects">
-    <div class="project" data-title="ZenCodeEdit Zen Code Edit Editor ">
-      <h3>ZenCodeEdit</h3>
-      <p>The Editor for Peace.</p>
-      <button onclick="window.location.href='https://zencodeedit.vercel.app'">Go</button>
+  <section class="features">
+    <div class="feature">
+      <i class="fas fa-code"></i>
+      <h3>Developer Tools</h3>
+      <p>Powerful tools for developers, including code editors and system utilities.</p>
     </div>
-    <div class="project" data-title="Chat Gun leaperchatgun">
-      <h3>leaperChatGun</h3>
-      <p>Chat to friend without login🎉.</p>
-      <button onclick="window.location.href='leaperchatgun.html'">Go</button>
+    <div class="feature">
+      <i class="fas fa-palette"></i>
+      <h3>Creative Visuals</h3>
+      <p>Chart makers and visual tools to bring your data and ideas to life.</p>
     </div>
-    <div class="project" data-title="Cava WEB">
-      <h3>CAVA Web</h3>
-      <p>UnOfficial CAVA Web.</p>
-      <button onclick="window.location.href='cava_web_unofficial.html'">Go</button>
-    </div>
-    <div class="project" data-title="neofetch fetch infetch internetfetch systemd system info">
-      <h3>inFetch</h3>
-      <p>like neofetch but only ascii</p>
-      <button onclick="window.location.href='infetch.html'">Go</button>
-    </div>
-    <div class="project" data-title="visuals chart maker chartmaker leprvisuals leapervisuals visual">
-      <h3>leprVisuals</h3>
-      <p>Cool Chart maker.</p>
-      <button onclick="window.location.href='visuals.html'">Go</button>
-    </div>
-    <div class="project" data-title="hypr linux hyprlepr lepr leaper hyprleaper de desktop environment">
-      <h3>hyprLepr</h3>
-      <p>Cool Desktop. (Desktop recommended)</p>
-      <button onclick="window.location.href='hyprlepr.html'">Go</button>
-    </div>
-    <div class="project" data-title="leaperdash leprdash dashboard dash board">
-      <h3>leaperDash</h3>
-      <p>Dashboard to see some things :)</p>
-      <button onclick="window.location.href='leprdash.html'">Go</button>
+    <div class="feature">
+      <i class="fas fa-rocket"></i>
+      <h3>Innovative Projects</h3>
+      <p>Unique applications and utilities designed to enhance your digital experience.</p>
     </div>
   </section>
 
   <section class="contact" id="contact">
     <h3>Contact</h3>
     <div class="social-links">
-        <a href="mailto:tickets@leaperstuff.p.tawk.email" class="social-link email-link">
+      <a href="mailto:tickets@leaperstuff.p.tawk.email" class="social-link email-link">
         <i class="fas fa-envelope"></i>
         <span>Email</span>
       </a>
@@ -726,26 +714,10 @@
   </div>
 
 <script>
-  const searchInput = document.getElementById("searchInput");
-  const projects = document.querySelectorAll(".project");
   const hamburger = document.getElementById("hamburger");
   const navMenu = document.getElementById("navMenu");
   const telegramPrompt = document.getElementById("telegramPrompt");
   const hidePrompt = document.getElementById("hidePrompt");
-
-  // Search functionality
-  searchInput.addEventListener("input", function () {
-    const query = searchInput.value.toLowerCase();
-    projects.forEach(proj => {
-      const title = proj.getAttribute("data-title").toLowerCase();
-      if (title.includes(query)) {
-        proj.style.display = "block";
-        proj.style.animation = "fadeInUp 0.4s ease forwards";
-      } else {
-        proj.style.display = "none";
-      }
-    });
-  });
 
   // Hamburger toggle
   hamburger.addEventListener("click", (e) => {
