@@ -6,141 +6,12 @@
   <title>leprVisuals – leaperStuff</title>
   <link rel="icon" type="image/x-icon" href="roundedlogo.gif">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="basicstyle.css">
   <style>
-    :root {
-      --bg: #0b0b12;
-      --bg-secondary: #151522;
-      --text: #f5f5f5;
-      --accent: #ffd600;
-      --accent-light: #ffed4e;
-      --accent-dark: #b8940f;
-      --panel: rgba(255,255,255,0.05);
-      --glass: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.2);
-      --glass-shadow: rgba(0, 0, 0, 0.1);
-      --radius-sm: 12px;
-      --radius-md: 20px;
-      --radius-lg: 30px;
-    }
-    
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0b0b12 0%, #151522 100%);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    
-    /* Liquid glass effect background */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(255, 214, 0, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 214, 0, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-      z-index: -1;
-      pointer-events: none;
-    }
-    
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.2rem 2.5rem;
-      background: var(--glass);
-      border-bottom: 1px solid var(--glass-border);
-      position: sticky;
-      top: 0;
-      backdrop-filter: blur(12px) saturate(180%);
-      -webkit-backdrop-filter: blur(12px) saturate(180%);
-      z-index: 100;
-      box-shadow: 0 4px 20px var(--glass-shadow);
-      border-radius: 0 0 var(--radius-md) var(--radius-md);
-    }
-    
-    header h1 {
-      font-size: 1.8rem;
-      color: var(--accent);
-      text-shadow: 0 0 10px rgba(255, 214, 0, 0.3);
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-
-option {
-  color: black; !important
-}
-
-    /* Menu */
-    nav {
-      display: flex;
-      gap: 1rem;
-    }
-    
-    nav a {
-      color: var(--text);
-      text-decoration: none;
-      transition: all 0.3s ease;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      position: relative;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    nav a::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 214, 0, 0.2), transparent);
-      transition: left 0.5s;
-    }
-    
-    nav a:hover::before {
-      left: 100%;
-    }
-    
-    nav a:hover { 
-      color: var(--accent); 
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 214, 0, 0.3);
-    }
-
-    /* Mobile styles */
-    @media (max-width: 768px) {
-      header {
-        padding: 1rem 1.5rem;
-      }
-      
-      nav {
-        display: flex;
-      }
-      
-      nav a:not(.home-link) {
-        display: none;
-      }
-      
-      .home-link {
-        padding: 0.5rem;
-        font-size: 1.2rem;	
-      }
-    }
-
+    /* Grid layout for chart and controls */
     .main-container {
       display: flex;
       flex-direction: column;
@@ -149,178 +20,12 @@ option {
       min-height: calc(100vh - 120px);
     }
     
-    .page-header {
-      text-align: center;
-      margin-bottom: 2rem;
-      width: 100%;
-    }
-    
-    .page-header h1 {
-      font-size: 2.5rem;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-      letter-spacing: 1px;
-      text-shadow: 0 0 10px rgba(255, 214, 0, 0.3);
-    }
-    
-    .tagline {
-      font-size: 1.2rem;
-      opacity: 0.8;
-      margin-bottom: 1rem;
-    }
-    
-    .spreadsheet {
-      background: var(--glass);
-      padding: 1.5rem;
-      border-radius: var(--radius-md);
-      box-shadow: 0 8px 32px var(--glass-shadow);
-      margin-bottom: 2rem;
-      width: 90%;
-      max-width: 1000px;
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .spreadsheet::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(255, 214, 0, 0.05) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    
-    .spreadsheet:hover::before {
-      opacity: 1;
-    }
-    
-    .spreadsheet-controls {
+    .spreadsheet-controls, .chart-controls {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 15px;
       align-items: center;
-    }
-    
-    .spreadsheet-controls button, 
-    .spreadsheet-controls select {
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--glass-border);
-      background: var(--panel);
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s;
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-    }
-    
-    .spreadsheet-controls button:hover {
-      background: var(--accent);
-      color: #000;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
-    }
-    
-    .presets-select {
-      flex-grow: 1;
-      max-width: 200px;
-    }
-    
-    .spreadsheet table {
-      border-collapse: collapse;
-      background: var(--panel);
-      color: var(--text);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      width: 100%;
-      margin-bottom: 15px;
-      border: 1px solid var(--glass-border);
-    }
-    
-    .spreadsheet th {
-      background: var(--accent);
-      color: #000;
-      font-weight: bold;
-      padding: 10px;
-      text-align: center;
-    }
-    
-    .spreadsheet td {
-      border: 1px solid var(--glass-border);
-      padding: 0;
-    }
-    
-    .spreadsheet input {
-      width: 100%;
-      border: none;
-      text-align: center;
-      background: transparent;
-      color: var(--text);
-      padding: 8px;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-    
-    .spreadsheet input:focus {
-      outline: 2px solid var(--accent);
-      background: rgba(255, 214, 0, 0.1);
-    }
-    
-    button, select {
-      margin: 0.5rem 0.2rem;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      border: none;
-      background: var(--accent);
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: left 0.5s;
-    }
-    
-    button:hover::before {
-      left: 100%;
-    }
-    
-    button:hover {
-      background: var(--accent-light);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
-    }
-    
-    .chart-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .chart-controls select {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--glass-border);
     }
     
     .size-controls {
@@ -334,53 +39,25 @@ option {
       gap: 10px;
     }
     
-    .custom-size-inputs input {
-      width: 80px;
-      padding: 5px;
-      border-radius: 4px;
-      border: 1px solid var(--glass-border);
-      background: var(--panel);
-      color: var(--text);
-    }
-    
     #chartWrapper {
       width: 90%;
       height: 90vh;
       max-height: 90%;
-      background: var(--glass);
-      border-radius: var(--radius-md);
+      background: white;
+      border-radius: 0;
       padding: 20px;
       box-sizing: border-box;
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 32px var(--glass-shadow);
       margin-bottom: 2rem;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
       position: relative;
       overflow: hidden;
-    }
-    
-    #chartWrapper::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(255, 214, 0, 0.05) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    
-    #chartWrapper:hover::before {
-      opacity: 1;
+      box-shadow: black 5px 5px;
+      border: 4px solid black;
     }
     
     #chartCanvas {
       width: 100% !important;
       height: 100% !important;
       background-color: white;
-      border-radius: var(--radius-sm);
     }
     
     .screenshot-modal {
@@ -394,44 +71,16 @@ option {
       z-index: 1000;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
     }
     
     .screenshot-options {
-      background: var(--glass);
+      background: rgb(226, 232, 181);
       padding: 2rem;
-      border-radius: var(--radius-md);
+      border-radius: 0;
       width: 90%;
       max-width: 500px;
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-    
-    .screenshot-options h3 {
-      margin-top: 0;
-      color: var(--accent);
-      text-shadow: 0 0 10px rgba(255, 214, 0, 0.3);
-    }
-    
-    .option-group {
-      margin-bottom: 1rem;
-    }
-    
-    .option-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    
-    .option-group input[type="number"] {
-      width: 80px;
-      padding: 5px;
-      border-radius: 4px;
-      border: 1px solid var(--glass-border);
-      background: var(--panel);
-      color: var(--text);
+      border: 4px solid black;
+      box-shadow: black 5px 5px;
     }
     
     .modal-buttons {
@@ -441,49 +90,9 @@ option {
       margin-top: 1rem;
     }
     
-    footer {
-      margin-top: 2rem;
-      font-size: 0.8rem;
-      opacity: 0.7;
-      text-align: center;
-      padding: 1.5rem;
-      background: var(--glass);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-top: 1px solid var(--glass-border);
-      width: 100%;
-      border-radius: var(--radius-md) var(--radius-md) 0 0;
-    }
-    
-    /* Animation for page load */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .spreadsheet, #chartWrapper, footer {
-      animation: fadeInUp 0.6s ease forwards;
-      opacity: 0;
-    }
-    
-    .spreadsheet { animation-delay: 0.1s; }
-    #chartWrapper { animation-delay: 0.2s; }
-    footer { animation-delay: 0.3s; }
-    
-    /* Responsive adjustments */
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .main-container {
-        padding: 1rem;
-      }
-      
-      .spreadsheet {
-        width: 95%;
         padding: 1rem;
       }
       
@@ -497,35 +106,126 @@ option {
         justify-content: center;
       }
       
-      .page-header h1 {
-        font-size: 2rem;
+      #chartWrapper {
+        width: 95%;
+        padding: 1rem;
       }
+    }
+    
+    /* Table styling */
+    .spreadsheet table {
+      border-collapse: collapse;
+      background: white;
+      color: black;
+      border-radius: 0;
+      overflow: hidden;
+      width: 100%;
+      margin-bottom: 15px;
+      border: 2px solid black;
+    }
+    
+    .spreadsheet th {
+      background: rgb(242, 225, 33);
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid black;
+    }
+    
+    .spreadsheet td {
+      border: 1px solid black;
+      padding: 0;
+    }
+    
+    .spreadsheet input {
+      width: 100%;
+      border: none;
+      text-align: center;
+      background: transparent;
+      color: black;
+      padding: 8px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    
+    .spreadsheet input:focus {
+      outline: 2px solid rgb(242, 225, 33);
+      background: rgba(242, 225, 33, 0.2);
+    }
+    
+    /* Form elements */
+    select {
+      padding: 8px 12px;
+      border-radius: 0;
+      border: 2px solid black;
+      background: rgb(212, 221, 146);
+      color: black;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: black 5px 5px;
+    }
+    
+    select:hover {
+      box-shadow: none;
+    }
+    
+    .custom-size-inputs input {
+      width: 80px;
+      padding: 5px;
+      border-radius: 0;
+      border: 2px solid black;
+      background: rgb(212, 221, 146);
+      color: black;
+      box-shadow: black 5px 5px;
+    }
+    
+    .custom-size-inputs input:hover {
+      box-shadow: none;
+    }
+    
+    .option-group input[type="number"] {
+      width: 80px;
+      padding: 5px;
+      border-radius: 0;
+      border: 2px solid black;
+      background: rgb(212, 221, 146);
+      color: black;
+      box-shadow: black 5px 5px;
+    }
+    
+    .option-group input[type="number"]:hover {
+      box-shadow: none;
+    }
+    
+    /* Radio buttons */
+    .option-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+    
+    input[type="radio"] {
+      margin-right: 8px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>LeaperStuff</h1>
-    <nav>
-      <a href="index.html" class="home-link"><i class="fas fa-home"></i></a>
-    </nav>
-  </header>
-
   <div class="main-container">
-    <div class="page-header">
-      <h1>leprVisuals</h1>
+      <div class="page-header">
+      <h1><a href="index.html">lepr</a>Visuals</h1>
       <p class="tagline">by <strong>leaperStuff</strong></p>
       <p>Create or upload data → Turn into stunning charts ✨</p>
     </div>
 
-    <div class="spreadsheet">
+    <div class="spreadsheet basicsection">
       <h3>Spreadsheet Maker</h3>
       
       <div class="spreadsheet-controls">
-        <button onclick="addRow()">+ Add Row</button>
-        <button onclick="removeRow()">- Remove Row</button>
+        <button class="basicbutton" onclick="addRow()">+ Add Row</button>
+        <button class="basicbutton" onclick="removeRow()">- Remove Row</button>
         
-        <select id="presets" class="presets-select" onchange="loadPreset()">
+        <select id="presets" class="presets-select basicinput" onchange="loadPreset()">
           <option value="">Select a preset...</option>
           <option value="sales">Sales Data</option>
           <option value="expenses">Monthly Expenses</option>
@@ -534,8 +234,8 @@ option {
           <option value="product">Product Ratings</option>
         </select>
         
-        <button onclick="downloadSpreadsheet()">Download as XLSX</button>
-        <button onclick="document.getElementById('fileInput').click()">Upload XLSX</button>
+        <button class="basicbutton" onclick="downloadSpreadsheet()">Download as XLSX</button>
+        <button class="basicbutton" onclick="document.getElementById('fileInput').click()">Upload XLSX</button>
         <input type="file" id="fileInput" accept=".xlsx" style="display: none" onchange="handleFileUpload(this.files)">
       </div>
       
@@ -556,7 +256,7 @@ option {
       
       <div class="chart-controls">
         <label for="chartType">Chart Type:</label>
-        <select id="chartType">
+        <select id="chartType" class="basicinput">
           <option value="pie">Pie Chart</option>
           <option value="doughnut">Doughnut Chart</option>
           <option value="bar">Bar Chart</option>
@@ -568,28 +268,28 @@ option {
         </select>
         
         <label for="chartSize">Chart Size:</label>
-        <select id="chartSize" onchange="toggleCustomSize()">
+        <select id="chartSize" class="basicinput" onchange="toggleCustomSize()">
           <option value="window">Window Size</option>
           <option value="square">Square (1:1)</option>
           <option value="custom">Custom</option>
         </select>
         
         <div class="custom-size-inputs" id="customSizeInputs" style="display: none;">
-          <input type="number" id="customWidth" placeholder="Width" value="800">
-          <input type="number" id="customHeight" placeholder="Height" value="600">
+          <input type="number" id="customWidth" class="basicinput" placeholder="Width" value="800">
+          <input type="number" id="customHeight" class="basicinput" placeholder="Height" value="600">
         </div>
         
-        <button onclick="generateChartFromSheet()">Generate Chart</button>
-        <button onclick="showScreenshotOptions()">Download</button>
+        <button class="basicbutton" onclick="generateChartFromSheet()">Generate Chart</button>
+        <button class="basicbutton" onclick="showScreenshotOptions()">Download</button>
       </div>
     </div>
     
-    <div id="chartWrapper">
+    <div id="chartWrapper" class="basicsection">
       <canvas id="chartCanvas"></canvas>
     </div>
 
     <div class="screenshot-modal" id="screenshotModal">
-      <div class="screenshot-options">
+      <div class="screenshot-options basicsection">
         <h3>Download Options</h3>
         <div class="option-group">
           <label>
@@ -601,11 +301,11 @@ option {
         </div>
         <div class="option-group">
           <label for="marginSize">Margin (px):</label>
-          <input type="number" id="marginSize" value="20" min="0" max="100">
+          <input type="number" id="marginSize" class="basicinput" value="20" min="0" max="100">
         </div>
         <div class="modal-buttons">
-          <button onclick="takeScreenshot()">Download</button>
-          <button onclick="document.getElementById('screenshotModal').style.display = 'none'">Cancel</button>
+          <button class="basicbutton" onclick="takeScreenshot()">Download</button>
+          <button class="basicbutton" onclick="document.getElementById('screenshotModal').style.display = 'none'">Cancel</button>
         </div>
       </div>
     </div>
@@ -680,7 +380,7 @@ option {
       const row = table.insertRow();
       for (let i = 0; i < cols; i++) {
         const cell = row.insertCell();
-        cell.innerHTML = '<input>';
+        cell.innerHTML = '<input class="basicinput">';
       }
     }
 
@@ -690,29 +390,6 @@ option {
         table.deleteRow(table.rows.length - 1);
       } else {
         alert("Need at least one data row.");
-      }
-    }
-
-    function addColumn() {
-      const table = document.getElementById("sheet");
-      for (let i = 0; i < table.rows.length; i++) {
-        const cell = table.rows[i].insertCell();
-        if (i === 0) {
-          cell.outerHTML = '<th>New Column</th>';
-        } else {
-          cell.innerHTML = '<input>';
-        }
-      }
-    }
-
-    function removeColumn() {
-      const table = document.getElementById("sheet");
-      if (table.rows[0].cells.length > 2) {
-        for (let i = 0; i < table.rows.length; i++) {
-          table.rows[i].deleteCell(table.rows[i].cells.length - 1);
-        }
-      } else {
-        alert("Need at least two columns.");
       }
     }
 
@@ -743,7 +420,7 @@ option {
         const row = table.insertRow();
         rowData.forEach(cellData => {
           const cell = row.insertCell();
-          cell.innerHTML = `<input value="${cellData}">`;
+          cell.innerHTML = `<input class="basicinput" value="${cellData}">`;
         });
       });
       
@@ -822,7 +499,7 @@ option {
             if (r === 0) {
               cell.outerHTML = `<th>${jsonData[r][c] || `Column ${c+1}`}</th>`;
             } else {
-              cell.innerHTML = `<input value="${jsonData[r][c] || ''}">`;
+              cell.innerHTML = `<input class="basicinput" value="${jsonData[r][c] || ''}">`;
             }
           }
         }
