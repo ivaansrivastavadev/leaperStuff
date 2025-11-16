@@ -5,239 +5,118 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="roundedlogo.gif">
   <title>LeaperStuff</title>
+
+  <!-- Your UI system -->
   <link rel="stylesheet" href="basicstyle.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+  <!-- Minimal layout system -->
   <style>
-    /* Custom styles for icons and Telegram-specific colors */
-    .telegram-link {
-      background-color: #0088cc !important;
-      color: white !important;
-    }
-    
-    .telegram-link:hover {
-      background-color: #006699 !important;
-    }
-    
-    .github-link {
-      background-color: #333 !important;
-      color: white !important;
-    }
-    
-    .github-link:hover {
-      background-color: #555 !important;
-    }
-    
-    .email-link {
-      background-color: #d43f3a !important;
-      color: white !important;
-    }
-    
-    .email-link:hover {
-      background-color: #b52b27 !important;
-    }
-    
-    /* Mobile navigation styles */
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      cursor: pointer;
-      gap: 5px;
-      z-index: 101;
-      padding: 8px;
-      border-radius: 5px;
-      transition: all 0.3s ease;
-    }
-    
-    .hamburger span {
-      width: 25px;
-      height: 3px;
-      background: black;
-      transition: 0.3s;
-      border-radius: 2px;
-    }
+    /* ===== LAYOUT SYSTEM ===== */
 
-    /* Hamburger animation */
-    .hamburger.active span:nth-child(1) {
-      transform: translateY(8px) rotate(45deg);
-    }
-    
-    .hamburger.active span:nth-child(2) {
-      opacity: 0;
-    }
-    
-    .hamburger.active span:nth-child(3) {
-      transform: translateY(-8px) rotate(-45deg);
-    }
+/* Page structure */
+body { margin: 0; padding: 0; }
 
-    /* Mobile styles */
-    @media (max-width: 768px) {
-      header {
-        padding: 1rem 1.5rem;
-      }
-      
-      nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 1.5rem;
-        left: 1.5rem;
-        flex-direction: column;
-        background: rgb(212, 221, 146);
-        border-radius: 5px;
-        padding: 1.5rem;
-        box-shadow: black 5px 5px;
-        margin-top: 10px;
-        z-index: 99;
-      }
-      
-      nav.show {
-        display: flex;
-        animation: slideDown 0.3s ease forwards;
-      }
-      
-      .hamburger {
-        display: flex;
-      }
-      
-      nav a {
-        padding: 0.8rem;
-        text-align: center;
-        border-radius: 5px;
-        margin-bottom: 0.5rem;
-        background: rgb(226, 232, 181);
-      }
-    }
+/* Header container */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
 
-    /* Animation for page load */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .hero, .feature, .contact, footer {
-      animation: fadeInUp 0.6s ease forwards;
-      opacity: 0;
-    }
-    
-    .hero { animation-delay: 0.1s; }
-    .feature:nth-child(1) { animation-delay: 0.2s; }
-    .feature:nth-child(2) { animation-delay: 0.3s; }
-    .feature:nth-child(3) { animation-delay: 0.4s; }
-    .contact { animation-delay: 0.5s; }
-    footer { animation-delay: 0.6s; }
+/* Hero section */
+.hero {
+  text-align: center;
+  margin: 40px auto;
+  max-width: 700px;
+}
+
+/* Features section */
+.features {
+  display: flex;
+  gap: 16px;
+  margin: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.feature {
+  flex: 1;
+  min-width: 250px;
+  max-width: 350px;
+}
+
+/* Contact section */
+.contact {
+  margin: 40px auto;
+  max-width: 700px;
+  text-align: center;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 40px;
+  padding: 10px;
+}
+
   </style>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <header class="basicsection">
-    <div class="hamburger" id="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <nav id="navMenu" class="basicnav">
-      <li><a href="#"><strong>leaperStuff</strong></a></li>
-      <li><a href="tools.html" class="tools-btn">Tools</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </nav>
-  </header>
+<section class="hero div">
+  <h2>LeaperStuff</h2>
+  <button onclick="window.location.href='tools.html'">Explore Tools</button>
+    <button onclick='window.location.href="#contact"''>Contact</a>
+</section>
 
-  <section class="hero basicsection">
-    <h2>LeaperStuff</h2>
-    <p>An open-source project made with love by Ivaan Srivastava</p>
-    <button onclick='window.location.href="tools.html"' class="cta-button basicbutton">Explore Tools</a>
-  </section>
+<section class="features">
+  <div class="feature div">
+    <h3>Developer Tools</h3>
+    <p>Powerful tools for developers, including code editors and system utilities.</p>
+  </div>
 
-  <section class="features">
-    <div class="feature basicsection">
-      <h3>Developer Tools</h3>
-      <p>Powerful tools for developers, including code editors and system utilities.</p>
-    </div>
-    <div class="feature basicsection">
-      <h3>Creative Visuals</h3>
-      <p>Chart makers and visual tools to bring your data and ideas to life.</p>
-    </div>
-    <div class="feature basicsection">
-      <h3>Innovative Projects</h3>
-      <p>Unique applications and utilities designed to enhance your digital experience.</p>
-    </div>
-  </section>
+  <div class="feature div">
+    <h3>Creative Visuals</h3>
+    <p>Chart makers and visual tools to bring your data and ideas to life.</p>
+  </div>
 
-  <section class="contact basicsection" id="contact">
-    <h3>Contact</h3>
-    <div class="social-links">
-      <a href="mailto:tickets@leaperstuff.p.tawk.email" class="social-link email-link basicbutton">
-        <i class="fas fa-envelope"></i>
-        <span>Email</span>
-      </a><br>
-      <a href="https://github.com/ivaansrivastavadev" class="social-link github-link basicbutton">
-        <i class="fab fa-github"></i>
-        <span>GitHub</span>
-      </a><br>
-      <a href="https://t.me/s/leaperposts" class="social-link telegram-link basicbutton">
-        <i class="fab fa-telegram"></i>
-        <span>Telegram</span>
-      </a>
-    </div>
-  </section>
+  <div class="feature div">
+    <h3>Innovative Projects</h3>
+    <p>Unique applications and utilities designed to enhance your digital experience.</p>
+  </div>
+</section>
 
-  <footer>
-    © 2025 LeaperStuff. All rights reserved.
-  </footer>
+<section class="contact div" id="contact">
+  <h3>Contact</h3>
+
+  <a href="mailto:tickets@leaperstuff.p.tawk.email" class="basicbutton">
+    <i class="fas fa-envelope"></i> Email
+  </a><br>
+
+  <a href="https://github.com/ivaansrivastavadev" class="basicbutton">
+    <i class="fab fa-github"></i> GitHub
+  </a><br>
+
+  <a href="https://t.me/s/leaperposts" class="basicbutton">
+    <i class="fab fa-telegram"></i> Telegram
+  </a>
+</section>
+
+<footer>© 2025 LeaperStuff. All rights reserved.</footer>
 
 <script>
-  const hamburger = document.getElementById("hamburger");
-  const navMenu = document.getElementById("navMenu");
+  const ham = document.getElementById("hamburger");
+  const nav = document.getElementById("navMenu");
 
-  // Hamburger toggle
-  hamburger.addEventListener("click", (e) => {
-    e.stopPropagation();
-    navMenu.classList.toggle("show");
-    hamburger.classList.toggle("active");
-  });
-
-  // Close menu when clicking outside on mobile
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768) {
-      if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
-        navMenu.classList.remove('show');
-        hamburger.classList.remove('active');
-      }
-    }
+  ham.addEventListener("click", () => {
+    ham.classList.toggle("active");
+    nav.classList.toggle("show");
   });
 </script>
-
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6915e4cd6ca233195dc74ce5/1j9uobgui';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
 
 </body>
 </html>
+

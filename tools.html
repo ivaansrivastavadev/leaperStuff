@@ -1,201 +1,128 @@
-<center>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="roundedlogo.gif">
-  <title>LeaperStuff - IS</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="basicstyle.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="roundedlogo.gif" type="image/x-icon" />
+  <title>LeaperStuff — Tools</title>
+
+  <link rel="stylesheet" href="basicstyle.css" />
+
   <style>
-    /* Grid layout for tools */
-    .projects {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      padding: 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
+    /* ===== LAYOUT SYSTEM ===== */
+    body { margin: 0; padding: 0; }
+
+    header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+    nav { display: flex; gap: 12px; align-items: center; }
+
+    .tools-hero { text-align: center; margin: 40px auto; max-width: 700px; }
+
+    .search-container { text-align: center; margin-bottom: 30px; }
+
+    .tools-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin: 0 20px;
     }
-    
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-      .projects {
-        grid-template-columns: 1fr;
-        padding: 1rem;
-        gap: 1rem;
-      }
+
+    .tool-card {
+      flex: 1;
+      min-width: 250px;
+      max-width: 350px;
     }
-        .telegram-link {
-      background-color: #0088cc !important;
-      color: white !important;
-    }
-    
-    .telegram-link:hover {
-      background-color: #006699 !important;
-    }
-    
-    .github-link {
-      background-color: #333 !important;
-      color: white !important;
-    }
-    
-    .github-link:hover {
-      background-color: #555 !important;
-    }
-    
-    .email-link {
-      background-color: #d43f3a !important;
-      color: white !important;
-    }
-    
-    .email-link:hover {
-      background-color: #b52b27 !important;
-    }
+
+    footer { text-align: center; margin-top: 40px; padding: 10px; }
   </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-  <header>
-    <h1>LeaperStuff</h1>
-  </header>
+<center>
+<header>
+  <nav>
+    <a href="index.html"><strong>leaperStuff</strong></a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+</center>
+</header>
 
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search projects..." class="basicinput">
+<section class="tools-hero div">
+  <h2>Tools Library</h2>
+</section>
+
+<section class="search-container">
+  <input id="tool-search" type="text" placeholder="Search tools..." />
+</section>
+
+<section class="tools-list" id="projects">
+
+  <div class="tool-card div" data-title="ZenCodeEdit Zen Code Edit Editor Peace CodeEditor">
+    <h3>ZenCodeEdit</h3>
+    <p>The Editor for Peace.</p>
+    <button onclick="window.location.href='https://zencodeedit.vercel.app'">Go</button>
   </div>
 
-  <section class="projects" id="projects">
-    <div class="project basicsection" data-title="ZenCodeEdit Zen Code Edit Editor ">
-      <h3>ZenCodeEdit</h3>
-      <p>The Editor for Peace.</p>
-      <button class="basicbutton" onclick="window.location.href='https://zencodeedit.vercel.app'">Go</button>
-    </div>
-    <div class="project basicsection" data-title="Chat Gun leaperchatgun">
-      <h3>leaperChatGun</h3>
-      <p>Chat to friend without login🎉.</p>
-      <button class="basicbutton" onclick="window.location.href='leaperchatgun.html'">Go</button>
-    </div>
-    <div class="project basicsection" data-title="Cava WEB">
-      <h3>CAVA Web</h3>
-      <p>UnOfficial CAVA Web.</p>
-      <button class="basicbutton" onclick="window.location.href='cava_web_unofficial.html'">Go</button>
-    </div>
-    <div class="project basicsection" data-title="neofetch fetch infetch internetfetch systemd system info">
-      <h3>inFetch</h3>
-      <p>like neofetch but only ascii</p>
-      <button class="basicbutton" onclick="window.location.href='infetch.html'">Go</button>
-    </div>
-    <div class="project basicsection" data-title="visuals chart maker chartmaker leprvisuals leapervisuals visual">
-      <h3>leprVisuals</h3>
-      <p>Cool Chart maker.</p>
-      <button class="basicbutton" onclick="window.location.href='visuals.html'">Go</button>
-    </div>
-    <div class="project basicsection" data-title="hypr linux hyprlepr lepr leaper hyprleaper de desktop environment">
-      <h3>hyprLepr</h3>
-      <p>Cool Desktop. (Desktop recommended)</p>
-      <button class="basicbutton" onclick="window.location.href='hyprlepr.html'">Go</button>
-    </div>
-    <div class="project basicsection" data-title="leaperdash leprdash dashboard dash board">
-      <h3>leaperDash</h3>
-      <p>Dashboard to see some things :)</p>
-      <button class="basicbutton" onclick="window.location.href='leprdash.html'">Go</button>
-    </div>
-    <div class="project basicsection" data-title="lti leprtimer leapertimer timer clock">
-      <h3>LTI (LeprTimer)</h3>
-      <p>Retro Timer</p>
-      <button class="basicbutton" onclick="window.location.href='lti.html'">Go</button>
-    </div>
-  </section>
+  <div class="tool-card div" data-title="Chat Gun leaperchatgun ChatGun messaging anonymous chat">
+    <h3>leaperChatGun</h3>
+    <p>Chat to friend without login.</p>
+    <button onclick="window.location.href='leaperchatgun.html'">Go</button>
+  </div>
 
-  <section class="contact basicsection" id="contact">
-    <h3>Contact</h3>
-    <div class="social-links">
-      <a href="mailto:tickets@leaperstuff.p.tawk.email" class="social-link email-link basicbutton">
-        <i class="fas fa-envelope"></i>
-        <span>Email</span>
-      </a>
-      <a href="https://github.com/ivaansrivastavadev" class="social-link github-link basicbutton">
-        <i class="fab fa-github"></i>
-        <span>GitHub</span>
-      </a>
-      <a href="https://t.me/s/leaperposts" class="social-link telegram-link basicbutton">
-        <i class="fab fa-telegram"></i>
-        <span>Telegram</span>
-      </a>
-    </div>
-  </section>
+  <div class="tool-card div" data-title="CAVA Web Unofficial audio visualizer">
+    <h3>CAVA Web</h3>
+    <p>UnOfficial CAVA Web.</p>
+    <button onclick="window.location.href='cava_web_unofficial.html'">Go</button>
+  </div>
 
-  <footer>
-    © 2025 LeaperStuff. All rights reserved.
-  </footer>
+  <div class="tool-card div" data-title="neofetch infetch internetfetch system ascii fetch">
+    <h3>inFetch</h3>
+    <p>like neofetch but only ascii</p>
+    <button onclick="window.location.href='infetch.html'">Go</button>
+  </div>
+
+  <div class="tool-card div" data-title="visuals chart maker chartmaker leprvisuals leapervisuals visual charts data">
+    <h3>leprVisuals</h3>
+    <p>Cool Chart maker.</p>
+    <button onclick="window.location.href='visuals.html'">Go</button>
+  </div>
+
+  <div class="tool-card div" data-title="hypr linux hyprlepr lepr leaper hyprleaper de desktop environment">
+    <h3>hyprLepr</h3>
+    <p>Cool Desktop. (Desktop recommended)</p>
+    <button onclick="window.location.href='hyprlepr.html'">Go</button>
+  </div>
+
+  <div class="tool-card div" data-title="leaperdash leprdash dashboard dash board web tools">
+    <h3>leaperDash</h3>
+    <p>Dashboard to see some things :)</p>
+    <button onclick="window.location.href='leprdash.html'">Go</button>
+  </div>
+
+  <div class="tool-card div" data-title="lti leprtimer leapertimer timer clock retro">
+    <h3>LTI (LeprTimer)</h3>
+    <p>Retro Timer</p>
+    <button onclick="window.location.href='lti.html'">Go</button>
+  </div>
+
+</section>
+
+<footer>© 2025 LeaperStuff. All rights reserved.</footer>
 
 <script>
-  const searchInput = document.getElementById("searchInput");
-  const projects = document.querySelectorAll(".project");
-  const hamburger = document.getElementById("hamburger");
-  const navMenu = document.getElementById("navMenu");
-  const telegramPrompt = document.getElementById("telegramPrompt");
-  const hidePrompt = document.getElementById("hidePrompt");
+  const searchInput = document.getElementById("tool-search");
+  const cards = document.querySelectorAll(".tool-card");
 
-  // Search functionality
-  searchInput.addEventListener("input", function () {
-    const query = searchInput.value.toLowerCase();
-    projects.forEach(proj => {
-      const title = proj.getAttribute("data-title").toLowerCase();
-      if (title.includes(query)) {
-        proj.style.display = "block";
-      } else {
-        proj.style.display = "none";
-      }
+  searchInput.addEventListener("input", () => {
+    const q = searchInput.value.toLowerCase();
+
+    cards.forEach(card => {
+      const keywords = card.getAttribute("data-title").toLowerCase();
+      card.style.display = keywords.includes(q) ? "" : "none";
     });
   });
-
-  // Hamburger toggle
-  hamburger.addEventListener("click", (e) => {
-    e.stopPropagation();
-    navMenu.classList.toggle("show");
-    hamburger.classList.toggle("active");
-  });
-
-  // Close menu when clicking outside on mobile
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768) {
-      if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
-        navMenu.classList.remove('show');
-        hamburger.classList.remove('active');
-      }
-    }
-  });
-
-  // Show Telegram prompt after a delay
-  setTimeout(() => {
-    telegramPrompt.classList.add('show');
-  }, 3000);
-
-  // Hide Telegram prompt
-  hidePrompt.addEventListener('click', () => {
-    telegramPrompt.classList.remove('show');
-  });
-
 </script>
-
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6915e4cd6ca233195dc74ce5/1j9uobgui';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
 
 </body>
 </html>
-</center>
