@@ -9,6 +9,7 @@ body{
   transition: 0.3s;
   background-color: rgb(242, 225, 33);
   padding: 5px 10px;
+  align-content: center;
 }
 
 .basicbutton:hover {
@@ -21,6 +22,7 @@ body{
   transition: 0.5s;
   margin: 10px;
   padding: 20px 10px;
+  align-content: center;
 }
 
 .basicsection:hover {
@@ -46,6 +48,7 @@ body{
   padding: 0;
   overflow: hidden;
   position: sticky;
+  align-content: center;
 }
 
 .basicnav li {
@@ -69,3 +72,44 @@ footer {
   justify-content: center;
   width: 100%;
 }
+/* Table styling */
+    .spreadsheet table {
+      border-collapse: collapse;
+      background: white;
+      color: black;
+      border-radius: 0;
+      overflow: hidden;
+      width: 100%;
+      margin-bottom: 15px;
+      border: 2px solid black;
+    }
+    
+    .spreadsheet th {
+      background: rgb(242, 225, 33);
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid black;
+    }
+    
+    .spreadsheet td {
+      border: 1px solid black;
+      padding: 0;
+    }
+    
+    .spreadsheet input {
+      width: 100%;
+      border: none;
+      text-align: center;
+      background: transparent;
+      color: black;
+      padding: 8px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    
+    .spreadsheet input:focus {
+      outline: 2px solid rgb(242, 225, 33);
+      background: rgba(242, 225, 33, 0.2);
+    }
