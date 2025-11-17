@@ -13,110 +13,123 @@
   <style>
     /* ===== LAYOUT SYSTEM ===== */
 
-/* Page structure */
-body { margin: 0; padding: 0; }
+    /* Page structure */
+    body { margin: 0; padding: 0; }
 
-/* Header container */
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-}
+    /* Header container */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
 
-/* Hero section */
-.hero {
-  text-align: center;
-  margin: 40px auto;
-  max-width: 700px;
-}
+    /* Hero section */
+    .hero {
+      text-align: center;
+      margin: 40px auto;
+      max-width: 700px;
+    }
 
-/* Features section */
-.features {
-  display: flex;
-  gap: 16px;
-  margin: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
+    /* Features section */
+    .features {
+      display: flex;
+      gap: 16px;
+      margin: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-.feature {
-  flex: 1;
-  min-width: 250px;
-  max-width: 350px;
-}
+    .feature {
+      flex: 1;
+      min-width: 250px;
+      max-width: 350px;
+    }
 
-/* Contact section */
-.contact {
-  margin: 40px auto;
-  max-width: 700px;
-  text-align: center;
-}
+    /* Contact section */
+    .contact {
+      margin: 40px auto;
+      max-width: 700px;
+      text-align: center;
+    }
 
-/* Footer */
-footer {
-  text-align: center;
-  margin-top: 40px;
-  padding: 10px;
-}
-
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 10px;
+    }
   </style>
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-<section class="hero div">
-  <h2>LeaperStuff</h2>
-  <button onclick="window.location.href='tools.html'">Explore Tools</button>
-    <button onclick='window.location.href="#contact"''>Contact</a>
-</section>
+  <main class="page">
 
-<section class="features">
-  <div class="feature div">
-    <h3>Developer Tools</h3>
-    <p>Powerful tools for developers, including code editors and system utilities.</p>
-  </div>
+    <h2>LeaperStuff</h2>
 
-  <div class="feature div">
-    <h3>Creative Visuals</h3>
-    <p>Chart makers and visual tools to bring your data and ideas to life.</p>
-  </div>
+    <nav>
+      <button><strong>leaperStuff</strong></button>
+      <button class="tip tip-bottom" tooltip="tools.html" onclick="window.location.href='tools.html'">
+        Explore Tools
+      </button>
+      <button class="tip tip-bottom" tooltip="Contact section" onclick='window.location.href="#contact"'>
+        Contact
+      </button>
+    </nav>
 
-  <div class="feature div">
-    <h3>Innovative Projects</h3>
-    <p>Unique applications and utilities designed to enhance your digital experience.</p>
-  </div>
-</section>
+    <section class="features">
+      <div class="feature div">
+        <h3>Developer Tools</h3>
+        <p>Powerful tools for developers, including code editors and system utilities.</p>
+      </div>
 
-<section class="contact div" id="contact">
-  <h3>Contact</h3>
+      <div class="feature div">
+        <h3>Creative Visuals</h3>
+        <p>Chart makers and visual tools to bring your data and ideas to life.</p>
+      </div>
 
-  <a href="mailto:tickets@leaperstuff.p.tawk.email" class="basicbutton">
-    <i class="fas fa-envelope"></i> Email
-  </a><br>
+      <div class="feature div">
+        <h3>Innovative Projects</h3>
+        <p>Unique applications and utilities designed to enhance your digital experience.</p>
+      </div>
 
-  <a href="https://github.com/ivaansrivastavadev" class="basicbutton">
-    <i class="fab fa-github"></i> GitHub
-  </a><br>
+      <div class="feature div">
+        <h3>Open Source</h3>
+        <p>
+          Most of the code is Open-source on
+          <a href="https://github.com/ivaansrivastavadev/leaperStuff"
+             class="tip"
+             tooltip="Link">Github</a>
+        </p>
+      </div>
+    </section>
 
-  <a href="https://t.me/s/leaperposts" class="basicbutton">
-    <i class="fab fa-telegram"></i> Telegram
-  </a>
-</section>
+    <section class="contact div" id="contact">
+      <h3>Contact</h3>
 
-<footer>© 2025 LeaperStuff. All rights reserved.</footer>
+      <a href="mailto:tickets@leaperstuff.p.tawk.email" class="basicbutton">
+        <i class="fas fa-envelope"></i> Email
+      </a><br>
 
-<script>
-  const ham = document.getElementById("hamburger");
-  const nav = document.getElementById("navMenu");
+      <a href="https://github.com/ivaansrivastavadev" class="basicbutton">
+        <i class="fab fa-github"></i> GitHub
+      </a><br>
 
-  ham.addEventListener("click", () => {
-    ham.classList.toggle("active");
-    nav.classList.toggle("show");
-  });
-</script>
+      <a href="https://t.me/s/leaperposts" class="basicbutton">
+        <i class="fab fa-telegram"></i> Telegram
+      </a>
+    </section>
 
+    <footer>
+      © 2025 LeaperStuff. All rights reserved.
+    </footer>
+
+    <script></script>
+
+  </main>
 </body>
 </html>
 

@@ -1,4 +1,4 @@
-<center><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -44,13 +44,14 @@
       height: 90vh;
       max-height: 90%;
       background: white;
-      border-radius: 12px;
+      border-radius: 0;
       padding: 20px;
       box-sizing: border-box;
       margin-bottom: 2rem;
       position: relative;
       overflow: hidden;
-      border: 4px solid black;
+      border: 2px solid black;
+      box-shadow: var(--color1) 7px 7px;
     }
     
     #chartCanvas {
@@ -73,13 +74,13 @@
     }
     
     .screenshot-options {
-      background: rgb(226, 232, 181);
+      background: var(--color1);
       padding: 2rem;
       border-radius: 0;
       width: 90%;
       max-width: 500px;
-      border: 4px solid black;
-      box-shadow: black 5px 5px;
+      border: 2px solid black;
+      box-shadow: var(--color1) 7px 7px;
     }
     
     .modal-buttons {
@@ -110,116 +111,18 @@
         padding: 1rem;
       }
     }
-    
-    /* Table styling */
-    .spreadsheet table {
-      border-collapse: collapse;
-      background: white;
-      color: black;
-      border-radius: 0;
-      overflow: hidden;
-      width: 100%;
-      margin-bottom: 15px;
-      border: 2px solid black;
-    }
-    
-    .spreadsheet th {
-      background: rgb(242, 225, 33);
-      color: #000;
-      font-weight: bold;
-      padding: 10px;
-      text-align: center;
-      border: 1px solid black;
-    }
-    
-    .spreadsheet td {
-      border: 1px solid black;
-      padding: 0;
-    }
-    
-    .spreadsheet input {
-      width: 100%;
-      border: none;
-      text-align: center;
-      background: transparent;
-      color: black;
-      padding: 8px;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-    
-    .spreadsheet input:focus {
-      outline: 2px solid rgb(242, 225, 33);
-      background: rgba(242, 225, 33, 0.2);
-    }
-    
-    /* Form elements */
-    select {
-      padding: 8px 12px;
-      border-radius: 0;
-      border: 2px solid black;
-      background: rgb(212, 221, 146);
-      color: black;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: black 5px 5px;
-    }
-    
-    select:hover {
-      box-shadow: none;
-    }
-    
-    .custom-size-inputs input {
-      width: 80px;
-      padding: 5px;
-      border-radius: 0;
-      border: 2px solid black;
-      background: rgb(212, 221, 146);
-      color: black;
-      box-shadow: black 5px 5px;
-    }
-    
-    .custom-size-inputs input:hover {
-      box-shadow: none;
-    }
-    
-    .option-group input[type="number"] {
-      width: 80px;
-      padding: 5px;
-      border-radius: 0;
-      border: 2px solid black;
-      background: rgb(212, 221, 146);
-      color: black;
-      box-shadow: black 5px 5px;
-    }
-    
-    .option-group input[type="number"]:hover {
-      box-shadow: none;
-    }
-    
-    /* Radio buttons */
-    .option-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      cursor: pointer;
-    }
-    
-    input[type="radio"] {
-      margin-right: 8px;
-    }
+
   </style>
 </head>
 <body>
-      <div class="page-header">
-      <h1><a href="index.html">lepr</a>Visuals</h1>
-      <p class="tagline">by <strong>leaperStuff</strong></p>
+  <nav>
+    <button onclick="window.location.href='index.html'"><strong>leaperStuff</strong></button>
+  </nav>
+      <h1>leprVisuals</h1>
       <p>Create or upload data → Turn into stunning charts ✨</p>
-    </div>
 
-    <div class="spreadsheet basicsection">
       <h3>Spreadsheet Maker</h3>
       
-      <div class="spreadsheet-controls">
         <button class="basicbutton" onclick="addRow()">+ Add Row</button>
         <button class="basicbutton" onclick="removeRow()">- Remove Row</button>
         
@@ -235,7 +138,6 @@
         <button class="basicbutton" onclick="downloadSpreadsheet()">Download as XLSX</button>
         <button class="basicbutton" onclick="document.getElementById('fileInput').click()">Upload XLSX</button>
         <input type="file" id="fileInput" accept=".xlsx" style="display: none" onchange="handleFileUpload(this.files)">
-      </div>
       
       <table id="sheet">
         <tr>
@@ -243,16 +145,15 @@
           <th>Value</th>
         </tr>
         <tr>
-          <td><input value="First"></td>
-          <td><input value="1"></td>
+          <td><input class="basicinput" value="First"></td>
+          <td><input class="basicinput" value="1"></td>
         </tr>
         <tr>
-          <td><input value="Second"></td>
-          <td><input value="2"></td>
+          <td><input class="basicinput" value="Second"></td>
+          <td><input class="basicinput" value="2"></td>
         </tr>
       </table>
       
-      <div class="chart-controls">
         <label for="chartType">Chart Type:</label>
         <select id="chartType" class="basicinput">
           <option value="pie">Pie Chart</option>
@@ -279,7 +180,6 @@
         
         <button class="basicbutton" onclick="generateChartFromSheet()">Generate Chart</button>
         <button class="basicbutton" onclick="showScreenshotOptions()">Download</button>
-      </div>
     </div>
     
     <div id="chartWrapper" class="basicsection">
@@ -305,14 +205,15 @@
           <button class="basicbutton" onclick="takeScreenshot()">Download</button>
           <button class="basicbutton" onclick="document.getElementById('screenshotModal').style.display = 'none'">Cancel</button>
         </div>
+      </div>
 
-    <footer>© 2025 leaperStuff</footer>
-  </div>
+    <footer class="basicsection">© 2025 leaperStuff</footer>
 
   <!-- Keep libraries for Excel parsing (future upload feature) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Your JavaScript code remains exactly the same
     let chart;
     const presetData = {
       sales: {
@@ -700,5 +601,3 @@
   </script>
 </body>
 </html>
-</center>
-
