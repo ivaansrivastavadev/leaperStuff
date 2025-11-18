@@ -5,355 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/gif" href="roundedlogo.gif">
   <title>leaperStuff - 404</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg: #0b0b12;
-      --text: #f5f5f5;
-      --accent: #ffd600;
-      --glass: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.2);
-      --glass-shadow: rgba(0, 0, 0, 0.1);
-      --radius-sm: 12px;
-      --radius-md: 20px;
-      --radius-lg: 30px;
-    }
-    
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0b0b12 0%, #151522 100%);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      overflow-x: hidden;
-    }
-    
-    /* Liquid glass effect background */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(255, 214, 0, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 214, 0, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-      z-index: -1;
-      pointer-events: none;
-    }
-    
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    
-    header h1 {
-      font-size: 2.5rem;
-      color: var(--accent);
-      text-shadow: 0 0 10px rgba(255, 214, 0, 0.3);
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 1rem;
-    }
-    
-    .error-container {
-      background: var(--glass);
-      border-radius: var(--radius-md);
-      padding: 3rem 2rem;
-      backdrop-filter: blur(12px) saturate(180%);
-      -webkit-backdrop-filter: blur(12px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 32px var(--glass-shadow);
-      text-align: center;
-      max-width: 600px;
-      width: 90%;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 2rem;
-    }
-    
-    .error-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(255, 214, 0, 0.05) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    
-    .error-container:hover::before {
-      opacity: 1;
-    }
-    
-    .error-code {
-      font-size: 8rem;
-      font-weight: bold;
-      color: var(--accent);
-      text-shadow: 0 0 20px rgba(255, 214, 0, 0.5);
-      margin-bottom: 1rem;
-      line-height: 1;
-    }
-    
-    .message {
-      font-size: 1.5rem;
-      margin-bottom: 2rem;
-      color: rgba(255, 255, 255, 0.9);
-    }
-    
-    .hint {
-      font-size: 1rem;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 2rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .home-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.8rem;
-      padding: 1rem 2rem;
-      border-radius: var(--radius-sm);
-      background: var(--accent);
-      color: #0b0b12;
-      text-decoration: none;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(255, 214, 0, 0.3);
-      position: relative;
-      overflow: hidden;
-      margin-top: 1rem;
-    }
-    
-    .home-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: left 0.5s;
-    }
-    
-    .home-button:hover::before {
-      left: 100%;
-    }
-    
-    .home-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(255, 214, 0, 0.5);
-    }
-    
-    /* Easter egg popup */
-    #secret {
-      display: none;
-      margin-top: 2rem;
-      font-size: 1.2rem;
-      color: var(--accent);
-      animation: fadeIn 1s ease-in-out;
-      padding: 1.5rem;
-      background: var(--glass);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px var(--glass-shadow);
-      max-width: 500px;
-      width: 90%;
-    }
-    
-    #secret.show {
-      display: block;
-    }
-    
-    .game-container {
-      margin-top: 1.5rem;
-      padding: 1.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .game-title {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
-    }
-    
-    .game-instructions {
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.8);
-    }
-    
-    .game-board {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 0 auto;
-      max-width: 300px;
-    }
-    
-    .game-cell {
-      aspect-ratio: 1;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .game-cell:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: scale(1.05);
-    }
-    
-    .game-cell.active {
-      background: var(--accent);
-      color: #0b0b12;
-    }
-    
-    .game-controls {
-      margin-top: 1.5rem;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-    
-    .game-button {
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      background: var(--glass);
-      color: var(--text);
-      border: 1px solid var(--glass-border);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .game-button:hover {
-      background: var(--accent);
-      color: #0b0b12;
-    }
-    
-    .game-stats {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.8);
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    .pulse {
-      animation: pulse 2s infinite;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-      
-      .error-code {
-        font-size: 6rem;
-      }
-      
-      .message {
-        font-size: 1.2rem;
-      }
-      
-      .game-board {
-        max-width: 250px;
-      }
-    }
-  </style>
 </head>
 <body>
-  <header>
-    <h1>leaperStuff</h1>
-  </header>
-
-  <div class="error-container">
-    <div class="error-code">404</div>
-    <div class="message">Oops! The page you're looking for doesn't exist.</div>
-    <div class="hint">
-      <i class="fas fa-lightbulb"></i> Tip: Try exploring the homepage or... maybe a secret code? Press down arrow 🎮
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-brand">leaperStuff</a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tools.html">Tools</a></li>
+      </ul>
     </div>
-    <a href="index.html" class="home-button">
-      <i class="fas fa-home"></i>
-      <span>Back to Home</span>
-    </a>
-  </div>
+  </nav>
 
-  <div id="secret">
-    <div class="game-title">✨ You found the easter egg! ✨</div>
-    <p>Let's play a memory game! Match the pairs of icons.</p>
-    
-    <div class="game-container">
-      <div class="game-instructions">Click on cards to reveal icons. Match all pairs to win!</div>
+  <main class="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 2rem;">
+    <!-- Error Container -->
+    <section class="card text-center liquid-glass" style="max-width: 600px; width: 90%; padding: 3rem 2rem;">
+      <div class="error-code" style="font-size: 8rem; font-weight: bold; color: var(--color1); text-shadow: 0 0 20px rgba(255, 209, 102, 0.5); margin-bottom: 1rem; line-height: 1;">404</div>
       
-      <div class="game-board" id="gameBoard">
-        <!-- Game cells will be generated by JavaScript -->
+      <h2 style="font-size: 1.5rem; margin-bottom: 2rem; color: var(--text-light);">Oops! The page you're looking for doesn't exist.</h2>
+      
+      <div class="alert alert-warning" style="margin-bottom: 2rem;">
+        <i class="fas fa-lightbulb"></i> Tip: Try exploring the homepage or... maybe a secret code? Press down arrow 🎮
       </div>
       
-      <div class="game-stats">
-        <div>Moves: <span id="movesCount">0</span></div>
-        <div>Pairs Found: <span id="pairsCount">0</span>/<span id="totalPairs">0</span></div>
-      </div>
+      <a href="index.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.8rem;">
+        <i class="fas fa-home"></i>
+        <span>Back to Home</span>
+      </a>
+    </section>
+
+    <!-- Easter Egg Section -->
+    <div id="secret" class="card liquid-glass" style="display: none; max-width: 500px; width: 90%; margin-top: 2rem; text-align: center;">
+      <h3 style="color: var(--color1); margin-bottom: 1rem;">✨ You found the easter egg! ✨</h3>
+      <p style="margin-bottom: 1.5rem;">Let's play a memory game! Match the pairs of icons.</p>
       
-      <div class="game-controls">
-        <button class="game-button" id="restartGame">Restart Game</button>
-        <button class="game-button" id="closeGame">Close</button>
+      <div class="game-container" style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <div class="game-instructions" style="margin-bottom: 1rem; font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);">
+          Click on cards to reveal icons. Match all pairs to win!
+        </div>
+        
+        <div class="game-board" id="gameBoard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 auto; max-width: 300px;">
+          <!-- Game cells will be generated by JavaScript -->
+        </div>
+        
+        <div class="game-stats" style="display: flex; justify-content: space-between; margin-top: 1rem; font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);">
+          <div>Moves: <span id="movesCount">0</span></div>
+          <div>Pairs Found: <span id="pairsCount">0</span>/<span id="totalPairs">0</span></div>
+        </div>
+        
+        <div class="game-controls" style="margin-top: 1.5rem; display: flex; gap: 10px; justify-content: center;">
+          <button class="btn btn-secondary" id="restartGame">Restart Game</button>
+          <button class="btn btn-secondary" id="closeGame">Close</button>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="glass text-center" style="margin-top: 2rem; padding: 1.5rem;">
+    <p>© 2025 LeaperStuff. All rights reserved.</p>
+  </footer>
 
   <script>
-    // Easter Egg: Konami Code
+    // Easter Egg: Konami Code (simplified - just down arrow)
     const secretEl = document.getElementById("secret");
-    const konami = [40]
-    let entered = [];
+    let downArrowPressed = false;
 
     window.addEventListener("keydown", e => {
-      entered.push(e.keyCode);
-      if (entered.toString().indexOf(konami.toString()) >= 0) {
-        secretEl.classList.add('show');
-        initGame();
+      if (e.key === 'ArrowDown' || e.keyCode === 40) {
+        if (!downArrowPressed) {
+          downArrowPressed = true;
+          secretEl.style.display = 'block';
+          secretEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          initGame();
+        }
       }
-      if (entered.length > 10) entered.shift(); // keep buffer size
     });
 
     // Memory Game Logic
@@ -388,11 +117,35 @@
       gameState.cards.forEach((icon, index) => {
         const cell = document.createElement('div');
         cell.className = 'game-cell';
+        cell.style.aspectRatio = '1';
+        cell.style.background = 'rgba(255, 255, 255, 0.1)';
+        cell.style.borderRadius = '12px';
+        cell.style.display = 'flex';
+        cell.style.alignItems = 'center';
+        cell.style.justifyContent = 'center';
+        cell.style.fontSize = '2rem';
+        cell.style.cursor = 'pointer';
+        cell.style.transition = 'all 0.3s ease';
+        cell.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        
         cell.dataset.index = index;
         cell.dataset.icon = icon;
         cell.innerHTML = '<i class="fas fa-question"></i>';
         
         cell.addEventListener('click', () => flipCard(index));
+        cell.addEventListener('mouseenter', () => {
+          if (!cell.classList.contains('active')) {
+            cell.style.background = 'rgba(255, 255, 255, 0.15)';
+            cell.style.transform = 'scale(1.05)';
+          }
+        });
+        cell.addEventListener('mouseleave', () => {
+          if (!cell.classList.contains('active')) {
+            cell.style.background = 'rgba(255, 255, 255, 0.1)';
+            cell.style.transform = 'scale(1)';
+          }
+        });
+        
         gameBoard.appendChild(cell);
       });
     }
@@ -413,6 +166,8 @@
       
       // Flip the card
       cell.innerHTML = `<i class="fas fa-${icon}"></i>`;
+      cell.style.background = 'var(--color1)';
+      cell.style.color = 'var(--color5)';
       cell.classList.add('active');
       
       gameState.flippedCards.push(index);
@@ -449,6 +204,10 @@
           setTimeout(() => {
             firstCard.innerHTML = '<i class="fas fa-question"></i>';
             secondCard.innerHTML = '<i class="fas fa-question"></i>';
+            firstCard.style.background = 'rgba(255, 255, 255, 0.1)';
+            firstCard.style.color = 'var(--text-light)';
+            secondCard.style.background = 'rgba(255, 255, 255, 0.1)';
+            secondCard.style.color = 'var(--text-light)';
             firstCard.classList.remove('active');
             secondCard.classList.remove('active');
             
@@ -468,32 +227,9 @@
     // Event listeners for game controls
     document.getElementById('restartGame').addEventListener('click', initGame);
     document.getElementById('closeGame').addEventListener('click', () => {
-      secretEl.classList.remove('show');
+      secretEl.style.display = 'none';
+      downArrowPressed = false;
     });
-    
-    // Initialize on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      // Add subtle animation to the error code
-      const errorCode = document.querySelector('.error-code');
-      errorCode.classList.add('pulse');
-    });
-    
-// Scroll to secret div when down arrow is pressed
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown' || e.keyCode === 40) {
-        e.preventDefault(); // Prevent default arrow key behavior
-        
-        const secretDiv = document.getElementById('secret');
-        if (secretDiv) {
-            // Scroll to the secret div
-            secretDiv.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center' // or 'start', 'end', 'nearest'
-            });
-        }
-    }
-});
   </script>
 </body>
 </html>
-

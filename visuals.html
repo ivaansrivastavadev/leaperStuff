@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="basicstyle.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     /* Grid layout for chart and controls */
     .main-container {
@@ -28,36 +28,26 @@
       align-items: center;
     }
     
-    .size-controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    
-    .custom-size-inputs {
-      display: flex;
-      gap: 10px;
-    }
-    
     #chartWrapper {
       width: 90%;
       height: 90vh;
       max-height: 90%;
       background: white;
-      border-radius: 0;
+      border-radius: 16px;
       padding: 20px;
       box-sizing: border-box;
       margin-bottom: 2rem;
       position: relative;
       overflow: hidden;
-      border: 2px solid black;
-      box-shadow: var(--color1) 7px 7px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px var(--shadow);
     }
     
     #chartCanvas {
       width: 100% !important;
       height: 100% !important;
       background-color: white;
+      border-radius: 8px;
     }
     
     .screenshot-modal {
@@ -71,16 +61,16 @@
       z-index: 1000;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(10px);
     }
     
     .screenshot-options {
-      background: var(--color1);
+      composes: liquid-glass;
       padding: 2rem;
-      border-radius: 0;
+      border-radius: 16px;
       width: 90%;
       max-width: 500px;
-      border: 2px solid black;
-      box-shadow: var(--color1) 7px 7px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
     .modal-buttons {
@@ -88,6 +78,62 @@
       gap: 10px;
       justify-content: flex-end;
       margin-top: 1rem;
+    }
+    
+    /* Table styling */
+    #sheet {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    #sheet th, #sheet td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    #sheet th {
+      background: rgba(255, 255, 255, 0.1);
+      font-weight: 600;
+      color: var(--color1);
+    }
+    
+    #sheet tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    #sheet tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* Form elements in table */
+    #sheet input {
+      width: 100%;
+      padding: 0.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+    
+    #sheet input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Option groups */
+    .option-group {
+      margin: 1rem 0;
+    }
+    
+    .option-group label {
+      display: block;
+      margin: 0.5rem 0;
+      cursor: pointer;
     }
     
     /* Mobile responsiveness */
@@ -110,23 +156,41 @@
         width: 95%;
         padding: 1rem;
       }
+      
+      .modal-buttons {
+        flex-direction: column;
+      }
     }
 
   </style>
 </head>
 <body>
-  <nav>
-    <button onclick="window.location.href='index.html'"><strong>leaperStuff</strong></button>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-brand">leaperStuff</a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tools.html">Tools</a></li>
+      </ul>
+    </div>
   </nav>
-      <h1>leprVisuals</h1>
-      <p>Create or upload data → Turn into stunning charts ✨</p>
 
-      <h3>Spreadsheet Maker</h3>
+  <div class="main-container">
+    <!-- Header Section -->
+    <section class="card text-center" style="width: 90%; max-width: 1200px; margin-bottom: 2rem;">
+      <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--color1);">leprVisuals</h1>
+      <p style="font-size: 1.2rem; margin-bottom: 0;">Create or upload data → Turn into stunning charts ✨</p>
+    </section>
+
+    <!-- Controls Section -->
+    <section class="controls-section">
+      <h3 style="color: var(--color1); margin-bottom: 1.5rem;"><i class="fas fa-table"></i> Spreadsheet Maker</h3>
       
-        <button class="basicbutton" onclick="addRow()">+ Add Row</button>
-        <button class="basicbutton" onclick="removeRow()">- Remove Row</button>
+      <div class="spreadsheet-controls">
+        <button class="btn btn-primary" onclick="addRow()"><i class="fas fa-plus"></i> Add Row</button>
+        <button class="btn btn-secondary" onclick="removeRow()"><i class="fas fa-minus"></i> Remove Row</button>
         
-        <select id="presets" class="presets-select basicinput" onchange="loadPreset()">
+        <select id="presets" class="form-control" onchange="loadPreset()" style="width: auto; min-width: 150px;">
           <option value="">Select a preset...</option>
           <option value="sales">Sales Data</option>
           <option value="expenses">Monthly Expenses</option>
@@ -135,83 +199,109 @@
           <option value="product">Product Ratings</option>
         </select>
         
-        <button class="basicbutton" onclick="downloadSpreadsheet()">Download as XLSX</button>
-        <button class="basicbutton" onclick="document.getElementById('fileInput').click()">Upload XLSX</button>
+        <button class="btn btn-primary" onclick="downloadSpreadsheet()"><i class="fas fa-download"></i> Download XLSX</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()"><i class="fas fa-upload"></i> Upload XLSX</button>
         <input type="file" id="fileInput" accept=".xlsx" style="display: none" onchange="handleFileUpload(this.files)">
+      </div>
       
-      <table id="sheet">
-        <tr>
-          <th>Label</th>
-          <th>Value</th>
-        </tr>
-        <tr>
-          <td><input class="basicinput" value="First"></td>
-          <td><input class="basicinput" value="1"></td>
-        </tr>
-        <tr>
-          <td><input class="basicinput" value="Second"></td>
-          <td><input class="basicinput" value="2"></td>
-        </tr>
-      </table>
+      <div class="table-container">
+        <table id="sheet">
+          <tr>
+            <th>Label</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td><input class="form-control" value="First" style="background: transparent; border: none;"></td>
+            <td><input class="form-control" value="1" style="background: transparent; border: none;"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control" value="Second" style="background: transparent; border: none;"></td>
+            <td><input class="form-control" value="2" style="background: transparent; border: none;"></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- Chart Controls -->
+    <section class="controls-section">
+      <h3 style="color: var(--color1); margin-bottom: 1.5rem;"><i class="fas fa-chart-bar"></i> Chart Generator</h3>
       
-        <label for="chartType">Chart Type:</label>
-        <select id="chartType" class="basicinput">
-          <option value="pie">Pie Chart</option>
-          <option value="doughnut">Doughnut Chart</option>
-          <option value="bar">Bar Chart</option>
-          <option value="line">Line Chart</option>
-          <option value="radar">Radar Chart</option>
-          <option value="polarArea">Polar Area Chart</option>
-          <option value="scatter">Scatter Plot</option>
-          <option value="bubble">Bubble Chart</option>
-        </select>
-        
-        <label for="chartSize">Chart Size:</label>
-        <select id="chartSize" class="basicinput" onchange="toggleCustomSize()">
-          <option value="window">Window Size</option>
-          <option value="square">Square (1:1)</option>
-          <option value="custom">Custom</option>
-        </select>
-        
-        <div class="custom-size-inputs" id="customSizeInputs" style="display: none;">
-          <input type="number" id="customWidth" class="basicinput" placeholder="Width" value="800">
-          <input type="number" id="customHeight" class="basicinput" placeholder="Height" value="600">
+      <div class="chart-controls">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Chart Type:</label>
+          <select id="chartType" class="form-control" style="width: auto; min-width: 150px;">
+            <option value="pie">Pie Chart</option>
+            <option value="doughnut">Doughnut Chart</option>
+            <option value="bar">Bar Chart</option>
+            <option value="line">Line Chart</option>
+            <option value="radar">Radar Chart</option>
+            <option value="polarArea">Polar Area Chart</option>
+            <option value="scatter">Scatter Plot</option>
+            <option value="bubble">Bubble Chart</option>
+          </select>
         </div>
         
-        <button class="basicbutton" onclick="generateChartFromSheet()">Generate Chart</button>
-        <button class="basicbutton" onclick="showScreenshotOptions()">Download</button>
-    </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Chart Size:</label>
+          <select id="chartSize" class="form-control" onchange="toggleCustomSize()" style="width: auto; min-width: 150px;">
+            <option value="window">Window Size</option>
+            <option value="square">Square (1:1)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        
+        <div class="custom-size-inputs" id="customSizeInputs" style="display: none;">
+          <input type="number" id="customWidth" class="form-control" placeholder="Width" value="800" style="width: 100px;">
+          <input type="number" id="customHeight" class="form-control" placeholder="Height" value="600" style="width: 100px;">
+        </div>
+        
+        <button class="btn btn-primary" onclick="generateChartFromSheet()"><i class="fas fa-magic"></i> Generate Chart</button>
+        <button class="btn btn-secondary" onclick="showScreenshotOptions()"><i class="fas fa-camera"></i> Download</button>
+      </div>
+    </section>
     
-    <div id="chartWrapper" class="basicsection">
+    <!-- Chart Display -->
+    <div id="chartWrapper" class="liquid-glass">
       <canvas id="chartCanvas"></canvas>
     </div>
 
+    <!-- Screenshot Modal -->
     <div class="screenshot-modal" id="screenshotModal">
-      <div class="screenshot-options basicsection">
-        <h3>Download Options</h3>
+      <div class="screenshot-options">
+        <h3 style="color: var(--color1); margin-bottom: 1.5rem;">Download Options</h3>
         <div class="option-group">
-          <label>
+          <label class="form-label">Background:</label>
+          <label style="display: block; margin: 0.5rem 0;">
             <input type="radio" name="bgType" value="white" checked> White Background
           </label>
-          <label>
+          <label style="display: block; margin: 0.5rem 0;">
             <input type="radio" name="bgType" value="transparent"> Transparent Background
           </label>
         </div>
         <div class="option-group">
-          <label for="marginSize">Margin (px):</label>
-          <input type="number" id="marginSize" class="basicinput" value="20" min="0" max="100">
+          <label class="form-label" for="marginSize">Margin (px):</label>
+          <input type="number" id="marginSize" class="form-control" value="20" min="0" max="100" style="width: 100px;">
         </div>
         <div class="modal-buttons">
-          <button class="basicbutton" onclick="takeScreenshot()">Download</button>
-          <button class="basicbutton" onclick="document.getElementById('screenshotModal').style.display = 'none'">Cancel</button>
+          <button class="btn btn-primary" onclick="takeScreenshot()"><i class="fas fa-download"></i> Download</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('screenshotModal').style.display = 'none'">Cancel</button>
         </div>
       </div>
+    </div>
+  </div>
 
-    <footer class="basicsection">© 2025 leaperStuff</footer>
+  <footer class="glass text-center" style="margin-top: 2rem; padding: 1.5rem;">
+    <p>© 2025 leaperStuff</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+      Built with <i class="fas fa-heart" style="color: var(--color1);"></i> using Glassmorphism UI
+    </p>
+  </footer>
 
-  <!-- Keep libraries for Excel parsing (future upload feature) -->
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Your existing JavaScript remains exactly the same -->
   <script>
     // Your JavaScript code remains exactly the same
     let chart;
@@ -277,7 +367,7 @@
       const row = table.insertRow();
       for (let i = 0; i < cols; i++) {
         const cell = row.insertCell();
-        cell.innerHTML = '<input class="basicinput">';
+        cell.innerHTML = '<input class="form-control" style="background: transparent; border: none;">';
       }
     }
 
@@ -317,7 +407,7 @@
         const row = table.insertRow();
         rowData.forEach(cellData => {
           const cell = row.insertCell();
-          cell.innerHTML = `<input class="basicinput" value="${cellData}">`;
+          cell.innerHTML = `<input class="form-control" value="${cellData}" style="background: transparent; border: none;">`;
         });
       });
       
@@ -396,7 +486,7 @@
             if (r === 0) {
               cell.outerHTML = `<th>${jsonData[r][c] || `Column ${c+1}`}</th>`;
             } else {
-              cell.innerHTML = `<input class="basicinput" value="${jsonData[r][c] || ''}">`;
+              cell.innerHTML = `<input class="form-control" value="${jsonData[r][c] || ''}" style="background: transparent; border: none;">`;
             }
           }
         }

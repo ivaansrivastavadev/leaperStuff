@@ -5,79 +5,221 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/gif" href="image.png">
   <title>leaperChatGun – Device ID Rooms</title>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+  <link rel="stylesheet" href="style.css">
   <style>
-    :root{
-      --bg:#1a1a00; --panel:#262600; --muted:#b8b878; --text:#fffdd0; --accent:#ffeb3b; --accent-2:#ffe082; --danger:#ff7043;
+    /* Minimal custom CSS - using style.css for most styles */
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem;
     }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0d0d00,#1a1a00 30%);color:var(--text);font:16px/1.4 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    .wrap{max-width:900px;margin:0 auto;padding:16px}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    h1{font-size:20px;margin:0;color:var(--accent)}
-    .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,235,59,.12);border:1px solid rgba(255,235,59,.3);color:var(--accent)}
-    .card{background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .grow{flex:1 1 240px}
-    label{display:block;font-size:12px;color:var(--muted);margin:6px 0}
-    input,button,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0d0d00;color:var(--text);outline:none}
-    input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,235,59,.25)}
-    button{background:linear-gradient(180deg,#f9a825,#fbc02d);cursor:pointer;border-color:rgba(255,235,59,.5);color:#000;font-weight:bold}
-    button:hover{filter:brightness(1.08)}
-    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:12px;color:var(--muted)}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
 
-    /* chat area */
-    .chat{height:min(60vh,560px);overflow:auto;padding:12px;scroll-behavior:smooth}
-    .msg{max-width:86%;padding:10px 12px;margin:6px 0;border-radius:14px;border:1px solid rgba(255,255,255,.12)}
-    .me{background:linear-gradient(180deg,#fbc02d,#f9a825);margin-left:auto;border-top-right-radius:6px;color:#000}
-    .them{background:#333300;border-top-left-radius:6px}
-    .meta{font-size:11px;color:var(--muted);margin-top:4px}
+    .chat-header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
 
-    .inputbar{display:flex;gap:10px;align-items:flex-end}
-    .inputbar textarea{height:54px;resize:vertical;min-height:48px;max-height:160px}
-    .send{flex:0 0 120px}
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-    .foot{margin-top:10px;color:var(--muted);font-size:12px}
-    .warn{color:var(--danger)}
-    .green{color:var(--accent-2)}
-    .link{color:var(--accent);text-decoration:underline;cursor:pointer}
-    .small{font-size:12px}
+    .grow {
+      flex: 1 1 240px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 12px;
+      color: var(--text-light);
+      opacity: 0.8;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Chat area */
+    .chat {
+      height: min(60vh, 560px);
+      overflow: auto;
+      padding: 1rem;
+      scroll-behavior: smooth;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .msg {
+      max-width: 86%;
+      padding: 10px 12px;
+      margin: 6px 0;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .me {
+      background: linear-gradient(135deg, var(--color1), var(--color2));
+      margin-left: auto;
+      border-top-right-radius: 6px;
+      color: var(--color5);
+    }
+
+    .them {
+      background: rgba(255, 255, 255, 0.15);
+      border-top-left-radius: 6px;
+    }
+
+    .meta {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 4px;
+    }
+
+    .inputbar {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .inputbar textarea {
+      height: 54px;
+      resize: vertical;
+      min-height: 48px;
+      max-height: 160px;
+    }
+
+    .send {
+      flex: 0 0 120px;
+    }
+
+    .foot {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+    }
+
+    .warn {
+      color: #ff7043;
+    }
+
+    .green {
+      color: var(--color1);
+    }
+
+    .link {
+      color: var(--color1);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .small {
+      font-size: 12px;
+    }
+
+    /* Toast notifications */
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      z-index: 1000;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .row {
+        flex-direction: column;
+      }
+      
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .inputbar {
+        flex-direction: column;
+      }
+      
+      .send {
+        flex: 1;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>leaperChatGun <span class="badge">client‑only</span></h1>
-      <div class="pill">Device ID: <span id="deviceId" class="mono"></span></div>
-    </header>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-brand">leaperStuff</a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tools.html">Tools</a></li>
+      </ul>
+    </div>
+  </nav>
 
-    <section class="card" style="padding:14px;margin-top:12px">
+  <div class="wrap">
+    <!-- Header -->
+    <div class="chat-header">
+      <h1 style="color: var(--color1); margin: 0;">leaperChatGun <span class="badge badge-primary">client‑only</span></h1>
+      <div class="pill">Device ID: <span id="deviceId" class="mono"></span></div>
+    </div>
+
+    <!-- Room Configuration -->
+    <section class="card">
       <div class="row">
         <div class="grow">
-          <label>Chat ID (share with your friend)</label>
-          <input id="room" class="mono" placeholder="e.g. yellow-tiger-8291" />
+          <label class="form-label">Chat ID (share with your friend)</label>
+          <input id="room" class="form-control mono" placeholder="e.g. yellow-tiger-8291" />
         </div>
         <div class="grow">
-          <label>Secret (optional – encrypts messages)</label>
-          <input id="secret" type="password" placeholder="passphrase for E2E encryption" />
+          <label class="form-label">Secret (optional – encrypts messages)</label>
+          <input id="secret" type="password" class="form-control" placeholder="passphrase for E2E encryption" />
         </div>
       </div>
-      <div class="toolbar" style="margin-top:10px">
-        <button id="join">Join / Create Room</button>
-        <button id="copyLink">Copy Invite Link</button>
+      <div class="toolbar">
+        <button id="join" class="btn btn-primary">Join / Create Room</button>
+        <button id="copyLink" class="btn btn-secondary">Copy Invite Link</button>
         <span class="pill">Relay peers: <span id="peerStatus" class="mono">—</span></span>
       </div>
-      <div class="foot small">No accounts. Messages sync via public <a class="link" target="_blank" href="https://github.com/amark/gun">GUN</a> relays. Use a <b>Secret</b> you share out‑of‑band for end‑to‑end encryption. Don’t put private data here without a secret. Made by Ivaan Srivastava AKA leaperStuff.</div>
+      <div class="foot small">
+        No accounts. Messages sync via public <a class="link" target="_blank" href="https://github.com/amark/gun">GUN</a> relays. 
+        Use a <b>Secret</b> you share out‑of‑band for end‑to‑end encryption. Don't put private data here without a secret. 
+        Made by Ivaan Srivastava AKA leaperStuff.
+      </div>
     </section>
 
-    <section class="card" style="padding:0;margin-top:14px">
+    <!-- Chat Interface -->
+    <section class="card" style="padding: 0;">
       <div id="chat" class="chat"></div>
-      <div style="padding:12px;border-top:1px solid rgba(255,255,255,.08)">
+      <div style="padding: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
         <div class="inputbar">
-          <textarea id="text" placeholder="Type a message…"></textarea>
-          <button id="send" class="send">Send</button>
+          <textarea id="text" class="form-control" placeholder="Type a message…"></textarea>
+          <button id="send" class="btn btn-primary send">Send</button>
         </div>
         <div class="foot">
           <span id="roomHint"></span>
@@ -95,6 +237,7 @@
   <script src="https://cdn.jsdelivr.net/npm/gun/axe.js"></script>
 
   <script>
+    // Your existing JavaScript remains exactly the same
     const $ = (id)=>document.getElementById(id);
 
     function getDeviceId(){
@@ -164,9 +307,7 @@
     function toast(msg){
       const div = document.createElement('div');
       div.textContent = msg;
-      div.style.position='fixed';div.style.bottom='14px';div.style.right='14px';
-      div.style.background='rgba(0,0,0,.7)';div.style.padding='10px 12px';div.style.borderRadius='10px';
-      div.style.border='1px solid rgba(255,255,255,.12)';
+      div.className = 'toast';
       document.body.appendChild(div);
       setTimeout(()=>div.remove(),1600);
     }
@@ -245,7 +386,6 @@
       secret = $('secret').value; setEncHint();
       joinRoom($('room').value.trim());
     });
-
   </script>
 </body>
 </html>

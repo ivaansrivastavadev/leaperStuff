@@ -6,113 +6,125 @@
   <link rel="icon" href="roundedlogo.gif" type="image/x-icon" />
   <title>LeaperStuff — Tools</title>
 
-  <link rel="stylesheet" href="basicstyle.css" />
-
-  <style>
-    /* ===== LAYOUT SYSTEM ===== */
-    .tools-hero { text-align: center; margin: 40px auto; max-width: 700px; }
-    .search-container { text-align: center; margin-bottom: 30px; }
-
-    .tools-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
-      margin: 0 20px;
-    }
-
-    .tool-card {
-      flex: 1;
-      min-width: 250px;
-      max-width: 350px;
-    }
-
-    footer { text-align: center; margin-top: 40px; padding: 10px; }
-  </style>
-
+  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-  <nav>
-    <button onclick='window.location.href="index.html"''><strong>leaperStuff</strong></button>
-    <button onclick='window.location.href="index.html#contact"''>Contact</button>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-brand">leaperStuff</a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
   </nav>
 
-<section class="tools-hero div">
-  <h2>Tools Library</h2>
-</section>
+  <main class="page" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+    <!-- Hero Section -->
+    <section class="hero card text-center">
+      <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--color1);">Tools Library</h1>
+      <p style="font-size: 1.2rem;">Discover powerful tools for developers and creators</p>
+    </section>
 
-<section class="search-container">
-  <input id="tool-search" type="text" placeholder="Search tools..." />
-</section>
+    <!-- Search Section -->
+    <section class="card text-center">
+      <div class="form-group">
+        <input id="tool-search" type="text" class="form-control" placeholder="Search tools..." style="text-align: center;" />
+      </div>
+    </section>
 
-<section class="tools-list" id="projects">
+    <!-- Tools Grid -->
+    <section class="features" id="projects">
+      <div class="tool-card card" data-title="ZenCodeEdit Zen Code Edit Editor Peace CodeEditor">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-code"></i> ZenCodeEdit</h3>
+        </div>
+        <p>The Editor for Peace.</p>
+        <button class="btn btn-primary" onclick="window.location.href='https://zencodeedit.vercel.app'">Open Tool</button>
+      </div>
 
-  <div class="tool-card div" data-title="ZenCodeEdit Zen Code Edit Editor Peace CodeEditor">
-    <h3>ZenCodeEdit</h3>
-    <p>The Editor for Peace.</p>
-    <button onclick="window.location.href='https://zencodeedit.vercel.app'">Go</button>
-  </div>
+      <div class="tool-card card" data-title="Chat Gun leaperchatgun ChatGun messaging anonymous chat">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-comments"></i> leaperChatGun</h3>
+        </div>
+        <p>Chat to a friend without login.</p>
+        <button class="btn btn-primary" onclick="window.location.href='leaperchatgun.html'">Open Tool</button>
+      </div>
 
-  <div class="tool-card div" data-title="Chat Gun leaperchatgun ChatGun messaging anonymous chat">
-    <h3>leaperChatGun</h3>
-    <p>Chat to friend without login.</p>
-    <button onclick="window.location.href='leaperchatgun.html'">Go</button>
-  </div>
+      <div class="tool-card card" data-title="CAVA Web Unofficial audio visualizer">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-music"></i> CAVA Web</h3>
+        </div>
+        <p>UnOfficial CAVA Web.</p>
+        <button class="btn btn-primary" onclick="window.location.href='cava_web_unofficial.html'">Open Tool</button>
+      </div>
 
-  <div class="tool-card div" data-title="CAVA Web Unofficial audio visualizer">
-    <h3>CAVA Web</h3>
-    <p>UnOfficial CAVA Web.</p>
-    <button onclick="window.location.href='cava_web_unofficial.html'">Go</button>
-  </div>
+      <div class="tool-card card" data-title="neofetch infetch internetfetch system ascii fetch">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-terminal"></i> inFetch</h3>
+        </div>
+        <p>like neofetch but only ascii</p>
+        <button class="btn btn-primary" onclick="window.location.href='infetch.html'">Open Tool</button>
+      </div>
 
-  <div class="tool-card div" data-title="neofetch infetch internetfetch system ascii fetch">
-    <h3>inFetch</h3>
-    <p>like neofetch but only ascii</p>
-    <button onclick="window.location.href='infetch.html'">Go</button>
-  </div>
+      <div class="tool-card card" data-title="visuals chart maker chartmaker leprvisuals leapervisuals visual charts data">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-chart-bar"></i> leprVisuals</h3>
+          <span class="badge badge-primary">Popular</span>
+        </div>
+        <p>Cool Chart maker.</p>
+        <button class="btn btn-primary" onclick="window.location.href='visuals.html'">Open Tool</button>
+      </div>
 
-  <div class="tool-card div" data-title="visuals chart maker chartmaker leprvisuals leapervisuals visual charts data">
-    <h3>leprVisuals</h3>
-    <p>Cool Chart maker.</p>
-    <button onclick="window.location.href='visuals.html'">Go</button>
-  </div>
+      <div class="tool-card card" data-title="hypr linux hyprlepr lepr leaper hyprleaper de desktop environment">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-desktop"></i> hyprLepr</h3>
+          <span class="badge badge-secondary">Linux</span>
+        </div>
+        <p>Cool Desktop. (Desktop recommended)</p>
+        <button class="btn btn-primary" onclick="window.location.href='hyprlepr.html'">Open Tool</button>
+      </div>
 
-  <div class="tool-card div" data-title="hypr linux hyprlepr lepr leaper hyprleaper de desktop environment">
-    <h3>hyprLepr</h3>
-    <p>Cool Desktop. (Desktop recommended)</p>
-    <button onclick="window.location.href='hyprlepr.html'">Go</button>
-  </div>
+      <div class="tool-card card" data-title="leaperdash leprdash dashboard dash board web tools">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> leaperDash</h3>
+        </div>
+        <p>Dashboard to see some things :)</p>
+        <button class="btn btn-primary" onclick="window.location.href='leprdash.html'">Open Tool</button>
+      </div>
 
-  <div class="tool-card div" data-title="leaperdash leprdash dashboard dash board web tools">
-    <h3>leaperDash</h3>
-    <p>Dashboard to see some things :)</p>
-    <button onclick="window.location.href='leprdash.html'">Go</button>
-  </div>
+      <div class="tool-card card" data-title="lti leprtimer leapertimer timer clock retro">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-clock"></i> LTI (LeprTimer)</h3>
+        </div>
+        <p>Retro Timer</p>
+        <button class="btn btn-primary" onclick="window.location.href='lti.html'">Open Tool</button>
+      </div>
+    </section>
 
-  <div class="tool-card div" data-title="lti leprtimer leapertimer timer clock retro">
-    <h3>LTI (LeprTimer)</h3>
-    <p>Retro Timer</p>
-    <button onclick="window.location.href='lti.html'">Go</button>
-  </div>
+    <!-- Footer -->
+    <footer class="glass text-center" style="margin-top: 4rem; padding: 2rem 0;">
+      <p>© 2025 LeaperStuff. All rights reserved.</p>
+      <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+        Built with <i class="fas fa-heart" style="color: var(--color1);"></i> by Ivaan Srivastava
+      </p>
+    </footer>
+  </main>
 
-</section>
+  <script>
+    const searchInput = document.getElementById("tool-search");
+    const cards = document.querySelectorAll(".tool-card");
 
-<footer>© 2025 LeaperStuff. All rights reserved.</footer>
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.toLowerCase();
 
-<script>
-  const searchInput = document.getElementById("tool-search");
-  const cards = document.querySelectorAll(".tool-card");
-
-  searchInput.addEventListener("input", () => {
-    const q = searchInput.value.toLowerCase();
-
-    cards.forEach(card => {
-      const keywords = card.getAttribute("data-title").toLowerCase();
-      card.style.display = keywords.includes(q) ? "" : "none";
+      cards.forEach(card => {
+        const keywords = card.getAttribute("data-title").toLowerCase();
+        card.style.display = keywords.includes(q) ? "" : "none";
+      });
     });
-  });
-</script>
-
+  </script>
 </body>
 </html>
