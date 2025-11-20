@@ -8,6 +8,80 @@
 
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* Tools Grid Layout */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tool-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  margin: 0;
+  flex: 1;
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-primary {
+  background: var(--color1);
+  color: white;
+}
+
+.badge-secondary {
+  background: var(--color2, #6c757d);
+  color: white;
+}
+
+.tool-card p {
+  flex: 1;
+  margin-bottom: 1.5rem;
+}
+
+.tool-card .btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .features {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+  </style>
 </head>
 <body>
   <!-- Navigation -->
@@ -101,6 +175,13 @@
         </div>
         <p>Retro Timer</p>
         <button class="btn btn-primary" onclick="window.location.href='lti.html'">Open Tool</button>
+      </div>
+            <div class="tool-card card" data-title="docs leaperdocs googledocs google docs leprdocs word writer">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa-solid fa-file"></i> leprDocs</h3>
+        </div>
+        <p>Just like Google Docs but privacy included (unless you're computer is hacked)</p>
+        <button class="btn btn-primary" onclick="window.location.href='docs.html'">Open Tool</button>
       </div>
     </section>
 
