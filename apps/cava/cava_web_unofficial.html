@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CAVA-Web</title>
+<link rel="stylesheet" href="cava.css">
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<div class="topbar">
+  <div class="hamb" id="hamb"><div></div></div>
+  <button class="controls-toggle btn" id="openControls">Customize</button>
+</div>
+
+<div class="sidebar hidden" id="sidebar" role="dialog" aria-label="Visualizer customization">
+  <button class="close-btn" id="closeSidebar" aria-label="Close">×</button>
+  <h3 style="margin:0 0 8px 0">Visualizer — Controls</h3>
+
+  <div class="sect">
+    <label>Audio Source</label>
+    <div class="row" style="gap:6px;">
+      <button class="btn" id="btn-mic">Use Microphone</button>
+      <button class="btn" id="btn-tab">Capture Tab/System Audio</button>
+      <label class="btn" for="file-input" style="cursor:pointer">Load File</label>
+      <input id="file-input" type="file" accept="audio/*,video/*" style="display:none">
+      <button class="btn" id="btn-stop">Stop</button>
+    </div>
+    <div style="margin-top:8px" class="muted">Tip: Tab/system capture requires browser permission to share a tab/window with audio (Chromium-based recommended).</div>
+  </div>
+
+  <div class="sect">
+    <label>Playback & Input</label>
+    <div class="row">
+      <audio id="audio" controls style="width:100%"></audio>
+    </div>
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Gain</label>
+      <input id="gain" type="range" min="0" max="4" step="0.01" value="1">
+      <input id="gainNum" type="number" step="0.01" min="0" max="10" value="1" style="width:72px;margin-left:6px">
+    </div>
+  </div>
+
+  <div class="sect">
+    <label>FFT & Bars</label>
+    <div class="row">
+      <label style="flex:1">FFT Size</label>
+      <select id="fft" class="small">
+        <option>32</option><option>64</option><option>128</option><option>256</option><option selected>512</option><option>1024</option><option>2048</option><option>4096</option>
+      </select>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label style="flex:1">Bar Count</label>
+      <input id="bars" type="range" min="8" max="256" value="64">
+      <input id="barsNum" type="number" min="8" max="256" value="64" style="width:72px;margin-left:6px">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label style="flex:1">Smoothing</label>
+      <input id="smooth" type="range" min="0" max="0.99" step="0.01" value="0.8">
+      <input id="smoothNum" type="number" min="0" max="0.99" step="0.01" value="0.8" style="width:72px;margin-left:6px">
+    </div>
+  </div>
+
+  <div class="sect">
+    <label>Visual Style</label>
+    <div class="row">
+      <label style="flex:1">Orientation</label>
+      <select id="orient"><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option><option value="radial">Radial</option></select>
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Bar Spacing</label>
+      <input id="spacing" type="range" min="0" max="12" value="2">
+      <input id="spacingNum" type="number" min="0" max="12" value="2" style="width:72px;margin-left:6px">
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Cap Height</label>
+      <input id="cap" type="range" min="0" max="30" value="4">
+      <input id="capNum" type="number" min="0" max="30" value="4" style="width:72px;margin-left:6px">
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Bar Radius</label>
+      <input id="radius" type="range" min="0" max="24" value="4">
+      <input id="radiusNum" type="number" min="0" max="24" value="4" style="width:72px;margin-left:6px">
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Background</label>
+      <input id="bgColor" type="color" value="#0b0b12">
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Gradient Start</label>
+      <input id="g1" type="color" value="#2de2a6">
+      <label style="flex:1">End</label>
+      <input id="g2" type="color" value="#2d90e2">
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Background Opacity</label>
+      <input id="bgOpacity" type="range" min="0" max="1" step="0.01" value="1">
+      <input id="bgOpacityNum" type="number" min="0" max="1" step="0.01" value="1" style="width:72px;margin-left:6px">
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <label style="flex:1">Scale (amplitude)</label>
+      <input id="scale" type="range" min="0.2" max="6" step="0.01" value="1.4">
+      <input id="scaleNum" type="number" min="0.2" max="6" step="0.01" value="1.4" style="width:72px;margin-left:6px">
+    </div>
+  </div>
+
+  <div class="sect">
+    <label>Extra</label>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button id="preset1" class="btn">Disco</button>
+      <button id="preset2" class="btn">Subtle</button>
+      <button id="preset3" class="btn">Radial</button>
+    </div>
+    <div class="muted footer">Built with Web Audio API & Canvas — works offline. Made by Ivaan Srivastava AKA leaperStuff, Cheers to cava devs.</div>
+  </div>
+</div>
+
+<script src="cava.js"></script>
+</body>
+</html>

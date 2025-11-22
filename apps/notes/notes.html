@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>leprNotes - leaperStuff</title>
+    <link rel="stylesheet" href="notes.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <nav id="navbar" class="navbar">
+        <div class="nav-brand">leprNotes — leaperStuff</div>
+        <div class="nav-controls">
+                          <button id="sidebarToggle" class="sidebar-toggle">☰</button>
+            <select id="modeSelect" class="mode-select">
+                <option value="preview">Preview</option>
+                <option value="editing" selected>Editing</option>
+                <option value="both">Both (Desktop)</option>
+                <option value="live">Live Preview (Beta)</option>
+            </select>
+            <div class="dropdown">
+                <button class="dropdown-toggle" id="fileActionsBtn">⋯</button>
+                <div class="dropdown-menu">
+                    <button id="renameBtn">Rename</button>
+                    <button id="duplicateBtn">Duplicate</button>
+                    <button id="versionHistoryBtn">Version History</button>
+                    <button id="deleteBtn">Delete</button>
+                    <button id="exportMDBtn">Export (MD)</button>
+                    <button id="exportJSONBtn">Export (JSON)</button>
+                </div>
+            </div>
+            <div id="saveIndicator" class="save-indicator">Saved</div>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+
+                <input type="text" id="searchNotes" placeholder="Search notes..." class="search-input">
+            </div>
+            <div class="sidebar-actions">
+                <button id="newNoteBtn" class="btn btn-primary">New Note</button>
+                <button id="newFolderBtn" class="btn btn-secondary">New Folder</button>
+                <button id="newTagBtn" class="btn btn-secondary">New Tag</button>
+            </div>
+            <div id="notesList" class="notes-list">
+                <!-- Notes will be populated here -->
+            </div>
+        </aside>
+
+        <main class="editor-area">
+            <div id="editingMode" class="mode-panel">
+                <div class="note-header">
+                    <h1 id="noteTitle" class="note-title editable" contenteditable="false">Untitled</h1>
+                    <div id="noteTags" class="note-tags"></div>
+                </div>
+                <textarea id="editor" class="editor" placeholder="Start writing your markdown..."></textarea>
+            </div>
+
+            <div id="previewMode" class="mode-panel hidden">
+                <div class="note-header">
+                    <h1 id="previewTitle" class="note-title">Untitled</h1>
+                    <div id="previewTags" class="note-tags"></div>
+                </div>
+                <div id="preview" class="preview"></div>
+            </div>
+
+            <div id="bothMode" class="mode-panel split-view hidden">
+                <div class="split-panel">
+                    <div class="note-header">
+                        <h1 id="bothTitle" class="note-title editable" contenteditable="false">Untitled</h1>
+                        <div id="bothTags" class="note-tags"></div>
+                    </div>
+                    <textarea id="editorBoth" class="editor" placeholder="Start writing your markdown..."></textarea>
+                </div>
+                <div class="split-panel">
+                    <div class="note-header">
+                        <h1 id="bothPreviewTitle" class="note-title">Untitled</h1>
+                        <div id="bothPreviewTags" class="note-tags"></div>
+                    </div>
+                    <div id="previewBoth" class="preview"></div>
+                </div>
+            </div>
+
+            <div id="liveMode" class="mode-panel hidden">
+                <div class="note-header">
+                    <h1 id="liveTitle" class="note-title editable" contenteditable="false">Untitled</h1>
+                    <div id="liveTags" class="note-tags"></div>
+                </div>
+                <div id="liveEditor" class="live-editor" contenteditable="true"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="deleteModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Delete Note</h3>
+            <p>Are you sure you want to delete this note?</p>
+            <div class="modal-actions">
+                <button id="confirmDelete" class="btn btn-danger">Delete</button>
+                <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tagModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Edit Tags</h3>
+            <div id="tagInputs"></div>
+            <div class="modal-actions">
+                <button id="saveTags" class="btn btn-primary">Save</button>
+                <button id="cancelTags" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="versionModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Version History</h3>
+            <div id="versionList"></div>
+            <div class="modal-actions">
+                <button id="closeVersionModal" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+    <script src="notes.js"></script>
+</body>
+</html>

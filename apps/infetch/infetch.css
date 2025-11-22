@@ -1,0 +1,74 @@
+  body {
+    background: #000;
+    color: #0f0;
+    font-family: monospace, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    user-select: none;
+    cursor: pointer;
+    overflow: hide;
+  }
+pre {
+  font-family: "Courier New", Courier, monospace; /* squarish monospace */
+  font-size: 100%;             /* scales with screen width */
+  line-height: 1;               /* reduces vertical spacing */
+  white-space: pre;             /* preserve spacing */
+  text-align: center;
+  max-width: 90vw;
+}
+
+  #hint {
+    position: fixed;
+    bottom: 1rem;
+    width: 100%;
+    text-align: center;
+    color: #060;
+    font-size: 0.9rem;
+    font-style: italic;
+    user-select: none;
+  }
+  /* Popup styles */
+  #popupOverlay {
+    position: fixed;
+    top: 0; left: 0; right:0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #popup {
+    background: #111;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    width: 320px;
+    box-shadow: 0 0 15px #00ff00aa;
+  }
+  #searchInput {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    background: #222;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    box-sizing: border-box;
+  }
+  #osList {
+    max-height: 200px;
+    overflow-y: auto;
+    color: #0f0;
+  }
+  #osList div {
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  #osList div:hover {
+    background: #00ff00;
+    color: #000;
+  }

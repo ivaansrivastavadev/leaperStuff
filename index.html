@@ -3,68 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="roundedlogo.gif">
+  <link rel="icon" type="image/x-icon" href="assets/roundedlogo.gif">
   <title>LeaperStuff</title>
 
   <!-- Glassmorphism UI System -->
   <link rel="stylesheet" href="style.css">
-
-  <!-- Layout System -->
-  <style>
-    /* ===== LAYOUT SYSTEM ===== */
-
-
-
-
-
-
-    /* Hero section */
-    .hero {
-      text-align: center;
-      margin: 4rem auto;
-      max-width: 700px;
-    }
-
-    /* Features section */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      margin: 3rem 0;
-    }
-
-    .feature {
-      min-height: 200px;
-    }
-
-    /* Contact section */
-    .contact {
-      margin: 4rem auto;
-      max-width: 600px;
-      text-align: center;
-    }
-
-    .contact-links {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1.5rem;
-    }
-
-
-
-    /* Brand styling */
-    .brand {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: var(--color1);
-    }
-
-
-
-
-  </style>
+  <link rel="stylesheet" href="main/styles.css">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -77,7 +21,7 @@
       <div class="navbar-container">
         <a href="#" class="navbar-brand brand">LeaperStuff</a>
         <ul class="navbar-nav">
-          <li><a href="tools.html" class="tip tip-bottom" tooltip="Explore our tools">Tools</a></li>
+          <li><a href="apps/tools.html" class="tip tip-bottom" tooltip="Explore our tools">Tools</a></li>
           <li><a href="#contact" class="tip tip-bottom" tooltip="Get in touch">Contact</a></li>
         </ul>
       </div>
@@ -88,7 +32,7 @@
       <h1 style="font-size: 3rem; margin-bottom: 1rem; color: var(--color1);">LeaperStuff</h1>
       <p style="font-size: 1.3rem; margin-bottom: 2rem;">Powerful tools for developers and creators</p>
       <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="tools.html" class="btn btn-primary">Explore Tools</a>
+        <a href="apps/tools.html" class="btn btn-primary">Explore Tools</a>
         <a href="#features" class="btn btn-secondary">Learn More</a>
       </div>
     </section>
@@ -164,34 +108,7 @@
       </p>
     </footer>
 
-    <script>
-      // Smooth scrolling for anchor links
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-          e.preventDefault();
-          const target = document.querySelector(this.getAttribute('href'));
-          if (target) {
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
-          }
-        });
-      });
-
-      // Add hover effects to cards
-      document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-          card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-          });
-          card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-          });
-        });
-      });
-    </script>
+    <script src="main/app.js"></script>
   </main>
 </body>
 </html>

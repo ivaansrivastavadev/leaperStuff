@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>leprVisuals – leaperStuff</title>
+  <link rel="icon" type="image/x-icon" href="../../assets/roundedlogo.gif">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="visuals.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="../../index.html" class="navbar-brand">leaperStuff</a>
+      <ul class="navbar-nav">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../tools.html">Tools</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <!-- Header Section -->
+    <section class="card text-center" style="width: 90%; max-width: 1200px; margin-bottom: 2rem;">
+      <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--color1);">leprVisuals</h1>
+      <p style="font-size: 1.2rem; margin-bottom: 0;">Create or upload data → Turn into stunning charts ✨</p>
+    </section>
+
+    <!-- Controls Section -->
+    <section class="controls-section">
+      <h3 style="color: var(--color1); margin-bottom: 1.5rem;"><i class="fas fa-table"></i> Spreadsheet Maker</h3>
+      
+      <div class="spreadsheet-controls">
+        <button class="btn btn-primary" onclick="addRow()"><i class="fas fa-plus"></i> Add Row</button>
+        <button class="btn btn-secondary" onclick="removeRow()"><i class="fas fa-minus"></i> Remove Row</button>
+        
+        <select id="presets" class="form-control" onchange="loadPreset()" style="width: auto; min-width: 150px;">
+          <option value="">Select a preset...</option>
+          <option value="sales">Sales Data</option>
+          <option value="expenses">Monthly Expenses</option>
+          <option value="population">Population by Country</option>
+          <option value="website">Website Traffic</option>
+          <option value="product">Product Ratings</option>
+        </select>
+        
+        <button class="btn btn-primary" onclick="downloadSpreadsheet()"><i class="fas fa-download"></i> Download XLSX</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()"><i class="fas fa-upload"></i> Upload XLSX</button>
+        <input type="file" id="fileInput" accept=".xlsx" style="display: none" onchange="handleFileUpload(this.files)">
+      </div>
+      
+      <div class="table-container">
+        <table id="sheet">
+          <tr>
+            <th>Label</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td><input class="form-control" value="First" style="background: transparent; border: none;"></td>
+            <td><input class="form-control" value="1" style="background: transparent; border: none;"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control" value="Second" style="background: transparent; border: none;"></td>
+            <td><input class="form-control" value="2" style="background: transparent; border: none;"></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- Chart Controls -->
+    <section class="controls-section">
+      <h3 style="color: var(--color1); margin-bottom: 1.5rem;"><i class="fas fa-chart-bar"></i> Chart Generator</h3>
+      
+      <div class="chart-controls">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Chart Type:</label>
+          <select id="chartType" class="form-control" style="width: auto; min-width: 150px;">
+            <option value="pie">Pie Chart</option>
+            <option value="doughnut">Doughnut Chart</option>
+            <option value="bar">Bar Chart</option>
+            <option value="line">Line Chart</option>
+            <option value="radar">Radar Chart</option>
+            <option value="polarArea">Polar Area Chart</option>
+            <option value="scatter">Scatter Plot</option>
+            <option value="bubble">Bubble Chart</option>
+          </select>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Chart Size:</label>
+          <select id="chartSize" class="form-control" onchange="toggleCustomSize()" style="width: auto; min-width: 150px;">
+            <option value="window">Window Size</option>
+            <option value="square">Square (1:1)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        
+        <div class="custom-size-inputs" id="customSizeInputs" style="display: none;">
+          <input type="number" id="customWidth" class="form-control" placeholder="Width" value="800" style="width: 100px;">
+          <input type="number" id="customHeight" class="form-control" placeholder="Height" value="600" style="width: 100px;">
+        </div>
+        
+        <button class="btn btn-primary" onclick="generateChartFromSheet()"><i class="fas fa-magic"></i> Generate Chart</button>
+        <button class="btn btn-secondary" onclick="showScreenshotOptions()"><i class="fas fa-camera"></i> Download</button>
+      </div>
+    </section>
+    
+    <!-- Chart Display -->
+    <div id="chartWrapper" class="liquid-glass">
+      <canvas id="chartCanvas"></canvas>
+    </div>
+
+    <!-- Screenshot Modal -->
+    <div class="screenshot-modal" id="screenshotModal">
+      <div class="screenshot-options">
+        <h3 style="color: var(--color1); margin-bottom: 1.5rem;">Download Options</h3>
+        <div class="option-group">
+          <label class="form-label">Background:</label>
+          <label style="display: block; margin: 0.5rem 0;">
+            <input type="radio" name="bgType" value="white" checked> White Background
+          </label>
+          <label style="display: block; margin: 0.5rem 0;">
+            <input type="radio" name="bgType" value="transparent"> Transparent Background
+          </label>
+        </div>
+        <div class="option-group">
+          <label class="form-label" for="marginSize">Margin (px):</label>
+          <input type="number" id="marginSize" class="form-control" value="20" min="0" max="100" style="width: 100px;">
+        </div>
+        <div class="modal-buttons">
+          <button class="btn btn-primary" onclick="takeScreenshot()"><i class="fas fa-download"></i> Download</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('screenshotModal').style.display = 'none'">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="glass text-center" style="margin-top: 2rem; padding: 1.5rem;">
+    <p>© 2025 leaperStuff</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+      Built with <i class="fas fa-heart" style="color: var(--color1);"></i> using Glassmorphism UI
+    </p>
+  </footer>
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script src="visuals.js"></script>
+</body>
+</html>
