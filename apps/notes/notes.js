@@ -181,11 +181,12 @@ class LeprNotes {
     getEditorContent() {
         switch (this.currentMode) {
             case 'editing':
-                return document.getElementById('editor').value;
+                return document.getElementById('editor')?.value || '';
             case 'both':
-                return document.getElementById('editorBoth').value;
+                return document.getElementById('editorBoth')?.value || '';
             case 'live':
-                return document.getElementById('liveEditor').innerText;
+                // live mode removed; keep fallback
+                return this.currentNote?.content || '';
             default:
                 return this.currentNote?.content || '';
         }
@@ -195,9 +196,10 @@ class LeprNotes {
         if (!this.currentNote) return;
         
         const content = this.currentNote.content;
-        document.getElementById('editor').value = content;
-        document.getElementById('editorBoth').value = content;
-        document.getElementById('liveEditor').innerText = content;
+        const ed = document.getElementById('editor');
+        const edBoth = document.getElementById('editorBoth');
+        if (ed) ed.value = content;
+        if (edBoth) edBoth.value = content;
     }
 
     updateNoteTitle() {
@@ -228,17 +230,47 @@ class LeprNotes {
     }
 
     setupMarkdownParser() {
-        // Custom renderer for underline support
-        const renderer = new marked.Renderer();
-        const originalParagraph = renderer.paragraph;
-        
-        // Add underline support using __text__
-        renderer.paragraph = (text) => {
-            // Process __text__ for underline
-            text = text.replace(/__([^_]+)__/g, '<u>$1</u>');
-            return originalParagraph.call(renderer, text);
+        // Use a custom inline extension to treat __text__ as underline
+        const self = this;
+
+        const underlineExt = {
+            name: 'underline',
+            level: 'inline',
+            start(src) { const i = src.indexOf('__'); return i === -1 ? undefined : i; },
+            tokenizer(src) {
+                const rule = /^__([^\n_]+?)__/;
+                const match = rule.exec(src);
+                if (match) {
+                    return {
+                        type: 'underline',
+                        raw: match[0],
+                        text: match[1]
+                    };
+                }
+            },
+            renderer(token) {
+                return `<u>${token.text}</u>`;
+            }
         };
-        
+
+        // Custom renderer to handle code blocks and mermaid
+        const renderer = new marked.Renderer();
+
+        // Preserve language class on code blocks and render mermaid blocks as diagrams
+        renderer.code = function(code, infostring, escaped) {
+            const lang = (infostring || '').trim();
+            if (lang === 'mermaid') {
+                // Return a mermaid container, mermaid will be initialized after insertion
+                return `<div class="mermaid">${self.escapeHtml(code)}</div>`;
+            }
+
+            const langClass = lang ? `language-${lang}` : '';
+            const safe = escaped ? code : self.escapeHtml(code);
+            return `<pre><code class="${langClass}">${safe}</code></pre>`;
+        };
+
+        marked.use({ extensions: [underlineExt] });
+
         marked.setOptions({
             renderer: renderer,
             breaks: true,
@@ -255,6 +287,8 @@ class LeprNotes {
             const html = marked.parse(content);
             document.getElementById('preview').innerHTML = html;
             document.getElementById('previewBoth').innerHTML = html;
+            // Post-render tasks (mermaid, syntax highlight)
+            this.postRender();
         } catch (e) {
             document.getElementById('preview').innerHTML = '<p>Error rendering markdown</p>';
             document.getElementById('previewBoth').innerHTML = '<p>Error rendering markdown</p>';
@@ -262,33 +296,34 @@ class LeprNotes {
     }
 
     renderLivePreview() {
-        if (this.livePreviewTimeout) {
-            clearTimeout(this.livePreviewTimeout);
-        }
-        
-        this.livePreviewTimeout = setTimeout(() => {
-            if (this.currentNote && this.currentMode === 'live') {
-                const content = document.getElementById('liveEditor').innerText;
-                try {
-                    const html = marked.parse(content);
-                    document.getElementById('liveEditor').innerHTML = html;
-                } catch (e) {
-                    document.getElementById('liveEditor').innerHTML = '<p>Error rendering markdown</p>';
-                }
+        // live preview removed
+    }
+
+    postRender() {
+        // Initialize mermaid diagrams if mermaid is loaded
+        if (window.mermaid) {
+            try {
+                // mermaid.init will render any .mermaid containers
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            } catch (e) {
+                console.warn('mermaid render error', e);
             }
-        }, 200);
+        }
     }
 
     // UI Management
     switchMode(mode) {
+        // Save current editor content before switching modes
+        this.saveCurrentNote();
+
         this.currentMode = mode;
-        
+
         // Hide all panels
         document.querySelectorAll('.mode-panel').forEach(panel => {
             panel.classList.add('hidden');
         });
-        
-        // Show selected panel
+
+        // Show selected panel and render preview where appropriate
         switch (mode) {
             case 'editing':
                 document.getElementById('editingMode').classList.remove('hidden');
@@ -301,12 +336,8 @@ class LeprNotes {
                 document.getElementById('bothMode').classList.remove('hidden');
                 this.renderPreview();
                 break;
-            case 'live':
-                document.getElementById('liveMode').classList.remove('hidden');
-                this.renderLivePreview();
-                break;
         }
-        
+
         // Update selector
         document.getElementById('modeSelect').value = mode;
     }
@@ -357,36 +388,70 @@ class LeprNotes {
     // Version History
     showVersionHistory() {
         if (!this.currentNote) return;
-        
         const versionList = document.getElementById('versionList');
         versionList.innerHTML = '';
-        
-        // Add current version
-        const currentVersion = document.createElement('div');
-        currentVersion.className = 'version-item active';
-        currentVersion.innerHTML = `
-            <strong>Current Version</strong>
-            <div>${new Date().toLocaleString()}</div>
-        `;
-        currentVersion.addEventListener('click', () => {
-            this.restoreVersion(this.currentNote.content);
+
+        // Build slider + preview area so user can scrub through versions
+        const versions = [{ timestamp: new Date().toISOString(), content: this.currentNote.content }].concat(this.currentNote.versions || []);
+
+        const sliderLabel = document.createElement('div');
+        sliderLabel.style.marginBottom = '8px';
+        sliderLabel.innerHTML = `<strong>Version Preview</strong>`;
+        versionList.appendChild(sliderLabel);
+
+        const range = document.createElement('input');
+        range.type = 'range';
+        range.min = 0;
+        range.max = Math.max(0, versions.length - 1);
+        range.value = 0;
+        range.style.width = '100%';
+        range.id = 'versionRange';
+        versionList.appendChild(range);
+
+        const meta = document.createElement('div');
+        meta.id = 'versionMeta';
+        meta.style.margin = '8px 0 12px 0';
+        versionList.appendChild(meta);
+
+        const previewBox = document.createElement('div');
+        previewBox.id = 'versionPreview';
+        previewBox.className = 'preview';
+        previewBox.style.maxHeight = '300px';
+        previewBox.style.overflowY = 'auto';
+        versionList.appendChild(previewBox);
+
+        const restoreBtn = document.createElement('button');
+        restoreBtn.className = 'btn btn-primary';
+        restoreBtn.textContent = 'Restore Selected Version';
+        restoreBtn.style.marginTop = '10px';
+        versionList.appendChild(restoreBtn);
+
+        const renderVersion = (idx) => {
+            const v = versions[idx];
+            meta.textContent = `Version ${idx} — ${new Date(v.timestamp).toLocaleString()}`;
+            try {
+                previewBox.innerHTML = marked.parse(v.content);
+                this.postRender();
+            } catch (e) {
+                previewBox.innerHTML = '<p>Error rendering preview</p>';
+            }
+        };
+
+        range.addEventListener('input', (e) => {
+            renderVersion(parseInt(e.target.value, 10));
         });
-        versionList.appendChild(currentVersion);
-        
-        // Add historical versions
-        this.currentNote.versions.forEach((version, index) => {
-            const versionEl = document.createElement('div');
-            versionEl.className = 'version-item';
-            versionEl.innerHTML = `
-                <strong>Version ${index + 1}</strong>
-                <div>${new Date(version.timestamp).toLocaleString()}</div>
-            `;
-            versionEl.addEventListener('click', () => {
-                this.restoreVersion(version.content);
-            });
-            versionList.appendChild(versionEl);
+
+        // Initial render
+        renderVersion(0);
+
+        restoreBtn.addEventListener('click', () => {
+            const idx = parseInt(range.value, 10);
+            const v = versions[idx];
+            if (v) {
+                this.restoreVersion(v.content);
+            }
         });
-        
+
         this.showModal('versionModal');
     }
 
@@ -410,19 +475,29 @@ class LeprNotes {
         });
         
         // Editor input
-        document.getElementById('editor').addEventListener('input', () => {
-            this.scheduleAutoSave();
-        });
-        
-        document.getElementById('editorBoth').addEventListener('input', () => {
-            this.scheduleAutoSave();
-            this.renderPreview();
-        });
-        
-        document.getElementById('liveEditor').addEventListener('input', () => {
-            this.scheduleAutoSave();
-            this.renderLivePreview();
-        });
+        const editorEl = document.getElementById('editor');
+        if (editorEl) {
+            editorEl.addEventListener('input', (e) => {
+                // update note content live and schedule save
+                if (this.currentNote) {
+                    this.currentNote.content = e.target.value;
+                    this.currentNote.updatedAt = new Date().toISOString();
+                }
+                this.scheduleAutoSave();
+            });
+        }
+
+        const editorBothEl = document.getElementById('editorBoth');
+        if (editorBothEl) {
+            editorBothEl.addEventListener('input', (e) => {
+                if (this.currentNote) {
+                    this.currentNote.content = e.target.value;
+                    this.currentNote.updatedAt = new Date().toISOString();
+                }
+                this.scheduleAutoSave();
+                this.renderPreview();
+            });
+        }
         
         // File actions
         document.getElementById('renameBtn').addEventListener('click', () => this.renameNote());

@@ -6,6 +6,8 @@
     <title>leprNotes - leaperStuff</title>
     <link rel="stylesheet" href="notes.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Mermaid for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
     <nav id="navbar" class="navbar">
@@ -16,7 +18,6 @@
                 <option value="preview">Preview</option>
                 <option value="editing" selected>Editing</option>
                 <option value="both">Both (Desktop)</option>
-                <option value="live">Live Preview (Beta)</option>
             </select>
             <div class="dropdown">
                 <button class="dropdown-toggle" id="fileActionsBtn">⋯</button>
@@ -83,13 +84,7 @@
                 </div>
             </div>
 
-            <div id="liveMode" class="mode-panel hidden">
-                <div class="note-header">
-                    <h1 id="liveTitle" class="note-title editable" contenteditable="false">Untitled</h1>
-                    <div id="liveTags" class="note-tags"></div>
-                </div>
-                <div id="liveEditor" class="live-editor" contenteditable="true"></div>
-            </div>
+            <!-- Live preview removed (kept Both and Preview modes) -->
         </main>
     </div>
 
