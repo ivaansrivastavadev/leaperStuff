@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTI - Timer & Stopwatch</title>
+    <link rel="stylesheet" href="lti.css">
+</head>
+<body>
+    <div class="app-container">
+        <h1 class="app-title">LTI</h1>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="timer">Timer</button>
+            <button class="mode-btn" data-mode="stopwatch">Stopwatch</button>
+        </div>
+        
+        <!-- Timer Mode -->
+        <div class="timer-container active-mode">
+            <div class="timer-display">
+                <div class="timer-ring-bg"></div>
+                <div class="timer-ring"></div>
+                <div class="time-text">00:00</div>
+            </div>
+            
+            <input type="text" class="timer-input" placeholder="e.g., 1 minute, 1:30, 90s">
+            
+            <div class="timer-controls">
+                <button class="control-btn" id="timer-toggle">Start</button>
+                <button class="stop-btn hidden" id="timer-stop">Stop</button>
+            </div>
+        </div>
+        
+        <!-- Stopwatch Mode -->
+        <div class="stopwatch-container">
+            <div class="stopwatch-display">
+                <div class="stopwatch-time">00:00:00</div>
+                <button class="stopwatch-btn" id="stopwatch-toggle">Start</button>
+                
+                <div class="stopwatch-controls">
+                    <button class="lap-btn hidden" id="lap-btn">Lap</button>
+                    <button class="stop-btn hidden" id="stopwatch-stop">Stop</button>
+                </div>
+                
+                <div class="lap-list hidden" id="lap-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Icon -->
+    <div class="settings-icon">
+        ⚙️
+    </div>
+    
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle">
+        🌙
+    </div>
+    
+    <!-- Settings Popup -->
+    <div class="settings-popup">
+        <div class="settings-content">
+            <h2 class="settings-title">Settings</h2>
+            
+            <div class="settings-section">
+                <div class="settings-option">
+                    <label for="custom-alert-text">Custom Stop Text (blank to disable)</label>
+                    <input type="text" id="custom-alert-text" placeholder="STOP" value="STOP"><br>
+                    
+                </div>
+                <div class="settings-section"><p style="font-size: 10px; margin-top: 10px;">Made with love by leaperStuff and ivaansrivastava</p></div>
+            </div>
+           
+                
+            
+            <button class="close-settings">Close</button>
+        </div>
+    </div>
+    
+    <!-- Alert Overlay -->
+    <div class="alert-overlay" id="alert-overlay">
+        <div class="alert-box">
+            <h3 class="alert-title" id="alert-title">Time's Up!</h3>
+            <input type="text" class="alert-input hidden" id="alert-input" placeholder="Type STOP to confirm">
+            <div>
+                <button class="alert-btn" id="alert-ok">OK</button>
+                <button class="alert-btn hidden" id="alert-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="lti.js"></script>
+</body>
+</html>

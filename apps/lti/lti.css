@@ -1,0 +1,464 @@
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        :root {
+            --primary-bg: #f0f0f0;
+            --secondary-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #4CAF50;
+            --accent-hover: #45a049;
+            --timer-green: #4CAF50;
+            --timer-yellow: #FFC107;
+            --timer-red: #F44336;
+            --button-radius: 24px;
+            --transition: all 0.3s ease;
+        }
+        
+        .dark-mode {
+            --primary-bg: #121212;
+            --secondary-bg: #1e1e1e;
+            --text-color: #f0f0f0;
+            --accent-color: #4CAF50;
+            --accent-hover: #45a049;
+            --timer-green: #4CAF50;
+            --timer-yellow: #FFC107;
+            --timer-red: #F44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', monospace, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: var(--transition);
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .app-title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+        
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--accent-color);
+            background: transparent;
+            color: var(--text-color);
+            font-family: inherit;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .mode-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .timer-container, .stopwatch-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .active-mode {
+            display: flex;
+        }
+        
+        .timer-display {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        
+        .timer-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--ring-color) 0%, transparent 0%);
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: background 0.5s ease;
+        }
+        
+        .timer-ring-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: var(--secondary-bg);
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .time-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            background-color: rgba(255,255,255,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 200px;
+            z-index: 10;
+        }
+        
+        .dark-mode .time-text {
+            background-color: rgba(30,30,30,0.8);
+        }
+        
+        .timer-input {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            width: 200px;
+            text-align: center;
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+        }
+        
+        .control-btn {
+            padding: 15px 30px;
+            font-family: inherit;
+            font-size: 1rem;
+            border: none;
+            border-radius: var(--button-radius);
+            background-color: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 5px;
+        }
+        
+        .control-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .control-btn.running {
+            border-radius: 999px;
+            background-color: var(--timer-yellow);
+        }
+        
+        .control-btn.paused {
+            border-radius: 64px;
+            background-color: var(--timer-red);
+        }
+        
+        .stop-btn {
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            border: 2px solid var(--timer-red);
+            background: transparent;
+            color: var(--timer-red);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        
+        .stop-btn:hover {
+            background-color: var(--timer-red);
+            color: white;
+        }
+        
+        .stopwatch-display {
+            width: 300px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .stopwatch-time {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .stopwatch-btn {
+            padding: 20px 40px;
+            font-family: inherit;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: var(--button-radius);
+            background-color: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 200px;
+        }
+        
+        .stopwatch-btn.running {
+            border-radius: 999px;
+            background-color: var(--timer-yellow);
+            font-size: 1.5rem;
+            padding: 25px 45px;
+        }
+        
+        .stopwatch-btn.paused {
+            border-radius: 64px;
+            background-color: var(--timer-red);
+        }
+        
+        .lap-btn {
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            border: 2px solid var(--accent-color);
+            background: transparent;
+            color: var(--accent-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 5px;
+        }
+        
+        .lap-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .lap-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .lap-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-size: 0.8rem;
+        }
+        
+        .lap-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+        
+        .settings-icon:hover {
+            transform: rotate(90deg);
+        }
+        
+        .settings-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            display: none;
+        }
+        
+        .settings-content {
+            background-color: var(--secondary-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+        
+        .settings-title {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .settings-section {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .settings-section h3 {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 5px;
+        }
+        
+        .settings-option {
+            margin-bottom: 15px;
+        }
+        
+        .settings-option label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .settings-option input, .settings-option select {
+            width: 100%;
+            padding: 8px;
+            font-family: inherit;
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 4px;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+        }
+        
+        .close-settings {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .close-settings:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .alert-box {
+            background-color: var(--secondary-bg);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        }
+        
+        .alert-title {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .alert-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-family: inherit;
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            text-align: center;
+        }
+        
+        .alert-btn {
+            padding: 10px 20px;
+            font-family: inherit;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 0 5px;
+        }
+        
+        .alert-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+        
+        @media (max-width: 500px) {
+            .timer-display, .stopwatch-display {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .time-text, .stopwatch-time {
+                font-size: 2rem;
+            }
+            
+            .app-title {
+                font-size: 2rem;
+            }
+        }
