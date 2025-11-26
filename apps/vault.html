@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>leprVault - Secure Encryption & Decryption</title>
+    <style>
+        /* CSS Variables for Color Palette */
+        :root {
+          --color1: #FFD166; /* Yellow */
+          --color2: #FFA62E; /* Orange-Yellow */
+          --color3: #FF8E00; /* Dark Yellow */
+          --color4: #118AB2; /* Blue */
+          --color5: #073B4C; /* Dark Blue */
+          --text-light: #ffffff;
+          --text-dark: #333333;
+          --shadow: rgba(0, 0, 0, 0.1);
+          --shadow-dark: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Reset and Base Styles */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #1a1a2e; /* Solid dark background instead of gradient */
+          min-height: 100vh;
+          color: var(--text-light);
+          line-height: 1.6;
+          padding-bottom: 2rem;
+        }
+
+        /* Glassmorphism Base Mixin */
+        .glass {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 16px;
+        }
+
+        /* Liquid Glass Effect */
+        .liquid-glass {
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 100%
+          );
+          backdrop-filter: blur(25px);
+          -webkit-backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 20px;
+          box-shadow: 
+            0 8px 32px var(--shadow),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .liquid-glass::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          transition: left 0.6s ease;
+        }
+
+        .liquid-glass:hover::before {
+          left: 100%;
+        }
+
+        /* Sticky Navbar with Background */
+        .navbar {
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+          padding: 1rem 2rem;
+          margin-bottom: 2rem;
+          background: rgba(26, 26, 46, 0.95); /* Solid background with slight transparency */
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .navbar-brand {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: var(--text-light);
+          text-decoration: none;
+        }
+
+        .navbar-nav {
+          display: flex;
+          list-style: none;
+          gap: 2rem;
+        }
+
+        .navbar-nav a {
+          color: var(--text-light);
+          text-decoration: none;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+        }
+
+        .navbar-nav a:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+
+        /* Buttons */
+        .btn {
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-decoration: none;
+          display: inline-block;
+          text-align: center;
+          margin: 5px;
+          background: linear-gradient(135deg, var(--color1), var(--color2));
+          color: var(--color5);
+        }
+
+        .btn-secondary {
+          background: var(--color4); /* Solid blue instead of gradient */
+          color: var(--text-light);
+        }
+
+        .btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 
+            0 12px 40px var(--shadow-dark),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .btn:active {
+          transform: translateY(-1px);
+        }
+
+        /* Cards */
+        .card {
+          padding: 2rem;
+          margin: 1rem;
+          transition: all 0.3s ease;
+          border-radius: 12px;
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 100%
+          );
+          backdrop-filter: blur(25px);
+          -webkit-backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          box-shadow: 
+            0 8px 32px var(--shadow),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 
+            0 15px 40px var(--shadow-dark),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .card-header {
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-title {
+          font-size: 1.25rem;
+          font-weight: bold;
+          margin-bottom: 0.5rem;
+        }
+
+        /* Forms - Updated with dark yellow background and white text */
+        .form-group {
+          margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          background: var(--color5); /* Dark yellow background */
+          color: var(--text-light); /* White text */
+          transition: all 0.3s ease;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-control:focus {
+          outline: none;
+          box-shadow: 
+            0 0 0 3px rgba(255, 209, 102, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          background: var(--color4); /* Lighter yellow on focus */
+        }
+
+        .form-control::placeholder {
+          color: rgba(255, 255, 255, 0.8); /* Light placeholder text */
+        }
+
+        /* Textarea specific styles */
+        textarea.form-control {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        /* Tables */
+        .table-container {
+          padding: 1.5rem;
+          margin: 1rem;
+          overflow-x: auto;
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 100%
+          );
+          backdrop-filter: blur(25px);
+          -webkit-backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 20px;
+        }
+
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 12px;
+          overflow: hidden;
+        }
+
+        .table th,
+        .table td {
+          padding: 1rem;
+          text-align: left;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .table th {
+          background: rgba(255, 255, 255, 0.1);
+          font-weight: 600;
+          color: var(--color1);
+        }
+
+        .table tr:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .table tr:last-child td {
+          border-bottom: none;
+        }
+
+        /* Alerts */
+        .alert {
+          padding: 1rem 1.5rem;
+          margin: 1rem;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .alert-success {
+          background: linear-gradient(135deg, rgba(17, 138, 178, 0.3), rgba(7, 59, 76, 0.3));
+          border-left: 4px solid var(--color4);
+        }
+
+        .alert-warning {
+          background: linear-gradient(135deg, rgba(255, 209, 102, 0.3), rgba(255, 142, 0, 0.3));
+          border-left: 4px solid var(--color1);
+        }
+
+        .alert-error {
+          background: linear-gradient(135deg, rgba(239, 71, 111, 0.3), rgba(255, 0, 0, 0.3));
+          border-left: 4px solid #EF476F;
+        }
+
+        /* Progress Bars */
+        .progress {
+          width: 100%;
+          height: 8px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          overflow: hidden;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+          height: 100%;
+          background: linear-gradient(90deg, var(--color1), var(--color2));
+          border-radius: 4px;
+          transition: width 0.4s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .progress-bar::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+          );
+          animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+          0% { left: -100%; }
+          100% { left: 100%; }
+        }
+
+        /* Badges */
+        .badge {
+          display: inline-block;
+          padding: 0.25rem 0.75rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .badge-primary {
+          background: linear-gradient(135deg, var(--color1), var(--color2));
+          color: var(--color5);
+        }
+
+        .badge-secondary {
+          background: var(--color4); /* Solid blue instead of gradient */
+          color: var(--text-light);
+        }
+
+        /* Modal */
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 2000;
+          backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+          padding: 2rem;
+          max-width: 500px;
+          width: 90%;
+          max-height: 80vh;
+          overflow-y: auto;
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 100%
+          );
+          backdrop-filter: blur(25px);
+          -webkit-backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 20px;
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-close {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          color: var(--text-light);
+          cursor: pointer;
+          padding: 0.25rem;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-radius: 8px;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+
+        .p-1 { padding: 0.5rem; }
+        .p-2 { padding: 1rem; }
+        .p-3 { padding: 1.5rem; }
+
+        .d-flex { display: flex; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .align-center { align-items: center; }
+
+        .mr-2 { margin-right: 0.5rem; }
+
+        /* Container for rounded corners demo */
+        .demo-container {
+          padding: 2rem;
+          margin: 2rem 0;
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 100%
+          );
+          backdrop-filter: blur(25px);
+          -webkit-backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .navbar-container {
+            flex-direction: column;
+            gap: 1rem;
+          }
+          
+          .navbar-nav {
+            gap: 1rem;
+          }
+          
+          .card {
+            padding: 1.5rem;
+            margin: 0.5rem;
+          }
+          
+          .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+          }
+        }
+        @media (min-width: 768px) {.navbar-brand {margin-right: 15px;}}
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(var(--color1), var(--color2));
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(var(--color2), var(--color3));
+        }
+
+        /* ------------- ToolTip ----------- */
+        .tip {
+          position: relative;
+          cursor: pointer;
+        }
+
+        .tip::after {
+          content: attr(tooltip);
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: var(--text-light);
+          padding: 2px 3px;
+          font-size: 12px;
+          white-space: nowrap;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+          z-index: 1000;
+          pointer-events: none;
+          border-radius: 8px;
+          box-shadow: 0 8px 32px var(--shadow);
+          margin-bottom: 8px;
+        }
+
+        .tip:hover::after,
+        .tip:hover::before {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .tip.tip-bottom::after {
+          top: 100%;
+          bottom: auto;
+          margin-top: 8px;
+          margin-bottom: 0;
+        }
+
+        .tip.tip-bottom::before {
+          top: 100%;
+          bottom: auto;
+          border-top-color: transparent;
+          border-bottom-color: rgba(255, 255, 255, 0.3);
+          margin-top: -4px;
+          margin-bottom: 0;
+        }
+
+        /* Tooltip color variations */
+        .tip.tip-primary::after {
+          background: linear-gradient(135deg, var(--color1), var(--color2));
+          color: var(--color5);
+          border: 1px solid rgba(255, 209, 102, 0.4);
+        }
+
+        .tip.tip-primary::before {
+          border-top-color: var(--color1);
+        }
+
+        .tip.tip-primary.tip-bottom::before {
+          border-bottom-color: var(--color1);
+          border-top-color: transparent;
+        }
+
+        .tip.tip-secondary::after {
+          background: var(--color4);
+          color: var(--text-light);
+          border: 1px solid rgba(17, 138, 178, 0.4);
+        }
+
+        .tip.tip-secondary::before {
+          border-top-color: var(--color4);
+        }
+
+        .tip.tip-secondary.tip-bottom::before {
+          border-bottom-color: var(--color4);
+          border-top-color: transparent;
+        }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+              nav {
+                flex-direction: column;
+                text-align: center;
+              }
+              
+              .features {
+                grid-template-columns: 1fr;
+              }
+              
+              .contact-links {
+                flex-direction: column;
+                align-items: center;
+              }
+            }
+
+                /* Footer */
+            footer {
+              text-align: center;
+              margin-top: 4rem;
+              padding: 2rem 0;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+        /* Custom styles for leprVault */
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        .section {
+          margin-bottom: 3rem;
+        }
+
+        .file-info {
+          margin-top: 0.5rem;
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .text-muted {
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .file-drop-area {
+          border: 2px dashed rgba(255, 255, 255, 0.3);
+          border-radius: 12px;
+          padding: 2rem;
+          text-align: center;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          margin-bottom: 1rem;
+        }
+
+        .file-drop-area:hover {
+          border-color: var(--color1);
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .file-drop-area.active {
+          border-color: var(--color4);
+          background: rgba(17, 138, 178, 0.1);
+        }
+
+        .file-list {
+          margin-top: 1rem;
+        }
+
+        .file-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          margin-bottom: 0.5rem;
+        }
+
+        .file-name {
+          flex: 1;
+        }
+
+        .file-size {
+          margin-right: 1rem;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .file-remove {
+          background: none;
+          border: none;
+          color: #EF476F;
+          cursor: pointer;
+          font-size: 1.2rem;
+        }
+
+        .hidden {
+          display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">leprVault</a>
+            <ul class="navbar-nav">
+                <li><a href="#encrypt-section">Encrypt</a></li>
+                <li><a href="#decrypt-section">Decrypt</a></li>
+                <li><a href="#about-section">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Encryption Section -->
+        <section id="encrypt-section" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Encrypt Data</h2>
+                    <p>Secure your files and text with multi-layer encryption</p>
+                </div>
+                
+                <form id="encrypt-form">
+                    <div class="form-group">
+                        <label class="form-label">Long Passcode</label>
+                        <input type="password" class="form-control" id="encrypt-passcode" placeholder="Enter a long, secure passcode" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">24 Words (in order)</label>
+                        <textarea class="form-control" id="encrypt-words" placeholder="Enter 24 words separated by spaces" rows="3" required></textarea>
+                        <small class="text-muted">Enter exactly 24 words in the correct order</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Encryption Range/Offset</label>
+                        <input type="number" class="form-control" id="encrypt-range" min="1" max="1000" value="128" required>
+                        <small class="text-muted">Higher values increase security but may take longer to process</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mode</label>
+                        <div class="d-flex">
+                            <div class="mr-2">
+                                <input type="radio" id="encrypt-mode-text" name="encrypt-mode" value="text" checked>
+                                <label for="encrypt-mode-text">Text</label>
+                            </div>
+                            <div>
+                                <input disabled=true type="radio" id="encrypt-mode-file" name="encrypt-mode" value="file">
+                                <label for="encrypt-mode-file">File</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="encrypt-file-group" style="display: none;">
+                        <label class="form-label">ZIP Password</label>
+                        <input type="password" class="form-control" id="encrypt-zip-passcode" placeholder="Password for encrypted ZIP file">
+                    </div>
+                    
+                    <div class="form-group" id="encrypt-text-group">
+                        <label class="form-label">Text to Encrypt</label>
+                        <textarea class="form-control" id="encrypt-text" placeholder="Enter the text you want to encrypt" rows="5" required></textarea>
+                    </div>
+                    
+                    <div class="form-group" id="encrypt-file-input-group" style="display: none;">
+                        <label class="form-label">File to Encrypt</label>
+                        <div class="file-drop-area" id="encrypt-file-drop">
+                            <p>Drag & drop files here or click to browse</p>
+                            <input type="file" class="hidden" id="encrypt-file" multiple>
+                            <button type="button" class="btn btn-secondary mt-2" onclick="document.getElementById('encrypt-file').click()">Browse Files</button>
+                        </div>
+                        <div class="file-list" id="encrypt-file-list"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-between align-center">
+                        <button type="submit" class="btn btn-primary">Encrypt</button>
+                        <div id="encrypt-progress" class="progress" style="width: 200px; display: none;">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="encrypt-result" class="mt-3" style="display: none;">
+                    <div class="alert alert-success">
+                        <h4>Encryption Complete!</h4>
+                        <p id="encrypt-result-text"></p>
+                        <div id="encrypt-download" style="display: none;">
+                            <button class="btn btn-secondary" id="download-encrypted">Download Encrypted File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decryption Section -->
+        <section id="decrypt-section" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Decrypt Data</h2>
+                    <p>Restore your encrypted files and text</p>
+                </div>
+                
+                <form id="decrypt-form">
+                    <div class="form-group">
+                        <label class="form-label">Long Passcode</label>
+                        <input type="password" class="form-control" id="decrypt-passcode" placeholder="Enter your long passcode" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">24 Words (in order)</label>
+                        <textarea class="form-control" id="decrypt-words" placeholder="Enter the 24 words in the correct order" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Decryption Range/Offset</label>
+                        <input type="number" class="form-control" id="decrypt-range" min="1" max="1000" value="128" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mode</label>
+                        <div class="d-flex">
+                            <div class="mr-2">
+                                <input type="radio" id="decrypt-mode-text" name="decrypt-mode" value="text" checked>
+                                <label for="decrypt-mode-text">Text</label>
+                            </div>
+                            <div>
+                                <input disabled=true type="radio" id="decrypt-mode-file" name="decrypt-mode" value="file">
+                                <label disabled=true for="decrypt-mode-file">File</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="decrypt-file-group" style="display: none;">
+                        <label class="form-label">ZIP Password</label>
+                        <input type="password" class="form-control" id="decrypt-zip-passcode" placeholder="Password for the encrypted ZIP file">
+                    </div>
+                    
+                    <div class="form-group" id="decrypt-text-group">
+                        <label class="form-label">Text to Decrypt</label>
+                        <textarea class="form-control" id="decrypt-text" placeholder="Enter the encrypted text" rows="5" required></textarea>
+                    </div>
+                    
+                    <div class="form-group" id="decrypt-file-input-group" style="display: none;">
+                        <label class="form-label">File to Decrypt</label>
+                        <div class="file-drop-area" id="decrypt-file-drop">
+                            <p>Drag & drop .leprvault files here or click to browse</p>
+                            <input type="file" class="hidden" id="decrypt-file" accept=".leprvault" multiple>
+                            <button type="button" class="btn btn-secondary mt-2" onclick="document.getElementById('decrypt-file').click()">Browse Files</button>
+                        </div>
+                        <div class="file-list" id="decrypt-file-list"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-between align-center">
+                        <button type="submit" class="btn btn-primary">Decrypt</button>
+                        <div id="decrypt-progress" class="progress" style="width: 200px; display: none;">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="decrypt-result" class="mt-3" style="display: none;">
+                    <div class="alert alert-success">
+                        <h4>Decryption Complete!</h4>
+                        <p id="decrypt-result-text"></p>
+                        <div id="decrypt-download" style="display: none;">
+                            <button class="btn btn-secondary" id="download-decrypted">Download Decrypted File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about-section" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">About leprVault</h2>
+                </div>
+                <div class="p-2">
+                    <p>leprVault is a secure encryption application that uses multi-layer encryption to protect your sensitive data.</p>
+                    
+                    <h4 class="mt-3">Encryption Layers:</h4>
+                    <ul>
+                        <li><strong>Layer 1:</strong> Long passcode encryption</li>
+                        <li><strong>Layer 2:</strong> 24-word sequence encryption</li>
+                        <li><strong>Layer 3:</strong> Range/offset encryption</li>
+                        <li><strong>Layer 4 (Files only):</strong> Password-protected ZIP encryption</li>
+                    </ul>
+                    
+                    <h4 class="mt-3">How It Works:</h4>
+                    <p>Your data is encrypted using a combination of these layers, making it extremely difficult to decrypt without all the correct credentials.</p>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong>Important:</strong> Always keep your passcode, 24 words, and range/offset value secure. Without these, your data cannot be recovered.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 leprVault - Secure Encryption System</p>
+        </div>
+    </footer>
+
+    <script>
+        // File handling variables
+        let encryptFiles = [];
+        let decryptFiles = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mode switching
+            const encryptModeRadios = document.querySelectorAll('input[name="encrypt-mode"]');
+            const decryptModeRadios = document.querySelectorAll('input[name="decrypt-mode"]');
+            
+            encryptModeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isFileMode = this.value === 'file';
+                    document.getElementById('encrypt-file-group').style.display = isFileMode ? 'block' : 'none';
+                    document.getElementById('encrypt-text-group').style.display = isFileMode ? 'none' : 'block';
+                    document.getElementById('encrypt-file-input-group').style.display = isFileMode ? 'block' : 'none';
+                    document.getElementById('encrypt-text').required = !isFileMode;
+                });
+            });
+            
+            decryptModeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isFileMode = this.value === 'file';
+                    document.getElementById('decrypt-file-group').style.display = isFileMode ? 'block' : 'none';
+                    document.getElementById('decrypt-text-group').style.display = isFileMode ? 'none' : 'block';
+                    document.getElementById('decrypt-file-input-group').style.display = isFileMode ? 'block' : 'none';
+                    document.getElementById('decrypt-text').required = !isFileMode;
+                });
+            });
+            
+            // File drop areas
+            setupFileDropArea('encrypt-file-drop', 'encrypt-file', encryptFiles, 'encrypt-file-list');
+            setupFileDropArea('decrypt-file-drop', 'decrypt-file', decryptFiles, 'decrypt-file-list');
+            
+            // File input change handlers
+            document.getElementById('encrypt-file').addEventListener('change', function(e) {
+                handleFileSelection(e.target.files, encryptFiles, 'encrypt-file-list');
+            });
+            
+            document.getElementById('decrypt-file').addEventListener('change', function(e) {
+                handleFileSelection(e.target.files, decryptFiles, 'decrypt-file-list');
+            });
+            
+            // Encryption form submission
+            document.getElementById('encrypt-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const passcode = document.getElementById('encrypt-passcode').value;
+                const words = document.getElementById('encrypt-words').value.trim().split(/\s+/);
+                const range = parseInt(document.getElementById('encrypt-range').value);
+                const mode = document.querySelector('input[name="encrypt-mode"]:checked').value;
+                const zipPasscode = document.getElementById('encrypt-zip-passcode').value;
+                
+                // Validate 24 words
+                if (words.length !== 24) {
+                    alert('Please enter exactly 24 words');
+                    return;
+                }
+                
+                // Validate files if in file mode
+                if (mode === 'file' && encryptFiles.length === 0) {
+                    alert('Please select at least one file to encrypt');
+                    return;
+                }
+                
+                // Show progress
+                const progressBar = document.querySelector('#encrypt-progress .progress-bar');
+                document.getElementById('encrypt-progress').style.display = 'block';
+                
+                // Simulate encryption process
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        
+                        // Show result
+                        const resultDiv = document.getElementById('encrypt-result');
+                        const resultText = document.getElementById('encrypt-result-text');
+                        
+                        if (mode === 'text') {
+                            const text = document.getElementById('encrypt-text').value;
+                            const encrypted = encryptText(text, passcode, words, range);
+                            resultText.textContent = `Encrypted text: ${encrypted}`;
+                            document.getElementById('encrypt-download').style.display = 'none';
+                        } else {
+                            resultText.textContent = `${encryptFiles.length} file(s) have been encrypted successfully.`;
+                            document.getElementById('encrypt-download').style.display = 'block';
+                            
+                            // Set up download button
+                            document.getElementById('download-encrypted').onclick = function() {
+                                downloadEncryptedFiles(encryptFiles, passcode, words, range, zipPasscode);
+                            };
+                        }
+                        
+                        resultDiv.style.display = 'block';
+                        document.getElementById('encrypt-progress').style.display = 'none';
+                    }
+                }, 100);
+            });
+            
+            // Decryption form submission
+            document.getElementById('decrypt-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const passcode = document.getElementById('decrypt-passcode').value;
+                const words = document.getElementById('decrypt-words').value.trim().split(/\s+/);
+                const range = parseInt(document.getElementById('decrypt-range').value);
+                const mode = document.querySelector('input[name="decrypt-mode"]:checked').value;
+                const zipPasscode = document.getElementById('decrypt-zip-passcode').value;
+                
+                // Validate 24 words
+                if (words.length !== 24) {
+                    alert('Please enter exactly 24 words');
+                    return;
+                }
+                
+                // Validate files if in file mode
+                if (mode === 'file' && decryptFiles.length === 0) {
+                    alert('Please select at least one file to decrypt');
+                    return;
+                }
+                
+                // Show progress
+                const progressBar = document.querySelector('#decrypt-progress .progress-bar');
+                document.getElementById('decrypt-progress').style.display = 'block';
+                
+                // Simulate decryption process
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        
+                        // Show result
+                        const resultDiv = document.getElementById('decrypt-result');
+                        const resultText = document.getElementById('decrypt-result-text');
+                        
+                        if (mode === 'text') {
+                            const text = document.getElementById('decrypt-text').value;
+                            try {
+                                const decrypted = decryptText(text, passcode, words, range);
+                                resultText.textContent = `Decrypted text: ${decrypted}`;
+                                document.getElementById('decrypt-download').style.display = 'none';
+                            } catch (error) {
+                                resultText.textContent = 'Decryption failed. Please check your credentials.';
+                                document.querySelector('#decrypt-result .alert').className = 'alert alert-error';
+                            }
+                        } else {
+                            try {
+                                resultText.textContent = `${decryptFiles.length} file(s) have been decrypted successfully.`;
+                                document.querySelector('#decrypt-result .alert').className = 'alert alert-success';
+                                document.getElementById('decrypt-download').style.display = 'block';
+                                
+                                // Set up download button
+                                document.getElementById('download-decrypted').onclick = function() {
+                                    downloadDecryptedFiles(decryptFiles, passcode, words, range, zipPasscode);
+                                };
+                            } catch (error) {
+                                resultText.textContent = 'Decryption failed. Please check your credentials.';
+                                document.querySelector('#decrypt-result .alert').className = 'alert alert-error';
+                                document.getElementById('decrypt-download').style.display = 'none';
+                            }
+                        }
+                        
+                        resultDiv.style.display = 'block';
+                        document.getElementById('decrypt-progress').style.display = 'none';
+                    }
+                }, 100);
+            });
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('.navbar-nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    document.querySelector(targetId).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+
+        // File handling functions
+        function setupFileDropArea(dropAreaId, fileInputId, filesArray, fileListId) {
+            const dropArea = document.getElementById(dropAreaId);
+            const fileInput = document.getElementById(fileInputId);
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('active');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('active');
+            }
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFileSelection(files, filesArray, fileListId);
+            }
+        }
+        
+        function handleFileSelection(files, filesArray, fileListId) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                // Check if file already exists
+                if (!filesArray.some(f => f.name === file.name && f.size === file.size)) {
+                    filesArray.push(file);
+                }
+            }
+            updateFileList(fileListId, filesArray);
+        }
+        
+        function updateFileList(fileListId, filesArray) {
+            const fileList = document.getElementById(fileListId);
+            fileList.innerHTML = '';
+            
+            filesArray.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                const fileSize = formatFileSize(file.size);
+                
+                fileItem.innerHTML = `
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${fileSize}</div>
+                    <button type="button" class="file-remove" onclick="removeFile(${index}, '${fileListId}', ${filesArray === encryptFiles ? 'encryptFiles' : 'decryptFiles'})">&times;</button>
+                `;
+                
+                fileList.appendChild(fileItem);
+            });
+        }
+        
+        function removeFile(index, fileListId, filesArrayName) {
+            if (filesArrayName === 'encryptFiles') {
+                encryptFiles.splice(index, 1);
+                updateFileList(fileListId, encryptFiles);
+            } else {
+                decryptFiles.splice(index, 1);
+                updateFileList(fileListId, decryptFiles);
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Encryption functions
+        function encryptText(text, passcode, words, range) {
+            // Simple XOR encryption for demonstration
+            // In a real application, you would use more secure encryption
+            let encrypted = '';
+            const key = generateKey(passcode, words, range);
+            
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i);
+                const keyChar = key.charCodeAt(i % key.length);
+                encrypted += String.fromCharCode(charCode ^ keyChar);
+            }
+            
+            return btoa(encrypted); // Base64 encode
+        }
+
+        function decryptText(encryptedText, passcode, words, range) {
+            // Simple XOR decryption for demonstration
+            const decoded = atob(encryptedText);
+            const key = generateKey(passcode, words, range);
+            
+            let decrypted = '';
+            for (let i = 0; i < decoded.length; i++) {
+                const charCode = decoded.charCodeAt(i);
+                const keyChar = key.charCodeAt(i % key.length);
+                decrypted += String.fromCharCode(charCode ^ keyChar);
+            }
+            
+            return decrypted;
+        }
+
+        function generateKey(passcode, words, range) {
+            // Generate a key from passcode, words, and range
+            let key = passcode;
+            
+            // Add words to key
+            words.forEach(word => {
+                key += word;
+            });
+            
+            // Apply range transformation
+            let transformedKey = '';
+            for (let i = 0; i < key.length; i++) {
+                const charCode = key.charCodeAt(i);
+                transformedKey += String.fromCharCode((charCode + range) % 256);
+            }
+            
+            return transformedKey;
+        }
+
+        function downloadEncryptedFiles(files, passcode, words, range, zipPasscode) {
+            // In a real implementation, this would encrypt the files and create a ZIP
+            // For demonstration, we'll just create a dummy file
+            let fileContent = "ENCRYPTED FILES:\n";
+            files.forEach(file => {
+                fileContent += `- ${file.name}\n`;
+            });
+            
+            const blob = new Blob([fileContent], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `encrypted_files.leprvault`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadDecryptedFiles(files, passcode, words, range, zipPasscode) {
+            // In a real implementation, this would decrypt the files
+            // For demonstration, we'll just create a dummy file
+            let fileContent = "DECRYPTED FILES:\n";
+            files.forEach(file => {
+                const originalName = file.name.replace('.leprvault', '');
+                fileContent += `- ${originalName}\n`;
+            });
+            
+            const blob = new Blob([fileContent], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `decrypted_files.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
