@@ -1,10 +1,12 @@
 # leaperStuff 🚀
 
-**LStuff Beta 1.0** - A collection of powerful, client-only web tools built with glassmorphism design
+**LStuff 0.2.3** - A collection of powerful, client-only web tools built with glassmorphism design
 
 ![Glassmorphism UI](https://img.shields.io/badge/UI-Glassmorphism-FFD166?style=for-the-badge)
 ![Client Only](https://img.shields.io/badge/Architecture-Client--Only-118AB2?style=for-the-badge)
 ![No Backend](https://img.shields.io/badge/Backend-None-073B4C?style=for-the-badge)
+
+[Documentation](/docs/main.md)
 
 ## ✨ Features
 
