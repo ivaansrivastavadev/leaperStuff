@@ -56,7 +56,7 @@ Most tools are open source! Feel free to:
 
 - 📧 Email: tickets@leaperstuff.p.tawk.email
 - 💻 GitHub: [ivaansrivastavadev](https://github.com/ivaansrivastavadev)
-- 📢 Telegram: [leaperposts](https://t.me/s/leaperposts)
+- 📢 Blog: [leaperposts](https://leaperposts.blogspot.com/)
 
 ## 📄 License
 
