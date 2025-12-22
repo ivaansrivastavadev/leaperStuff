@@ -7,9 +7,9 @@ const ads = [
   },
   {
     verified: true,
-    tittle: "TEST_AD",
-    ds: "THIS IS A TEST AD",
-    url: "https://leaperstuff.vercel.app/"
+    tittle: "leprsVisuals",
+    ds: "Make great charts using our tool, with more on our main site!",
+    url: "https://leaperstuff.vercel.app/apps/visuals/visuals.html/"
   }
 ];
 
