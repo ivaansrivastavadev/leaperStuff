@@ -3,1170 +3,542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HyprLepr — by leaperStuff</title>
+    <title>leprHypr | Web OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'SF Mono', 'Cascadia Code', monospace;
-        }
-
         :root {
-            --primary: #81a1c1;
-            --secondary: #5e81ac;
-            --background: #2e3440;
-            --surface: #3b4252;
-            --text: #eceff4;
-            --accent: #88c0d0;
-            --error: #bf616a;
-            --success: #a3be8c;
-            --warning: #ebcb8b;
-            --border-radius: 8px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-primary: #11111b;
+            --bg-secondary: #1e1e2e;
+            --accent: #cba6f7;
+            --text-main: #cdd6f4;
+            --text-dim: #a6adc8;
+            --danger: #f38ba8;
+            --win-border: #313244;
+            --brightness: 100%;
         }
 
-        body {
-            background-color: var(--background);
-            color: var(--text);
+        body, html {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
             overflow: hidden;
-            height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            filter: brightness(var(--brightness));
+        }
+
+        #desktop {
+            width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            position: relative; display: none;
+        }
+
+        #pingbar {
+            height: 35px;
+            background: rgba(17, 17, 27, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--win-border);
+            display: flex; align-items: center;
+            padding: 0 10px; justify-content: space-between;
+            position: absolute; top: 0; width: 100%; z-index: 1000;
+        }
+
+        .window {
+            position: absolute;
+            background: var(--bg-secondary);
+            border: 1px solid var(--win-border);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            transition: width 0.2s, height 0.2s, top 0.2s, left 0.2s;
+        }
+
+        .window.resizing { transition: none; }
+
+        .window-header {
+            background: rgba(49, 50, 68, 0.5);
+            padding: 6px 12px;
+            display: flex; justify-content: space-between;
+            align-items: center; cursor: move;
             user-select: none;
         }
 
-        /* Intro Screen */
-        #intro-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--background);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.8s ease;
-        }
+        .window-content { flex: 1; overflow: auto; position: relative; }
 
-        #intro-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        .win-btn { width: 22px; height: 22px; border-radius: 4px; margin-left: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .win-btn:hover { background: rgba(255,255,255,0.1); }
 
-        #intro-title {
-            font-size: 4rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            color: var(--primary);
-            text-shadow: 0 0 10px rgba(129, 161, 193, 0.5);
-        }
-
-        #intro-subtitle {
-            font-size: 1.5rem;
-            color: var(--text);
-            opacity: 0.8;
-        }
-
-        /* Desktop */
-        #desktop {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-            transition: var(--transition);
-        }
-
-        /* Waybar / Top Bar */
-        #top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 40px;
-            background-color: rgba(59, 66, 82, 0.9);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 100;
-            border-bottom: 1px solid rgba(136, 192, 208, 0.2);
-        }
-
-        #workspace-indicator {
-            display: flex;
-            gap: 5px;
-        }
-
-        .workspace-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--surface);
-            transition: var(--transition);
-        }
-
-        .workspace-dot.active {
-            background-color: var(--primary);
-        }
-
-        #time-date {
-            font-size: 0.9rem;
-            color: var(--text);
-        }
-
-        #top-bar-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .top-bar-btn {
-            background: none;
-            border: none;
-            color: var(--text);
-            padding: 5px 10px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .top-bar-btn:hover {
-            background-color: rgba(136, 192, 208, 0.2);
-        }
-
-        /* App Windows */
-        .app-window {
-            position: absolute;
-            background-color: var(--surface);
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            min-width: 300px;
-            min-height: 200px;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+        .resize-handle {
+            position: absolute; width: 10px; height: 10px;
+            right: 0; bottom: 0; cursor: nwse-resize;
             z-index: 10;
         }
 
-        .app-window.maximized {
-            top: 40px !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: calc(100% - 40px) !important;
-        }
-
-        .app-titlebar {
-            background-color: var(--background);
-            padding: 8px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: move;
-            user-select: none;
-        }
-
-        .app-title {
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .app-controls {
-            display: flex;
-            gap: 5px;
-        }
-
-        .app-control {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .app-control.close {
-            background-color: var(--error);
-        }
-
-        .app-control.minimize {
-            background-color: var(--warning);
-        }
-
-        .app-control.maximize {
-            background-color: var(--success);
-        }
-
-        .app-content {
-            flex: 1;
-            padding: 15px;
-            overflow: auto;
-        }
-
-        /* Terminal App */
-        .terminal-content {
-            background-color: #1e1e1e;
-            height: 100%;
-            padding: 10px;
-            font-family: 'SF Mono', 'Cascadia Code', monospace;
-            font-size: 0.9rem;
-            color: #cccccc;
-            overflow-y: auto;
-        }
-
-        .terminal-line {
-            margin-bottom: 5px;
-        }
-
-        .terminal-prompt {
-            color: var(--success);
-        }
-
-        .terminal-input {
-            background: transparent;
-            border: none;
-            color: inherit;
-            font-family: inherit;
-            font-size: inherit;
-            width: 80%;
-            outline: none;
-        }
-
-        /* Notes App */
-        .notes-textarea {
-            width: 100%;
-            height: 100%;
-            background-color: var(--surface);
-            border: none;
-            color: var(--text);
-            padding: 10px;
-            resize: none;
-            outline: none;
-            font-family: inherit;
-        }
-
-        /* File Manager */
-        .file-manager-content {
-            display: flex;
-            height: 100%;
-        }
-
-        .file-sidebar {
-            width: 200px;
-            background-color: var(--background);
-            padding: 10px;
-            border-right: 1px solid rgba(136, 192, 208, 0.2);
-        }
-
-        .file-list {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-        }
-
-        .file-item {
-            padding: 8px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .file-item:hover {
-            background-color: rgba(136, 192, 208, 0.1);
-        }
-
-        /* App Launcher */
-        #app-launcher {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 600px;
-            height: 400px;
-            background-color: rgba(46, 52, 64, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: var(--border-radius);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 200;
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--transition);
-        }
-
-        #app-launcher.active {
-            opacity: 1;
-            pointer-events: all;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        #app-launcher-search {
-            padding: 15px;
-            border-bottom: 1px solid rgba(136, 192, 208, 0.2);
-        }
-
-        #app-launcher-search input {
-            width: 100%;
-            padding: 10px 15px;
-            background-color: var(--surface);
-            border: none;
-            border-radius: var(--border-radius);
-            color: var(--text);
-            font-size: 1rem;
-            outline: none;
-        }
-
-        #app-launcher-grid {
-            flex: 1;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
-            overflow-y: auto;
-        }
-
-        .app-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .app-icon:hover {
-            background-color: rgba(136, 192, 208, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .app-icon-img {
-            width: 50px;
-            height: 50px;
-            background-color: var(--primary);
+        #polymenu, #control-center {
+            position: absolute; top: 40px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--win-border);
             border-radius: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
+            display: none; padding: 15px; z-index: 2000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        #polymenu { left: 10px; width: 350px; flex-direction: column; }
+        #control-center { right: 10px; width: 280px; }
+
+        .workspace-btn {
+            padding: 2px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+            font-size: 10px; border: 1px solid transparent;
+        }
+        .workspace-btn.active { background: var(--accent); color: var(--bg-primary); }
+        .workspace-btn.has-windows { border-color: var(--accent); }
+
+        .task-item {
+            padding: 2px 10px; border-radius: 4px; font-size: 10px; cursor: pointer;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--win-border);
+            display: flex; align-items: center; gap: 6px; max-width: 120px;
+        }
+        .task-item.active { border-color: var(--accent); background: rgba(203, 166, 247, 0.1); }
+        .task-item.minimized { opacity: 0.5; }
+
+        #logind {
+            position: fixed; inset: 0;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://raw.githubusercontent.com/JaaKooLit/wallpaper-bank/main/wallpapers/Minimalist/minimalist-1.png');
+            background-size: cover; display: none;
+            flex-direction: column; align-items: center; justify-content: center; z-index: 8000;
         }
 
-        .app-icon-name {
-            font-size: 0.8rem;
-            text-align: center;
-        }
-
-        /* Shortcuts Modal */
-        #shortcuts-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 500px;
-            background-color: rgba(46, 52, 64, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: var(--border-radius);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            z-index: 200;
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--transition);
-        }
-
-        #shortcuts-modal.active {
-            opacity: 1;
-            pointer-events: all;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        #shortcuts-modal h2 {
-            margin-bottom: 15px;
-            color: var(--primary);
-            text-align: center;
-        }
-
-        .shortcut-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(136, 192, 208, 0.1);
-        }
-
-        .shortcut-key {
-            background-color: var(--surface);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
-
-        /* Workspace Animation */
-        .workspace {
-            position: absolute;
-            top: 40px;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 40px);
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .workspace.hidden {
-            transform: translateX(100%);
-        }
-
-        /* Battery Indicator */
-        #battery-indicator {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .battery-level {
-            width: 20px;
-            height: 10px;
-            border: 1px solid var(--text);
-            border-radius: 2px;
-            position: relative;
-        }
-
-        .battery-level::after {
-            content: '';
-            position: absolute;
-            right: -3px;
-            top: 2px;
-            width: 2px;
-            height: 4px;
-            background-color: var(--text);
-            border-radius: 0 1px 1px 0;
-        }
-
-        .battery-fill {
-            height: 100%;
-            background-color: var(--success);
-            border-radius: 1px;
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 50px;
-            right: 20px;
-            padding: 10px 15px;
-            background-color: var(--surface);
-            border-radius: var(--border-radius);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            z-index: 300;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-        }
-
-        .notification.show {
-            transform: translateX(0);
+        .editor-textarea {
+            width: 100%; height: 100%; background: #1a1b26; color: #a9b1d6;
+            font-family: monospace; padding: 10px; border: none; outline: none; resize: none;
         }
     </style>
 </head>
 <body>
-    <!-- Intro Screen -->
-    <div id="intro-screen">
-        <h1 id="intro-title">HyprLepr</h1>
-        <p id="intro-subtitle">by leaperStuff</p>
+
+    <div id="webmouth" class="fixed inset-0 bg-black flex flex-col items-center justify-center z-[9000]">
+        <i class="fa-brands fa-linux text-6xl mb-4"></i>
+        <div class="w-48 h-1 bg-slate-800 rounded-full overflow-hidden">
+            <div id="boot-progress" class="h-full bg-purple-400 w-0 transition-all duration-300"></div>
+        </div>
     </div>
 
-    <!-- Desktop -->
+    <div id="logind">
+        <div id="login-clock" class="text-6xl font-bold mb-12">00:00</div>
+        <div class="bg-black/40 p-8 rounded-2xl backdrop-blur-md w-80 text-center border border-white/10">
+            <div id="login-user-list" class="flex flex-col gap-2 mb-4"></div>
+            <div id="login-auth" style="display:none">
+                <h2 id="current-auth-user" class="mb-4 font-bold"></h2>
+                <input type="password" id="login-pass" placeholder="Password" class="w-full bg-white/10 border border-white/20 p-2 rounded mb-4 text-center outline-none focus:border-purple-400 text-white">
+                <div class="flex gap-2">
+                    <button onclick="System.showUserPicker()" class="flex-1 bg-white/10 py-2 rounded text-xs">Back</button>
+                    <button onclick="System.login()" class="flex-[2] bg-purple-500 py-2 rounded font-bold">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="desktop">
-        <!-- Top Bar -->
-        <div id="top-bar">
-            <div id="workspace-indicator">
-                <div class="workspace-dot active" data-workspace="1"></div>
-                <div class="workspace-dot" data-workspace="2"></div>
+        <header id="pingbar">
+            <div class="flex items-center gap-3">
+                <button onclick="System.togglePolymenu()" class="hover:text-purple-400 px-2"><i class="fa-solid fa-ghost"></i></button>
+                <div class="flex gap-1" id="workspaces"></div>
+                <div class="h-4 w-[1px] bg-white/10 mx-1"></div>
+                <div class="flex gap-2" id="taskbar"></div>
             </div>
             
-            <div id="time-date">Loading...</div>
-            
-            <div id="top-bar-buttons">
-                <button class="top-bar-btn" id="app-launcher-btn">Apps</button>
-                <button class="top-bar-btn" id="shortcuts-btn">Shortcuts</button>
-                <div id="battery-indicator">
-                    <div class="battery-level">
-                        <div class="battery-fill" style="width: 85%;"></div>
-                    </div>
-                    <span>85%</span>
-                </div>
-                <button class="top-bar-btn" id="wallpaper-btn">Wallpaper</button>
+            <div class="flex items-center gap-4 text-[10px]">
+                <div id="clock">00:00</div>
+                <div onclick="System.toggleControlCenter()" class="cursor-pointer flex gap-3"><i class="fa-solid fa-wifi"></i><i class="fa-solid fa-sliders"></i></div>
             </div>
+        </header>
+
+        <div id="polymenu">
+            <input type="text" id="menu-search" placeholder="Search apps..." class="bg-white/5 border border-white/10 p-2 rounded mb-4 outline-none text-sm text-white w-full">
+            <div class="grid grid-cols-1 gap-1" id="app-list"></div>
         </div>
 
-        <!-- Workspace 1 -->
-        <div class="workspace" id="workspace-1"></div>
-        
-        <!-- Workspace 2 -->
-        <div class="workspace hidden" id="workspace-2"></div>
-
-        <!-- App Launcher -->
-        <div id="app-launcher">
-            <div id="app-launcher-search">
-                <input type="text" placeholder="Search for apps..." id="app-search">
+        <div id="control-center">
+            <div class="mb-4">
+                <label class="text-[10px] uppercase opacity-50 mb-2 block">Brightness</label>
+                <input type="range" class="w-full accent-purple-400" min="10" max="150" value="100" oninput="System.updateBrightness(this.value)">
             </div>
-            <div id="app-launcher-grid">
-                <!-- App icons will be generated by JavaScript -->
-            </div>
+            <button onclick="System.lock()" class="w-full bg-white/5 py-2 rounded text-xs hover:bg-white/10">Lock Session</button>
         </div>
 
-        <!-- Shortcuts Modal -->
-        <div id="shortcuts-modal">
-            <h2>Keyboard Shortcuts</h2>
-            <div class="shortcut-list">
-                <div class="shortcut-item">
-                    <span>Open App Launcher</span>
-                    <span class="shortcut-key">Ctrl+Shift+L</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Open Terminal</span>
-                    <span class="shortcut-key">Ctrl+Shift+T</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Open Notes</span>
-                    <span class="shortcut-key">Ctrl+Shift+N</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Open File Manager</span>
-                    <span class="shortcut-key">Ctrl+Shift+F</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Switch to Workspace 1</span>
-                    <span class="shortcut-key">Ctrl+Shift+1</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Switch to Workspace 2</span>
-                    <span class="shortcut-key">Ctrl+Shift+2</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Close Current App</span>
-                    <span class="shortcut-key">Ctrl+Shift+Q</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Toggle Wallpaper</span>
-                    <span class="shortcut-key">Ctrl+Shift+W</span>
-                </div>
-                <div class="shortcut-item">
-                    <span>Show Shortcuts</span>
-                    <span class="shortcut-key">Ctrl+Shift+?</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notification -->
-        <div class="notification" id="notification"></div>
+        <div id="window-layer" class="w-full h-full pt-[35px]"></div>
     </div>
 
     <script>
-        // State management
-        const state = {
-            currentWorkspace: 1,
-            apps: [],
-            wallpapers: [
-                'linear-gradient(135deg, #2e3440 0%, #4c566a 100%)',
-                'linear-gradient(135deg, #3b4252 0%, #434c5e 100%)',
-                'linear-gradient(135deg, #2e3440 0%, #5e81ac 100%)',
-                'linear-gradient(135deg, #2e3440 0%, #81a1c1 100%)'
-            ],
-            currentWallpaper: 0,
-            zIndexCounter: 10,
-            notesContent: localStorage.getItem('hyprlepr_notes') || ''
+        const VFS = {
+            data: {},
+            init() {
+                const saved = localStorage.getItem('lepr_vfs');
+                if (saved) { this.data = JSON.parse(saved); } 
+                else {
+                    this.data = {
+                        '/': { type: 'dir', children: ['home', 'bin'] },
+                        '/bin': { type: 'dir', children: [] },
+                        '/home': { type: 'dir', children: ['user'] },
+                        '/home/user': { type: 'dir', children: ['documents', 'notes.txt'] },
+                        '/home/user/notes.txt': { type: 'file', content: 'Hello from leprHypr!' },
+                        '/home/user/documents': { type: 'dir', children: [] }
+                    };
+                    this.save();
+                }
+            },
+            save() { localStorage.setItem('lepr_vfs', JSON.stringify(this.data)); },
+            getItem(path) { return this.data[path]; },
+            createFile(path, content = '') {
+                const parts = path.split('/'); const name = parts.pop(); const parent = parts.join('/') || '/';
+                if (!this.data[parent]) return;
+                if (!this.data[parent].children.includes(name)) this.data[parent].children.push(name);
+                this.data[path] = { type: 'file', content }; this.save();
+            },
+            mkdir(path) {
+                const parts = path.split('/'); const name = parts.pop(); const parent = parts.join('/') || '/';
+                if (!this.data[parent]) return;
+                if (!this.data[parent].children.includes(name)) this.data[parent].children.push(name);
+                this.data[path] = { type: 'dir', children: [] }; this.save();
+            }
         };
 
-        // App definitions
-        const apps = [
-            {
-                id: 'terminal',
-                name: 'Terminal',
-                icon: '>_',
-                workspace: 1,
-                createWindow: createTerminalWindow
-            },
-            {
-                id: 'notes',
-                name: 'Notes',
-                icon: '📝',
-                workspace: 1,
-                createWindow: createNotesWindow
-            },
-            {
-                id: 'file-manager',
-                name: 'File Manager',
-                icon: '📁',
-                workspace: 2,
-                createWindow: createFileManagerWindow
-            }
-        ];
-
-        // DOM Elements
-        const introScreen = document.getElementById('intro-screen');
-        const desktop = document.getElementById('desktop');
-        const timeDateElement = document.getElementById('time-date');
-        const workspaceIndicator = document.getElementById('workspace-indicator');
-        const workspace1 = document.getElementById('workspace-1');
-        const workspace2 = document.getElementById('workspace-2');
-        const appLauncher = document.getElementById('app-launcher');
-        const appLauncherBtn = document.getElementById('app-launcher-btn');
-        const appSearch = document.getElementById('app-search');
-        const appLauncherGrid = document.getElementById('app-launcher-grid');
-        const shortcutsModal = document.getElementById('shortcuts-modal');
-        const shortcutsBtn = document.getElementById('shortcuts-btn');
-        const wallpaperBtn = document.getElementById('wallpaper-btn');
-        const notification = document.getElementById('notification');
-
-        // Initialize
-        function init() {
-            // Set initial wallpaper
-            updateWallpaper();
-            
-            // Hide intro screen after 3 seconds
-            setTimeout(() => {
-                introScreen.classList.add('hidden');
-            }, 3000);
-
-            // Update time and date
-            updateTimeDate();
-            setInterval(updateTimeDate, 1000);
-
-            // Populate app launcher
-            populateAppLauncher();
-
-            // Set up event listeners
-            setupEventListeners();
-
-            // Show welcome notification
-            showNotification('Welcome to HyprLepr! Press Ctrl+Shift+? for shortcuts.');
-        }
-
-        // Update time and date
-        function updateTimeDate() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const dateString = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
-            timeDateElement.textContent = `${timeString} • ${dateString}`;
-        }
-
-        // Populate app launcher
-        function populateAppLauncher() {
-            appLauncherGrid.innerHTML = '';
-            
-            apps.forEach(app => {
-                const appIcon = document.createElement('div');
-                appIcon.className = 'app-icon';
-                appIcon.innerHTML = `
-                    <div class="app-icon-img">${app.icon}</div>
-                    <div class="app-icon-name">${app.name}</div>
+        const WindowManager = {
+            windows: [],
+            zIndex: 100,
+            create(appName, params = {}) {
+                const id = 'win-' + Math.random().toString(36).substr(2, 9);
+                const win = { 
+                    id, 
+                    name: appName, 
+                    workspace: System.currentWorkspace, 
+                    x: 100 + (this.windows.length * 20), 
+                    y: 80 + (this.windows.length * 20), 
+                    w: 700, h: 450,
+                    minimized: false,
+                    maximized: false,
+                    oldSize: null
+                };
+                this.windows.push(win);
+                
+                const el = document.createElement('div');
+                el.className = 'window';
+                el.id = id;
+                el.style.cssText = `left:${win.x}px; top:${win.y}px; width:${win.w}px; height:${win.h}px; z-index:${++this.zIndex}`;
+                el.innerHTML = `
+                    <div class="window-header" onmousedown="WindowManager.focus('${id}'); WindowManager.dragStart(event, '${id}')">
+                        <span class="text-[9px] font-bold uppercase tracking-widest opacity-70">${appName}</span>
+                        <div class="flex">
+                            <div class="win-btn" onclick="WindowManager.minimize('${id}')"><i class="fa-solid fa-minus text-[8px]"></i></div>
+                            <div class="win-btn" onclick="WindowManager.maximize('${id}')"><i class="fa-solid fa-expand text-[8px]"></i></div>
+                            <div class="win-btn hover:text-red-400" onclick="WindowManager.close('${id}')"><i class="fa-solid fa-xmark text-[10px]"></i></div>
+                        </div>
+                    </div>
+                    <div class="window-content" id="content-${id}"></div>
+                    <div class="resize-handle" onmousedown="WindowManager.resizeStart(event, '${id}')"></div>
                 `;
-                
-                appIcon.addEventListener('click', () => {
-                    launchApp(app.id);
-                    closeAppLauncher();
-                });
-                
-                appLauncherGrid.appendChild(appIcon);
-            });
-        }
-
-        // Set up event listeners
-        function setupEventListeners() {
-            // App launcher button
-            appLauncherBtn.addEventListener('click', toggleAppLauncher);
-            
-            // Shortcuts button
-            shortcutsBtn.addEventListener('click', toggleShortcutsModal);
-            
-            // Wallpaper button
-            wallpaperBtn.addEventListener('click', cycleWallpaper);
-            
-            // App search
-            appSearch.addEventListener('input', filterApps);
-            
-            // Keyboard shortcuts
-            document.addEventListener('keydown', handleKeyboardShortcut);
-            
-            // Workspace switching
-            workspaceIndicator.addEventListener('click', (e) => {
-                if (e.target.classList.contains('workspace-dot')) {
-                    const workspace = parseInt(e.target.dataset.workspace);
-                    switchWorkspace(workspace);
+                document.getElementById('window-layer').appendChild(el);
+                this.renderApp(appName, `content-${id}`, params);
+                this.updateVisibility();
+                this.renderTaskbar();
+                System.renderWorkspaces();
+            },
+            focus(id) {
+                const win = this.windows.find(w => w.id === id);
+                if (win) {
+                    const el = document.getElementById(id);
+                    el.style.zIndex = ++this.zIndex;
+                    this.renderTaskbar();
                 }
-            });
-            
-            // Close modals when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!appLauncher.contains(e.target) && e.target !== appLauncherBtn) {
-                    closeAppLauncher();
-                }
-                
-                if (!shortcutsModal.contains(e.target) && e.target !== shortcutsBtn) {
-                    closeShortcutsModal();
-                }
-            });
-        }
-
-        // Handle keyboard shortcuts
-        function handleKeyboardShortcut(e) {
-            if (e.ctrlKey && e.shiftKey) {
-                e.preventDefault();
-                
-                switch(e.key) {
-                    case 'L':
-                    case 'l':
-                        toggleAppLauncher();
-                        break;
-                    case 'T':
-                    case 't':
-                        launchApp('terminal');
-                        break;
-                    case 'N':
-                    case 'n':
-                        launchApp('notes');
-                        break;
-                    case 'F':
-                    case 'f':
-                        launchApp('file-manager');
-                        break;
-                    case '1':
-                        switchWorkspace(1);
-                        break;
-                    case '2':
-                        switchWorkspace(2);
-                        break;
-                    case 'Q':
-                    case 'q':
-                        closeTopApp();
-                        break;
-                    case 'W':
-                    case 'w':
-                        cycleWallpaper();
-                        break;
-                    case '?':
-                        toggleShortcutsModal();
-                        break;
-                }
-            }
-        }
-
-        // Toggle app launcher
-        function toggleAppLauncher() {
-            if (appLauncher.classList.contains('active')) {
-                closeAppLauncher();
-            } else {
-                openAppLauncher();
-            }
-        }
-
-        // Open app launcher
-        function openAppLauncher() {
-            appLauncher.classList.add('active');
-            appSearch.focus();
-        }
-
-        // Close app launcher
-        function closeAppLauncher() {
-            appLauncher.classList.remove('active');
-            appSearch.value = '';
-            filterApps(); // Reset filter
-        }
-
-        // Filter apps in launcher
-        function filterApps() {
-            const searchTerm = appSearch.value.toLowerCase();
-            const appIcons = appLauncherGrid.querySelectorAll('.app-icon');
-            
-            appIcons.forEach(icon => {
-                const appName = icon.querySelector('.app-icon-name').textContent.toLowerCase();
-                if (appName.includes(searchTerm)) {
-                    icon.style.display = 'flex';
+            },
+            minimize(id) {
+                const win = this.windows.find(w => w.id === id);
+                win.minimized = true;
+                this.updateVisibility();
+                this.renderTaskbar();
+            },
+            maximize(id) {
+                const win = this.windows.find(w => w.id === id);
+                const el = document.getElementById(id);
+                if (win.maximized) {
+                    win.maximized = false;
+                    el.style.left = win.oldSize.x + 'px';
+                    el.style.top = win.oldSize.y + 'px';
+                    el.style.width = win.oldSize.w + 'px';
+                    el.style.height = win.oldSize.h + 'px';
                 } else {
-                    icon.style.display = 'none';
+                    win.oldSize = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
+                    win.maximized = true;
+                    el.style.left = '0px';
+                    el.style.top = '35px';
+                    el.style.width = '100vw';
+                    el.style.height = 'calc(100vh - 35px)';
                 }
-            });
-        }
-
-        // Toggle shortcuts modal
-        function toggleShortcutsModal() {
-            if (shortcutsModal.classList.contains('active')) {
-                closeShortcutsModal();
-            } else {
-                openShortcutsModal();
+            },
+            close(id) {
+                document.getElementById(id)?.remove();
+                this.windows = this.windows.filter(w => w.id !== id);
+                this.renderTaskbar();
+                System.renderWorkspaces();
+            },
+            updateVisibility() {
+                this.windows.forEach(w => {
+                    const el = document.getElementById(w.id);
+                    if (el) el.style.display = (w.workspace === System.currentWorkspace && !w.minimized) ? 'flex' : 'none';
+                });
+            },
+            renderTaskbar() {
+                const tb = document.getElementById('taskbar');
+                tb.innerHTML = '';
+                this.windows.filter(w => w.workspace === System.currentWorkspace).forEach(w => {
+                    const item = document.createElement('div');
+                    item.className = `task-item ${w.minimized ? 'minimized' : ''}`;
+                    item.innerHTML = `<i class="fa-solid fa-circle-dot text-[6px] text-purple-400"></i> ${w.name}`;
+                    item.onclick = () => {
+                        if (w.minimized) {
+                            w.minimized = false;
+                            this.updateVisibility();
+                        }
+                        this.focus(w.id);
+                    };
+                    tb.appendChild(item);
+                });
+            },
+            dragStart(e, id) {
+                const win = this.windows.find(w => w.id === id);
+                if (win.maximized) return;
+                const el = document.getElementById(id);
+                let ox = e.clientX - el.offsetLeft; let oy = e.clientY - el.offsetTop;
+                const mm = (ev) => { 
+                    el.style.left = (ev.clientX - ox) + 'px'; 
+                    el.style.top = (ev.clientY - oy) + 'px'; 
+                };
+                const mu = () => { window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); };
+                window.addEventListener('mousemove', mm); window.addEventListener('mouseup', mu);
+            },
+            resizeStart(e, id) {
+                e.preventDefault();
+                const win = this.windows.find(w => w.id === id);
+                if (win.maximized) return;
+                const el = document.getElementById(id);
+                el.classList.add('resizing');
+                let startW = el.offsetWidth; let startH = el.offsetHeight;
+                let startX = e.clientX; let startY = e.clientY;
+                const mm = (ev) => {
+                    el.style.width = (startW + (ev.clientX - startX)) + 'px';
+                    el.style.height = (startH + (ev.clientY - startY)) + 'px';
+                };
+                const mu = () => { 
+                    el.classList.remove('resizing');
+                    window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); 
+                };
+                window.addEventListener('mousemove', mm); window.addEventListener('mouseup', mu);
+            },
+            renderApp(name, containerId, params) {
+                const container = document.getElementById(containerId);
+                if (Apps[name]) Apps[name](container, params);
             }
-        }
+        };
 
-        // Open shortcuts modal
-        function openShortcutsModal() {
-            shortcutsModal.classList.add('active');
-        }
-
-        // Close shortcuts modal
-        function closeShortcutsModal() {
-            shortcutsModal.classList.remove('active');
-        }
-
-        // Switch workspace
-        function switchWorkspace(workspace) {
-            if (workspace === state.currentWorkspace) return;
-            
-            // Update workspace indicator
-            document.querySelectorAll('.workspace-dot').forEach(dot => {
-                dot.classList.remove('active');
-            });
-            document.querySelector(`.workspace-dot[data-workspace="${workspace}"]`).classList.add('active');
-            
-            // Animate workspace transition
-            const currentWorkspaceElement = document.getElementById(`workspace-${state.currentWorkspace}`);
-            const newWorkspaceElement = document.getElementById(`workspace-${workspace}`);
-            
-            if (workspace > state.currentWorkspace) {
-                // Moving right
-                currentWorkspaceElement.classList.add('hidden');
-                newWorkspaceElement.classList.remove('hidden');
-            } else {
-                // Moving left
-                currentWorkspaceElement.classList.add('hidden');
-                newWorkspaceElement.classList.remove('hidden');
-            }
-            
-            state.currentWorkspace = workspace;
-            
-            showNotification(`Switched to workspace ${workspace}`);
-        }
-
-        // Launch app
-        function launchApp(appId) {
-            const app = apps.find(a => a.id === appId);
-            if (!app) return;
-            
-            // Check if app is already open
-            const existingApp = state.apps.find(a => a.id === appId && a.workspace === app.workspace);
-            if (existingApp) {
-                // Bring to front
-                bringToFront(existingApp.windowElement);
-                return;
-            }
-            
-            // Create app window
-            const windowElement = app.createWindow();
-            windowElement.dataset.appId = appId;
-            windowElement.dataset.workspace = app.workspace;
-            
-            // Add to state
-            state.apps.push({
-                id: appId,
-                workspace: app.workspace,
-                windowElement: windowElement
-            });
-            
-            // Add to correct workspace
-            const workspaceElement = document.getElementById(`workspace-${app.workspace}`);
-            workspaceElement.appendChild(windowElement);
-            
-            // Position window randomly but within viewport
-            positionWindowRandomly(windowElement);
-            
-            // Set up window controls
-            setupWindowControls(windowElement);
-            
-            // Bring to front
-            bringToFront(windowElement);
-            
-            showNotification(`Launched ${app.name}`);
-        }
-
-        // Create terminal window
-        function createTerminalWindow() {
-            const windowElement = document.createElement('div');
-            windowElement.className = 'app-window';
-            windowElement.innerHTML = `
-                <div class="app-titlebar">
-                    <div class="app-title">Terminal</div>
-                    <div class="app-controls">
-                        <div class="app-control minimize"></div>
-                        <div class="app-control maximize"></div>
-                        <div class="app-control close"></div>
-                    </div>
-                </div>
-                <div class="app-content">
-                    <div class="terminal-content">
-                        <div class="terminal-line">Welcome to HyprLepr Terminal</div>
-                        <div class="terminal-line">Type 'help' for available commands</div>
-                        <div class="terminal-line">
-                            <span class="terminal-prompt">user@hyprlepr:~$ </span>
-                            <input type="text" class="terminal-input" autofocus>
+        const Apps = {
+            Terminal: (container) => {
+                let path = '/home/user';
+                container.innerHTML = `<div class="p-2 font-mono text-xs h-full flex flex-col bg-black">
+                    <div id="term-out" class="flex-1 overflow-auto whitespace-pre-wrap mb-2">leprHypr Terminal v1.0\nType 'help' for commands.</div>
+                    <div class="flex gap-2"><span class="text-purple-400">➜</span><input type="text" id="term-in" class="term-input text-white"></div>
+                </div>`;
+                const out = container.querySelector('#term-out');
+                const inp = container.querySelector('#term-in');
+                inp.focus();
+                inp.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        const val = inp.value.trim(); const [cmd, ...args] = val.split(' ');
+                        out.innerHTML += `\n<span class="opacity-50">${path} $ ${val}</span>\n`;
+                        if (cmd === 'ls') out.innerHTML += VFS.getItem(path).children.join('  ') + '\n';
+                        else if (cmd === 'mkdir') VFS.mkdir(path + '/' + args[0]);
+                        else if (cmd === 'cd') {
+                            const target = args[0] === '..' ? path.split('/').slice(0,-1).join('/') || '/' : path + '/' + args[0];
+                            if (VFS.getItem(target)?.type === 'dir') path = target; else out.innerHTML += 'Not a directory\n';
+                        }
+                        else if (cmd === 'nano') WindowManager.create('CodeEditor', { file: path + '/' + args[0] });
+                        else if (cmd === 'clear') out.innerHTML = '';
+                        else if (cmd === 'help') out.innerHTML ='The commands are: ls,cd,mkdir,nano,clear,help from pakage coreutils';
+                        else out.innerHTML += `Command not found: ${cmd}\n`;
+                        inp.value = ''; out.scrollTop = out.scrollHeight;
+                    }
+                };
+            },
+            Funder: (container) => {
+                let path = '/home/user';
+                const draw = () => {
+                    const dir = VFS.getItem(path);
+                    container.innerHTML = `<div class="p-4 h-full bg-[#1e1e2e]">
+                        <div class="flex items-center gap-2 mb-4 bg-white/5 p-2 rounded text-[10px] opacity-70">
+                            <button class="hover:text-purple-400" onclick="this.dispatchEvent(new CustomEvent('nav-up', {bubbles:true}))"><i class="fa-solid fa-arrow-up"></i></button>
+                            <span class="text-white">${path}</span>
                         </div>
-                    </div>
-                </div>
-            `;
-            
-            // Set up terminal input
-            const terminalInput = windowElement.querySelector('.terminal-input');
-            terminalInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    handleTerminalCommand(terminalInput.value, windowElement);
-                    terminalInput.value = '';
-                }
-            });
-            
-            return windowElement;
-        }
-
-        // Handle terminal command
-        function handleTerminalCommand(command, windowElement) {
-            const terminalContent = windowElement.querySelector('.terminal-content');
-            const promptLine = document.createElement('div');
-            promptLine.className = 'terminal-line';
-            promptLine.innerHTML = `<span class="terminal-prompt">user@hyprlepr:~$ </span>${command}`;
-            terminalContent.appendChild(promptLine);
-            
-            const outputLine = document.createElement('div');
-            outputLine.className = 'terminal-line';
-            
-            command = command.trim().toLowerCase();
-            
-            if (command === 'help') {
-                outputLine.textContent = 'Available commands: help, date, clear, about';
-            } else if (command === 'date') {
-                outputLine.textContent = new Date().toString();
-            } else if (command === 'clear') {
-                terminalContent.innerHTML = '';
-            } else if (command === 'about') {
-                outputLine.textContent = 'HyprLepr - A web-based desktop environment by leaperStuff';
-            } else if (command === '') {
-                // Do nothing for empty command
-                outputLine.textContent = '';
-            } else {
-                outputLine.textContent = `Command not found: ${command}`;
-            }
-            
-            if (outputLine.textContent) {
-                terminalContent.appendChild(outputLine);
-            }
-            
-            // Add new prompt
-            const newPrompt = document.createElement('div');
-            newPrompt.className = 'terminal-line';
-            newPrompt.innerHTML = `
-                <span class="terminal-prompt">user@hyprlepr:~$ </span>
-                <input type="text" class="terminal-input" autofocus>
-            `;
-            terminalContent.appendChild(newPrompt);
-            
-            // Focus new input
-            const newInput = newPrompt.querySelector('.terminal-input');
-            newInput.focus();
-            
-            // Set up event listener for new input
-            newInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    handleTerminalCommand(newInput.value, windowElement);
-                    newInput.value = '';
-                }
-            });
-            
-            // Scroll to bottom
-            terminalContent.scrollTop = terminalContent.scrollHeight;
-        }
-
-        // Create notes window
-        function createNotesWindow() {
-            const windowElement = document.createElement('div');
-            windowElement.className = 'app-window';
-            windowElement.innerHTML = `
-                <div class="app-titlebar">
-                    <div class="app-title">Notes</div>
-                    <div class="app-controls">
-                        <div class="app-control minimize"></div>
-                        <div class="app-control maximize"></div>
-                        <div class="app-control close"></div>
-                    </div>
-                </div>
-                <div class="app-content">
-                    <textarea class="notes-textarea" placeholder="Start typing your notes...">${state.notesContent}</textarea>
-                </div>
-            `;
-            
-            // Set up auto-save
-            const textarea = windowElement.querySelector('.notes-textarea');
-            textarea.addEventListener('input', () => {
-                state.notesContent = textarea.value;
-                localStorage.setItem('hyprlepr_notes', state.notesContent);
-            });
-            
-            return windowElement;
-        }
-
-        // Create file manager window
-        function createFileManagerWindow() {
-            const windowElement = document.createElement('div');
-            windowElement.className = 'app-window';
-            windowElement.innerHTML = `
-                <div class="app-titlebar">
-                    <div class="app-title">File Manager</div>
-                    <div class="app-controls">
-                        <div class="app-control minimize"></div>
-                        <div class="app-control maximize"></div>
-                        <div class="app-control close"></div>
-                    </div>
-                </div>
-                <div class="app-content">
-                    <div class="file-manager-content">
-                        <div class="file-sidebar">
-                            <div class="file-item">
-                                <span>📁 Documents</span>
-                            </div>
-                            <div class="file-item">
-                                <span>📁 Pictures</span>
-                            </div>
-                            <div class="file-item">
-                                <span>📁 Downloads</span>
-                            </div>
-                            <div class="file-item">
-                                <span>📁 Music</span>
-                            </div>
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-4">
+                            ${dir.children.map(c => {
+                                const item = VFS.getItem(path + '/' + c);
+                                return `<div class="flex flex-col items-center gap-1 cursor-pointer p-2 hover:bg-white/5 rounded group" onclick="this.dispatchEvent(new CustomEvent('item-click', {detail:'${c}', bubbles:true}))">
+                                    <i class="fa-solid ${item.type === 'dir' ? 'fa-folder text-yellow-500' : 'fa-file-lines text-blue-400'} text-2xl"></i>
+                                    <span class="text-[9px] truncate w-full text-center text-white">${c}</span>
+                                </div>`;
+                            }).join('')}
                         </div>
-                        <div class="file-list">
-                            <div class="file-item">
-                                <span>📄 readme.txt</span>
-                            </div>
-                            <div class="file-item">
-                                <span>📄 todo.md</span>
-                            </div>
-                            <div class="file-item">
-                                <span>📄 config.json</span>
-                            </div>
-                            <div class="file-item">
-                                <span>📁 projects</span>
-                            </div>
-                        </div>
+                    </div>`;
+                };
+                container.addEventListener('nav-up', () => { path = path.split('/').slice(0,-1).join('/') || '/'; draw(); });
+                container.addEventListener('item-click', (e) => {
+                    const target = path + (path === '/' ? '' : '/') + e.detail;
+                    if (VFS.getItem(target).type === 'dir') { path = target; draw(); }
+                    else { WindowManager.create('CodeEditor', { file: target }); }
+                });
+                draw();
+            },
+            CodeEditor: (container, params) => {
+                const filePath = params.file || '';
+                const fileData = filePath ? VFS.getItem(filePath) : null;
+                container.innerHTML = `<div class="flex flex-col h-full">
+                    <div class="bg-white/5 p-2 flex justify-between items-center px-4">
+                        <span class="text-[9px] opacity-50 font-mono text-white">${filePath || 'Untitled'}</span>
+                        <button id="save-btn" class="bg-purple-500 text-[9px] px-3 py-1 rounded font-bold uppercase hover:bg-purple-600">Save</button>
                     </div>
-                </div>
-            `;
-            
-            return windowElement;
-        }
+                    <textarea class="editor-textarea" spellcheck="false">${fileData ? fileData.content : ''}</textarea>
+                </div>`;
+                container.querySelector('#save-btn').onclick = () => {
+                    const content = container.querySelector('textarea').value;
+                    if (filePath) { VFS.createFile(filePath, content); }
+                    else {
+                        const name = prompt("Filename?");
+                        if (name) VFS.createFile('/home/user/' + name, content);
+                    }
+                };
+            },
+            iBrowser: (container, params) => {
+                const url = params.url || 'https://www.wikipedia.org';
+                container.innerHTML = `<div class="flex flex-col h-full bg-white">
+                    <input id="url" type="text" value="${url}" class="p-2 border-b text-xs text-black outline-none w-full">
+                    <iframe src="${url}" class="flex-1 border-none"></iframe>
+                </div>`;
+                const inp = container.querySelector('#url');
+                inp.onkeydown = (e) => { if(e.key === 'Enter') container.querySelector('iframe').src = inp.value.includes('.') ? (inp.value.startsWith('http') ? inp.value : 'https://'+inp.value) : 'https://www.bing.com/search?q='+inp.value; };
+            },
+            Settings: (container) => {
+                const render = () => {
+                    const users = JSON.parse(localStorage.getItem('lepr_users') || '[]');
+                    container.innerHTML = `<div class="p-6 text-xs max-w-md">
+                        <h2 class="font-bold mb-4 border-b border-white/10 pb-2">User Management</h2>
+                        <div class="flex flex-col gap-2 mb-6">
+                            ${users.map(u => `<div class="flex justify-between items-center bg-white/5 p-2 rounded">
+                                <span><i class="fa-solid fa-user mr-2 opacity-50"></i>${u.name}</span>
+                                <button onclick="this.dispatchEvent(new CustomEvent('del-user', {detail:'${u.name}', bubbles:true}))" class="text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                            </div>`).join('')}
+                        </div>
+                        <h2 class="font-bold mb-4 border-b border-white/10 pb-2">Create User</h2>
+                        <input id="u-name" type="text" placeholder="Username" class="w-full bg-white/5 border border-white/10 p-2 rounded mb-2 text-white outline-none">
+                        <input id="u-pass" type="password" placeholder="Password" class="w-full bg-white/5 border border-white/10 p-2 rounded mb-4 text-white outline-none">
+                        <button id="add-user" class="w-full bg-purple-500 py-2 rounded font-bold hover:bg-purple-600">Add User</button>
+                    </div>`;
+                    container.querySelector('#add-user').onclick = () => {
+                        const name = container.querySelector('#u-name').value;
+                        const pass = container.querySelector('#u-pass').value;
+                        if (name && pass) {
+                            users.push({name, pass}); 
+                            localStorage.setItem('lepr_users', JSON.stringify(users)); 
+                            render();
+                            if (users.length === 1) setTimeout(() => { if(confirm("User created! Refresh to login?")) location.reload(); }, 100);
+                        }
+                    };
+                };
+                container.addEventListener('del-user', (e) => {
+                    let users = JSON.parse(localStorage.getItem('lepr_users')).filter(u => u.name !== e.detail);
+                    localStorage.setItem('lepr_users', JSON.stringify(users)); render();
+                });
+                render();
+            }
+        };
 
-        // Position window randomly
-        function positionWindowRandomly(windowElement) {
-            const maxX = window.innerWidth - 300;
-            const maxY = window.innerHeight - 300;
-            const x = Math.max(50, Math.min(maxX, Math.floor(Math.random() * maxX)));
-            const y = Math.max(50, Math.min(maxY, Math.floor(Math.random() * maxY)));
-            
-            windowElement.style.left = `${x}px`;
-            windowElement.style.top = `${y}px`;
-        }
-
-        // Set up window controls
-        function setupWindowControls(windowElement) {
-            const titlebar = windowElement.querySelector('.app-titlebar');
-            const closeBtn = windowElement.querySelector('.app-control.close');
-            const minimizeBtn = windowElement.querySelector('.app-control.minimize');
-            const maximizeBtn = windowElement.querySelector('.app-control.maximize');
-            
-            // Close button
-            closeBtn.addEventListener('click', () => {
-                const appId = windowElement.dataset.appId;
-                state.apps = state.apps.filter(app => app.windowElement !== windowElement);
-                windowElement.remove();
-                showNotification(`Closed ${appId}`);
-            });
-            
-            // Minimize button (not implemented)
-            minimizeBtn.addEventListener('click', () => {
-                showNotification('Minimize functionality not implemented in demo');
-            });
-            
-            // Maximize button
-            maximizeBtn.addEventListener('click', () => {
-                windowElement.classList.toggle('maximized');
-            });
-            
-            // Make window draggable
-            let isDragging = false;
-            let dragOffset = { x: 0, y: 0 };
-            
-            titlebar.addEventListener('mousedown', (e) => {
-                if (windowElement.classList.contains('maximized')) return;
+        const System = {
+            currentWorkspace: 1,
+            currentUser: null,
+            init() {
+                VFS.init();
+                this.updateClock(); setInterval(() => this.updateClock(), 1000);
+                this.renderWorkspaces();
                 
-                isDragging = true;
-                dragOffset.x = e.clientX - windowElement.offsetLeft;
-                dragOffset.y = e.clientY - windowElement.offsetTop;
-                bringToFront(windowElement);
-            });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                
-                windowElement.style.left = `${e.clientX - dragOffset.x}px`;
-                windowElement.style.top = `${e.clientY - dragOffset.y}px`;
-            });
-            
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
-        }
-
-        // Bring window to front
-        function bringToFront(windowElement) {
-            state.zIndexCounter++;
-            windowElement.style.zIndex = state.zIndexCounter;
-        }
-
-        // Close top app
-        function closeTopApp() {
-            const currentWorkspaceApps = state.apps.filter(app => app.workspace === state.currentWorkspace);
-            if (currentWorkspaceApps.length === 0) return;
-            
-            // Find the topmost app (highest z-index)
-            let topApp = currentWorkspaceApps[0];
-            for (const app of currentWorkspaceApps) {
-                const zIndex = parseInt(app.windowElement.style.zIndex) || 0;
-                const topZIndex = parseInt(topApp.windowElement.style.zIndex) || 0;
-                if (zIndex > topZIndex) {
-                    topApp = app;
+                let b = 0;
+                const bi = setInterval(() => {
+                    b += 20; document.getElementById('boot-progress').style.width = b + '%';
+                    if (b >= 100) { clearInterval(bi); document.getElementById('webmouth').style.display='none'; this.showUserPicker(); }
+                }, 100);
+            },
+            updateClock() {
+                const d = new Date(); document.getElementById('clock').innerText = d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+                const lc = document.getElementById('login-clock'); if(lc) lc.innerText = document.getElementById('clock').innerText;
+            },
+            showUserPicker() {
+                const users = JSON.parse(localStorage.getItem('lepr_users') || '[]');
+                const list = document.getElementById('login-user-list');
+                document.getElementById('logind').style.display = 'flex';
+                if (users.length === 0) {
+                    list.innerHTML = `<button onclick="System.setupMode()" class="bg-purple-500 p-2 rounded font-bold">Setup First User</button>`;
+                } else {
+                    document.getElementById('login-auth').style.display = 'none';
+                    document.getElementById('login-user-list').style.display = 'flex';
+                    list.innerHTML = users.map(u => `<button onclick="System.prepAuth('${u.name}')" class="bg-white/10 p-3 rounded hover:bg-white/20 flex items-center gap-3 text-white"><i class="fa-solid fa-user"></i> ${u.name}</button>`).join('');
                 }
-            }
-            
-            // Close it
-            state.apps = state.apps.filter(app => app !== topApp);
-            topApp.windowElement.remove();
-            showNotification(`Closed ${topApp.id}`);
-        }
+            },
+            setupMode() {
+                document.getElementById('logind').style.display = 'none';
+                document.getElementById('desktop').style.display = 'block';
+                WindowManager.create('Settings');
+            },
+            prepAuth(name) {
+                this.currentUser = name;
+                document.getElementById('login-user-list').style.display = 'none';
+                document.getElementById('login-auth').style.display = 'block';
+                document.getElementById('current-auth-user').innerText = name;
+                document.getElementById('login-pass').focus();
+            },
+            login() {
+                const pass = document.getElementById('login-pass').value;
+                const user = JSON.parse(localStorage.getItem('lepr_users')).find(u => u.name === this.currentUser);
+                if (user && pass === user.pass) {
+                    document.getElementById('logind').style.display = 'none';
+                    document.getElementById('desktop').style.display = 'block';
+                    this.loadWallpaper();
+                    this.renderAppList();
+                } else { alert("Wrong password"); }
+            },
+            lock() { location.reload(); },
+            renderWorkspaces() {
+                const ws = document.getElementById('workspaces'); ws.innerHTML = '';
+                for (let i = 1; i <= 6; i++) {
+                    const hasWins = WindowManager.windows.some(w => w.workspace === i);
+                    const btn = document.createElement('button');
+                    btn.className = `workspace-btn ${i === this.currentWorkspace ? 'active' : ''} ${hasWins ? 'has-windows' : ''}`;
+                    btn.innerText = i;
+                    btn.onclick = () => { 
+                        this.currentWorkspace = i; 
+                        this.renderWorkspaces(); 
+                        WindowManager.updateVisibility(); 
+                        WindowManager.renderTaskbar();
+                    };
+                    ws.appendChild(btn);
+                }
+            },
+            renderAppList() {
+                document.getElementById('app-list').innerHTML = Object.keys(Apps).map(a => `<div class="p-2 hover:bg-white/5 rounded cursor-pointer text-sm text-white" onclick="WindowManager.create('${a}'); System.togglePolymenu()"><i class="fa-solid fa-rocket mr-3 opacity-50"></i>${a}</div>`).join('');
+            },
+            togglePolymenu() { const m = document.getElementById('polymenu'); m.style.display = m.style.display==='flex' ? 'none' : 'flex'; },
+            toggleControlCenter() { const c = document.getElementById('control-center'); c.style.display = c.style.display==='block' ? 'none' : 'block'; },
+            updateBrightness(v) { document.documentElement.style.setProperty('--brightness', v + '%'); },
+            loadWallpaper() { document.getElementById('desktop').style.backgroundImage = `url('https://raw.githubusercontent.com/JaaKooLit/wallpaper-bank/main/wallpapers/Minimalist/minimalist-4.png')`; }
+        };
 
-        // Cycle wallpaper
-        function cycleWallpaper() {
-            state.currentWallpaper = (state.currentWallpaper + 1) % state.wallpapers.length;
-            updateWallpaper();
-            showNotification(`Changed wallpaper to style ${state.currentWallpaper + 1}`);
-        }
-
-        // Update wallpaper
-        function updateWallpaper() {
-            desktop.style.backgroundImage = state.wallpapers[state.currentWallpaper];
-        }
-
-        // Show notification
-        function showNotification(message) {
-            notification.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Initialize the desktop environment
-        init();
+        window.onload = () => System.init();
     </script>
 </body>
 </html>

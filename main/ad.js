@@ -4,12 +4,6 @@ const ads = [
     tittle: "RECALLR - Football News",
     ds: "Your hub for football news and match analysis",
     url: "https://recallr.blogspot.com"
-  },
-  {
-    verified: true,
-    tittle: "leprVisuals",
-    ds: "Make great charts using our tool, with more on our main site!",
-    url: "https://leaperstuff.vercel.app/apps/visuals/visuals.html"
   }
 ];
 
