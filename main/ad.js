@@ -1,9 +1,15 @@
 const ads = [
   {
     verified: true,
-    tittle: "RECALLR - Football News",
+    title: "RECALLR - Football News",
     ds: "Your hub for football news and match analysis",
     url: "https://recallr.blogspot.com"
+  },
+  {
+    verified: true,
+    title: "leaperPosts",
+    ds: "leaperStuff updates on telegram",
+    url: "https://t.me/leaperstuff"
   }
 ];
 
@@ -25,7 +31,7 @@ container.innerHTML = ads.map(data => `
     </div>
 
     <div style="margin-bottom: 10px;">
-      <strong style="display: block; font-size: 14px; color: #222; font-family: sans-serif; font-weight: bold;">${data.tittle}</strong>
+      <strong style="display: block; font-size: 14px; color: #222; font-family: sans-serif; font-weight: bold;">${data.title}</strong>
       <p style="margin: 4px 0 0; font-size: 12px; color: #555; font-family: sans-serif; line-height: 1.2;">${data.ds}</p>
     </div>
 
