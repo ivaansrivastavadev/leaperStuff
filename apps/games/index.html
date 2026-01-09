@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>leaperStuff Games</title>
+    <style>
+        :root {
+            --neon-green: #39ff14;
+            --dark-bg: #0a0a0a;
+            --crt-overlay: rgba(18, 16, 16, 0.1);
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--neon-green);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .library {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 80%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        .game-card {
+            border: 2px solid var(--neon-green);
+            padding: 1rem;
+            background: #111;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .game-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            border: 1px solid var(--neon-green);
+            padding: 2px 5px;
+        }
+
+        .btn {
+            background: var(--neon-green);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        footer {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>leaperStuff Games</h1>
+        <p>System Status: Online | Catalog: v0.1</p>
+    </header>
+
+    <main class="library">
+        <div class="game-card" onclick="window.location.href='paintcolor.html'">
+            <span class="badge">WEB_JS</span>
+            <h3>PaintColor</h3>
+            <p>Paint in boxes.</p>
+            <button class="btn">INITIALIZE</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 198X LEAPERSTUFF INDUSTRIES</p>
+    </footer>
+
+    <script>
+        // Random glitch effect logic
+        setInterval(() => {
+            const header = document.querySelector('h1');
+            if (Math.random() > 0.95) {
+                header.style.textShadow = "2px 2px #ff00ff, -2px -2px #00ffff";
+                setTimeout(() => {
+                    header.style.textShadow = "0 0 10px var(--neon-green)";
+                }, 100);
+            }
+        }, 500);
+    </script>
+</body>
+</html>
