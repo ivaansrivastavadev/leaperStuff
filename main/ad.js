@@ -7,9 +7,9 @@ const ads = [
   },
   {
     verified: true,
-    title: "leaperPosts",
-    ds: "leaperStuff updates on telegram",
-    url: "https://t.me/leaperstuff"
+    title: "leprMark",
+    ds: "Test your computer speeds",
+    url: "/apps/leprmark/leprmark.html"
   }
 ];
 

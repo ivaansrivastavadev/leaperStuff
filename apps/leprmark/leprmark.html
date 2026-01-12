@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>leprMark | Industrial Load</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+        .warning-box { background: rgba(239, 71, 111, 0.2); border: 2px solid #EF476F; padding: 15px; border-radius: 12px; color: #EF476F; font-weight: bold; margin-bottom: 20px; text-align: center; }
+        .load-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; padding: 15px; border: 2px solid var(--color1); border-radius: 15px; }
+        .multiplier-val { font-size: 2.5rem; font-weight: bold; color: var(--color1); min-width: 80px; text-align: center; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .monitor-small { font-size: 0.85rem; opacity: 0.8; margin-top: 5px; font-family: monospace; }
+        
+        /* Net Popup */
+        #netPopup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; z-index: 10001; text-align: center; }
+    </style>
+</head>
+<body>
+    <nav class="navbar"><div class="navbar-container"><a href="#" class="navbar-brand">leprMark INDUSTRIAL v5</a></div></nav>
+
+    <div class="dashboard">
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i> WARNING: STRESS TESTING CAN PERMANENTLY DAMAGE HARDWARE OR CAUSE SYSTEM REBOOTS.
+        </div>
+
+        <div class="card liquid-glass text-center">
+            <h3>Global Load Multiplier</h3>
+            <div class="load-controls">
+                <button class="btn btn-secondary" onclick="updateMult(-5)">-5</button>
+                <div class="multiplier-val" id="multText">1x</div>
+                <button class="btn btn-secondary" onclick="updateMult(5)">+5</button>
+            </div>
+            <button class="btn btn-primary w-100" onclick="runAllTests()">⚡ ENGAGE ALL (DANGER)</button>
+        </div>
+
+        <div class="test-grid">
+            <div class="card glass">
+                <h4><i class="fas fa-microchip"></i> CPU Cluster</h4>
+                <div id="cpu-log" class="monitor-small">Ready</div>
+                <button class="btn btn-secondary mt-2 w-100" onclick="toggleCPU()">Toggle CPU</button>
+            </div>
+            <div class="card glass">
+                <h4><i class="fas fa-memory"></i> Physical RAM</h4>
+                <div id="ram-log" class="monitor-small">0MB Committed</div>
+                <button class="btn btn-secondary mt-2 w-100" onclick="toggleRAM()">Toggle RAM</button>
+            </div>
+            <div class="card glass">
+                <h4><i class="fas fa-wifi"></i> Net Burst</h4>
+                <div id="net-status" class="monitor-small">IDLE</div>
+                <button class="btn btn-secondary mt-2 w-100" onclick="toggleNet()">Start Network Test</button>
+            </div>
+            <div class="card glass">
+                <h4><i class="fas fa-battery-half"></i> Power</h4>
+                <div id="batt-log" class="monitor-small">Detecting...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="netPopup" class="card liquid-glass active-test">
+        <h3 style="color:var(--color1)">Network Stress</h3>
+        <hr class="mb-2">
+        <p>Download: <span id="dl-speed" style="color:var(--color4)">0.00</span> MB/s</p>
+        <p>Upload: <span id="ul-speed" style="color:#EF476F">0.00</span> MB/s</p>
+        <button class="btn btn-secondary mt-2" onclick="closeNet()">Stop & Close</button>
+    </div>
+
+    <script src="benchmark.js">
+    </script>
+</body>
+</html>
