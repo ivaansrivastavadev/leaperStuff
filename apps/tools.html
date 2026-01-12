@@ -9,82 +9,47 @@
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    /* Tools Grid Layout */
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .card-title { margin: 0; flex: 1; font-size: 1.25rem; }
+    
+    .fav-btn {
+      background: none;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+      padding: 0 0 0 10px;
+    }
+    .fav-btn.active { color: #ef476f; }
 
-.tool-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.tool-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.card-title {
-  margin: 0;
-  flex: 1;
-}
-
-.badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.badge-primary {
-  background: var(--color1);
-  color: white;
-}
-
-.badge-secondary {
-  background: var(--color2, #6c757d);
-  color: white;
-}
-
-.tool-card p {
-  flex: 1;
-  margin-bottom: 1.5rem;
-}
-
-.tool-card .btn {
-  margin-top: auto;
-  align-self: flex-start;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .features {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .features {
-    grid-template-columns: 1fr;
-  }
-}
+    .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 5px; }
+    .badge-primary { background: var(--color1); color: white; }
+    
+    .tool-card p { flex: 1; margin-bottom: 1.5rem; opacity: 0.9; }
+    .tool-card .btn { margin-top: auto; width: 100%; }
+    
+    .stats-info { font-size: 0.7rem; opacity: 0.5; margin-top: 10px; text-align: right; }
   </style>
 </head>
 <body>
-  <!-- Navigation -->
   <nav class="navbar">
     <div class="navbar-container">
       <a href="../index.html" class="navbar-brand">leaperStuff</a>
@@ -95,146 +60,110 @@
     </div>
   </nav>
 
+  
+
   <main class="page" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
-    <!-- Hero Section -->
     <section class="hero card text-center">
       <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--color1);">Tools Library</h1>
-      <p style="font-size: 1.2rem;">Discover powerful tools for developers and creators</p>
+      <p style="font-size: 1.2rem;">Your most used tools will automatically move to the top.</p>
     </section>
 
-    <!-- Search Section -->
     <section class="card text-center">
       <div class="form-group">
         <input id="tool-search" type="text" class="form-control" placeholder="Search tools..." style="text-align: center;" />
       </div>
     </section>
+<div id="ad-container"></div><script src="/main/ad.js"></script> 
 
-    <!-- Tools Grid -->
-    <section class="features" id="projects">
-      <div class="tool-card card" data-title="ZenCodeEdit Zen Code Edit Editor Peace CodeEditor">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-code"></i> ZenCodeEdit</h3>
-        </div>
-        <p>The Editor for Peace.</p>
-        <button class="btn btn-primary" onclick="window.location.href='https://zencodeedit.vercel.app'">Open Tool</button>
-      </div>
+    <section class="features" id="tool-grid"></section>
 
-      <div class="tool-card card" data-title="Chat Gun leaperchatgun ChatGun messaging anonymous chat">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-comments"></i> leaperChatGun</h3>
-        </div>
-        <p>Chat to a friend without login.</p>
-        <button class="btn btn-primary" onclick="window.location.href='chatgun/leaperchatgun.html'">Open Tool</button>
-      </div>
-
-      <div class="tool-card card" data-title="CAVA Web Unofficial audio visualizer">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-music"></i> CAVA Web</h3>
-        </div>
-        <p>UnOfficial CAVA Web.</p>
-        <button class="btn btn-primary" onclick="window.location.href='cava/cava_web_unofficial.html'">Open Tool</button>
-      </div>
-
-      <div class="tool-card card" data-title="neofetch infetch internetfetch system ascii fetch">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-terminal"></i> inFetch</h3>
-        </div>
-        <p>like neofetch but only ascii</p>
-        <button class="btn btn-primary" onclick="window.location.href='infetch/infetch.html'">Open Tool</button>
-      </div>
-
-      <div class="tool-card card" data-title="visuals chart maker chartmaker leprvisuals leapervisuals visual charts data">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-chart-bar"></i> leprVisuals</h3>
-          <span class="badge badge-primary">Popular</span>
-        </div>
-        <p>Cool Chart maker.</p>
-        <button class="btn btn-primary" onclick="window.location.href='visuals/visuals.html'">Open Tool</button>
-      </div>
-
-      <div class="tool-card card" data-title="hypr linux hyprlepr leprhypr lepr leaper hyprleaper leaperhypr de desktop environment">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-desktop"></i> leprHypr</h3>
-          <span class="badge badge-secondary">Linux</span>
-        </div>
-        <p>Cool Desktop. (Desktop recommended)</p>
-        <button class="btn btn-primary" onclick="window.location.href='hyprlepr.html'">Open Tool</button>
-      </div>
-
-      <div class="tool-card card" data-title="leaperdash leprdash dashboard dash board web tools">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> leaperDash</h3>
-        </div>
-        <p>Dashboard to see some things :)</p>
-        <button class="btn btn-primary" onclick="window.location.href='leprdash.html'">Open Tool</button>
-      </div>
-
-      <div class="tool-card card" data-title="lti leprtimer leapertimer timer clock retro">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-clock"></i> LTI (LeprTimer)</h3>
-        </div>
-        <p>Simple Timer</p>
-        <button class="btn btn-primary" onclick="window.location.href='lti/lti.html'">Open Tool</button>
-      </div>
-            <div class="tool-card card" data-title="notes leapernotes leprnotes notetaker taker note taker note-taker taking">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fa-solid fa-file"></i> leprnotes</h3>
-        </div><p>#CoolNotesApp</p>
-        <button class="btn btn-primary" onclick="window.location.href='notes/notes.html'">Open Tool</button>
-      </div>
-                  <div class="tool-card card" data-title="notes leapernotes leprnotes notetaker taker note taker note-taker taking">
-        <div class="card-header">
-          <h3 class="card-title">leprVault</h3>
-        </div><p>Encrypter and Decrypter</p>
-        <button class="btn btn-primary" onclick="window.location.href='vault.html'">Open Tool</button>
-      </div>
-      <div class="card-header">
-          <h3 class="card-title">leprMark</h3>
-        </div><p>Benchmark test.</p>
-        <button class="btn btn-primary" onclick="window.location.href='leprmark/leprmark.html'">Open Tool</button>
-      </div>
-    </section>
-
-<div id="ad-container"></div><script src="/main/ad.js"></script>
-
-    <!-- Footer -->
     <footer class="glass text-center" style="margin-top: 4rem; padding: 2rem 0;">
       <p>© 2025 LeaperStuff. All rights reserved.</p>
-      <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
-        Built with <i class="fas fa-heart" style="color: var(--color1);"></i> by Ivaan Srivastava ©️ 2026
-      </p>
     </footer>
   </main>
 
   <script>
-    const searchInput = document.getElementById("tool-search");
-    const cards = document.querySelectorAll(".tool-card");
+    // 1. Initial Tool Data
+    const baseTools = [
+      { id: "zencode", title: "ZenCodeEdit", icon: "fa-code", desc: "The Editor for Peace.", link: "https://zencodeedit.vercel.app", tags: "editor code zen" },
+      { id: "chatgun", title: "leaperChatGun", icon: "fa-comments", desc: "Chat to a friend without login.", link: "chatgun/leaperchatgun.html", tags: "chat messaging anonymous" },
+      { id: "cava", title: "CAVA Web", icon: "fa-music", desc: "UnOfficial CAVA Web visualizer.", link: "cava/cava_web_unofficial.html", tags: "audio visualizer music" },
+      { id: "infetch", title: "inFetch", icon: "fa-terminal", desc: "Like neofetch but only ASCII.", link: "infetch/infetch.html", tags: "system fetch terminal" },
+      { id: "visuals", title: "leprVisuals", icon: "fa-chart-bar", desc: "Cool Chart maker for your data.", link: "visuals/visuals.html", badge: "Popular", tags: "chart data visuals" },
+      { id: "hypr", title: "leprHypr", icon: "fa-desktop", desc: "Cool Desktop Environment experience.", link: "hyprlepr.html", badge: "Linux", tags: "linux desktop de" },
+      { id: "dash", title: "leaperDash", icon: "fa-tachometer-alt", desc: "Quick access dashboard for system info.", link: "leprdash.html", tags: "dashboard stats" },
+      { id: "lti", title: "LeprTimer", icon: "fa-clock", desc: "Simple and efficient retro timer.", link: "lti/lti.html", tags: "timer clock lti" },
+      { id: "notes", title: "leprNotes", icon: "fa-file-lines", desc: "A clean and fast notes app.", link: "notes/notes.html", tags: "notes taking notepad" },
+      { id: "vault", title: "leprVault", icon: "fa-vault", desc: "Secure Encrypter and Decrypter.", link: "vault.html", tags: "encrypt decrypt security" },
+      { id: "mark", title: "leprMark", icon: "fa-gauge-high", desc: "Industrial hardware benchmark test.", link: "leprmark/leprmark.html", badge: "Extreme", tags: "benchmark stress test gpu cpu" }
+    ];
 
-    searchInput.addEventListener("input", () => {
-      const q = searchInput.value.toLowerCase();
+    // 2. Load User Data from LocalStorage
+    let userStats = JSON.parse(localStorage.getItem('leaperStats')) || {};
+    let favorites = JSON.parse(localStorage.getItem('leaperFavs')) || [];
 
-      cards.forEach(card => {
-        const keywords = card.getAttribute("data-title").toLowerCase();
-        card.style.display = keywords.includes(q) ? "" : "none";
+    const grid = document.getElementById('tool-grid');
+    const search = document.getElementById('tool-search');
+
+    function handleToolClick(id, url) {
+        userStats[id] = (userStats[id] || 0) + 1;
+        localStorage.setItem('leaperStats', JSON.stringify(userStats));
+        window.location.href = url;
+    }
+
+    function toggleFav(id, e) {
+        e.stopPropagation();
+        const index = favorites.indexOf(id);
+        if (index > -1) favorites.splice(index, 1);
+        else favorites.push(id);
+        localStorage.setItem('leaperFavs', JSON.stringify(favorites));
+        displayTools(search.value);
+    }
+
+    function displayTools(query = "") {
+      grid.innerHTML = "";
+
+      // Sort logic: Favorites first, then by click count, then alphabetically
+      const sortedTools = [...baseTools].sort((a, b) => {
+          const aFav = favorites.includes(a.id) ? 1 : 0;
+          const bFav = favorites.includes(b.id) ? 1 : 0;
+          if (aFav !== bFav) return bFav - aFav;
+          
+          const aClicks = userStats[a.id] || 0;
+          const bClicks = userStats[b.id] || 0;
+          if (aClicks !== bClicks) return bClicks - aClicks;
+          
+          return a.title.localeCompare(b.title);
       });
-    });
+
+      const filtered = sortedTools.filter(t => 
+        t.title.toLowerCase().includes(query.toLowerCase()) || 
+        t.tags.toLowerCase().includes(query.toLowerCase())
+      );
+
+      filtered.forEach(t => {
+        const isFav = favorites.includes(t.id);
+        const clicks = userStats[t.id] || 0;
+        const card = document.createElement('div');
+        card.className = "tool-card card";
+        card.innerHTML = `
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas ${t.icon}"></i> ${t.title}</h3>
+            ${t.badge ? `<span class="badge badge-primary">${t.badge}</span>` : ''}
+            <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${t.id}', event)">
+                <i class="fas fa-heart"></i>
+            </button>
+          </div>
+          <p>${t.desc}</p>
+          <button class="btn btn-primary" onclick="handleToolClick('${t.id}', '${t.link}')">Open Tool</button>
+          ${clicks > 0 ? `<div class="stats-info">Used ${clicks} times</div>` : ''}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    search.addEventListener('input', (e) => displayTools(e.target.value));
+    window.onload = () => displayTools();
   </script>
-
-  <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6915e4cd6ca233195dc74ce5/1j9uobgui';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
-
-
-
 </body>
 </html>
