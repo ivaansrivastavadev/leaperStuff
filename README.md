@@ -6,8 +6,6 @@
 ![Client Only](https://img.shields.io/badge/Architecture-Client--Only-118AB2?style=for-the-badge)
 ![No Backend](https://img.shields.io/badge/Backend-None-073B4C?style=for-the-badge)
 
-[Documentation](/docs/main.md)
-
 ## ✨ Features
 
 - **Beautiful Glassmorphism UI** - Stunning liquid glass effects with backdrop blur
