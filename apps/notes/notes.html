@@ -1,128 +1,699 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>leprNotes - leaperStuff</title>
-    <link rel="stylesheet" href="notes.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Mermaid for diagrams -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-194ZHCENMF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-194ZHCENMF');
+</script>
+<!-- EnD -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>leprNotes — LeaperStuff</title>
+  <link rel="icon" type="image/png" href="../..//assets/roundedlogo.gif">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+
+  <style>
+    /* ── Full-screen app layout ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Topbar (auto-hide on desktop) ── */
+    #navbar {
+      height: var(--navbar-h);
+      background: rgba(26,24,20,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-5);
+      gap: var(--space-4);
+      flex-shrink: 0;
+      z-index: 100;
+      transition: transform 300ms var(--ease), opacity 300ms var(--ease);
+      position: relative;
+    }
+    #navbar.hidden {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+    }
+
+    .nav-brand {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-brand i { color: var(--accent); }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    /* Save indicator */
+    .save-indicator {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+    }
+    .save-indicator.saving { color: var(--warning); border-color: rgba(255,152,0,0.3); }
+    .save-indicator.saved  { color: var(--success); border-color: rgba(76,175,80,0.3); }
+
+    /* Mode select */
+    .mode-select {
+      appearance: none;
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-pill);
+      color: var(--text-primary);
+      font-family: var(--font);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      padding: 5px 28px 5px 12px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23A09A8E'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color var(--dur-fast);
+    }
+    .mode-select:focus { outline: none; border-color: var(--accent); }
+
+    /* Sidebar toggle */
+    .sidebar-toggle {
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-secondary);
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all var(--dur-fast) var(--ease);
+    }
+    .sidebar-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Dropdown */
+    .ln-dropdown { position: relative; }
+    .ln-dropdown-toggle {
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-secondary);
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 18px; font-weight: 700;
+      transition: all var(--dur-fast) var(--ease);
+    }
+    .ln-dropdown-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+    .ln-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 180px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--space-2);
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+      display: none;
+      animation: wf-slide-up 150ms var(--ease);
+    }
+    .ln-dropdown-menu.show { display: block; }
+
+    .ln-dropdown-menu button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      border-radius: var(--r-md);
+      font-family: var(--font);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-align: left;
+      transition: background var(--dur-fast), color var(--dur-fast);
+    }
+    .ln-dropdown-menu button:hover { background: var(--bg-overlay); color: var(--text-primary); }
+    .ln-dropdown-menu button.danger:hover { background: var(--error-subtle); color: var(--error); }
+    .ln-dropdown-menu .ln-sep {
+      border: none; border-top: 1px solid var(--border); margin: 4px 0;
+    }
+
+    /* ── App container ── */
+    .app-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      transition: width 250ms var(--ease), min-width 250ms var(--ease);
+    }
+    .sidebar.collapsed {
+      width: 0;
+      min-width: 0;
+      border-right: none;
+    }
+
+    .sidebar-header {
+      padding: var(--space-4) var(--space-4) var(--space-3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-pill);
+      color: var(--text-primary);
+      font-family: var(--font);
+      font-size: var(--text-sm);
+      padding: 7px 14px 7px 36px;
+      outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236B6559' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 12px center;
+      transition: border-color var(--dur-fast);
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-tertiary); }
+
+    .sidebar-actions {
+      display: flex;
+      gap: 8px;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-actions button { flex: 1; }
+
+    .notes-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-2);
+    }
+
+    /* Note list item */
+    .note-item {
+      padding: 10px 12px;
+      border-radius: var(--r-lg);
+      cursor: pointer;
+      transition: background var(--dur-fast), border-color var(--dur-fast);
+      border: 1.5px solid transparent;
+      margin-bottom: 4px;
+    }
+    .note-item:hover { background: var(--bg-elevated); }
+    .note-item.active {
+      background: var(--accent-subtle);
+      border-color: rgba(245,166,35,0.3);
+    }
+    .note-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .note-item-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+    .note-actions-btn {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 16px;
+      width: 24px; height: 24px;
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--dur-fast), color var(--dur-fast);
+      flex-shrink: 0;
+    }
+    .note-actions-btn:hover { background: var(--bg-overlay); color: var(--text-primary); }
+    .note-item-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+    .note-item-date {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    /* Tag chip */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--r-pill);
+      background: var(--accent-subtle);
+      border: 1px solid rgba(245,166,35,0.25);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* ── Editor area ── */
+    .editor-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-base);
+    }
+
+    .mode-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .mode-panel.hidden { display: none; }
+
+    /* Split view */
+    .split-view {
+      flex-direction: row;
+    }
+    .split-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+    }
+    .split-panel:last-child { border-right: none; }
+
+    /* Note header (title + tags bar) */
+    .note-header {
+      padding: var(--space-4) var(--space-6) var(--space-3);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-surface);
+      flex-shrink: 0;
+    }
+
+    .note-title {
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      background: none;
+      border: none;
+      outline: none;
+      width: 100%;
+      line-height: 1.2;
+    }
+    .note-title[contenteditable="true"] {
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 2px;
+    }
+
+    .note-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    /* Editor textarea */
+    .editor {
+      flex: 1;
+      padding: var(--space-6);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      border: none;
+      outline: none;
+      resize: none;
+      overflow-y: auto;
+    }
+
+    /* Preview */
+    .preview {
+      flex: 1;
+      padding: var(--space-6);
+      overflow-y: auto;
+      line-height: 1.75;
+      color: var(--text-primary);
+    }
+
+    /* Markdown preview styles */
+    .preview h1, .preview h2, .preview h3,
+    .preview h4, .preview h5, .preview h6 {
+      color: var(--text-primary);
+      margin: 1.4em 0 0.5em;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+    .preview h1 { font-size: var(--text-2xl); letter-spacing: -0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .preview h2 { font-size: var(--text-xl); }
+    .preview h3 { font-size: var(--text-lg); }
+    .preview p  { color: var(--text-secondary); margin-bottom: 1em; }
+    .preview a  { color: var(--accent); }
+    .preview strong { color: var(--text-primary); font-weight: 700; }
+    .preview em { font-style: italic; }
+    .preview ul, .preview ol { padding-left: 1.5em; margin-bottom: 1em; color: var(--text-secondary); }
+    .preview li { margin-bottom: 4px; }
+    .preview blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 8px 16px;
+      background: var(--accent-subtle);
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      color: var(--text-secondary);
+      margin: 1em 0;
+    }
+    .preview code {
+      background: var(--bg-elevated);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: var(--r-xs);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+    .preview pre {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--space-4);
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+    .preview pre code { background: none; padding: 0; color: var(--text-secondary); }
+    .preview table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+      font-size: var(--text-sm);
+    }
+    .preview th {
+      background: var(--bg-elevated);
+      color: var(--text-tertiary);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .preview td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .preview hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5em 0;
+    }
+    .preview img { max-width: 100%; border-radius: var(--r-md); }
+
+    /* ── Modals ── */
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(10,9,7,0.75);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      animation: wf-fade-in 200ms;
+    }
+    .modal.hidden { display: none; }
+
+    .modal-content {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: var(--space-8);
+      width: 100%;
+      max-width: 480px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: wf-slide-up 300ms var(--ease-spring);
+    }
+    .modal-content h3 {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-4);
+      color: var(--text-primary);
+    }
+    .modal-content p { color: var(--text-secondary); margin-bottom: var(--space-5); }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Version history */
+    #versionRange { width: 100%; accent-color: var(--accent); margin: 8px 0; }
+    #versionMeta  { font-size: var(--text-xs); color: var(--text-tertiary); margin-bottom: 12px; }
+    #versionPreview {
+      max-height: 280px;
+      overflow-y: auto;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--space-4);
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: var(--bg-overlay);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: var(--r-pill);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 999;
+      transition: opacity var(--dur-mid), transform var(--dur-mid);
+    }
+    #toast.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+    #toast button {
+      background: none; border: none;
+      color: var(--accent); font-weight: 700;
+      cursor: pointer; margin-left: 10px;
+      font-family: var(--font); font-size: var(--text-sm);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .sidebar { position: absolute; z-index: 50; height: 100%; left: 0; top: var(--navbar-h); }
+      .sidebar.collapsed { transform: translateX(-100%); }
+      .split-view { flex-direction: column; }
+      .split-panel { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
 </head>
 <body>
-    <nav id="navbar" class="navbar">
-        <div class="nav-brand">leprNotes — leaperStuff</div>
-        <div class="nav-controls">
-                          <button id="sidebarToggle" class="sidebar-toggle">☰</button>
-            <select id="modeSelect" class="mode-select">
-                <option value="preview">Preview</option>
-                <option value="editing" selected>Editing</option>
-                <option value="both">Both (Desktop)</option>
-            </select>
-            <div class="dropdown">
-                <button class="dropdown-toggle" id="fileActionsBtn">⋯</button>
-                <div class="dropdown-menu">
-                    <button id="renameBtn">Rename</button>
-                    <button id="duplicateBtn">Duplicate</button>
-                    <button id="versionHistoryBtn">Version History</button>
-                    <button id="deleteBtn">Delete</button>
-                    <button id="exportMDBtn">Export (MD)</button>
-                    <button id="exportJSONBtn">Export (JSON)</button>
-                </div>
-            </div>
-            <div id="saveIndicator" class="save-indicator">Saved</div>
-        </div>
-    </nav>
 
-    <div class="app-container">
-        <aside id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-
-                <input type="text" id="searchNotes" placeholder="Search notes..." class="search-input">
-            </div>
-            <div class="sidebar-actions">
-                <button id="newNoteBtn" class="btn btn-primary">New Note</button>
-                <button id="newFolderBtn" class="btn btn-secondary">New Folder</button>
-                <button id="newTagBtn" class="btn btn-secondary">New Tag</button>
-            </div>
-            <div id="notesList" class="notes-list">
-                <!-- Notes will be populated here -->
-            </div>
-        </aside>
-
-        <main class="editor-area">
-            <div id="editingMode" class="mode-panel">
-                <div class="note-header">
-                    <h1 id="noteTitle" class="note-title editable" contenteditable="false">Untitled</h1>
-                    <div id="noteTags" class="note-tags"></div>
-                </div>
-                <textarea id="editor" class="editor" placeholder="Start writing your markdown..."></textarea>
-            </div>
-
-            <div id="previewMode" class="mode-panel hidden">
-                <div class="note-header">
-                    <h1 id="previewTitle" class="note-title">Untitled</h1>
-                    <div id="previewTags" class="note-tags"></div>
-                </div>
-                <div id="preview" class="preview"></div>
-            </div>
-
-            <div id="bothMode" class="mode-panel split-view hidden">
-                <div class="split-panel">
-                    <div class="note-header">
-                        <h1 id="bothTitle" class="note-title editable" contenteditable="false">Untitled</h1>
-                        <div id="bothTags" class="note-tags"></div>
-                    </div>
-                    <textarea id="editorBoth" class="editor" placeholder="Start writing your markdown..."></textarea>
-                </div>
-                <div class="split-panel">
-                    <div class="note-header">
-                        <h1 id="bothPreviewTitle" class="note-title">Untitled</h1>
-                        <div id="bothPreviewTags" class="note-tags"></div>
-                    </div>
-                    <div id="previewBoth" class="preview"></div>
-                </div>
-            </div>
-
-            <!-- Live preview removed (kept Both and Preview modes) -->
-        </main>
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav id="navbar">
+    <div class="nav-brand">
+      <i class="fas fa-note-sticky"></i>
+      leprNotes
     </div>
+    <div class="nav-controls">
+      <button id="sidebarToggle" class="sidebar-toggle" title="Toggle sidebar">
+        <i class="fas fa-sidebar" style="font-size:13px;"></i>
+      </button>
 
-    <!-- Modals -->
-    <div id="deleteModal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Delete Note</h3>
-            <p>Are you sure you want to delete this note?</p>
-            <div class="modal-actions">
-                <button id="confirmDelete" class="btn btn-danger">Delete</button>
-                <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
-            </div>
+      <select id="modeSelect" class="mode-select" title="View mode">
+        <option value="preview">Preview</option>
+        <option value="editing" selected>Editing</option>
+        <option value="both">Split (Desktop)</option>
+      </select>
+
+      <!-- Actions dropdown -->
+      <div class="ln-dropdown">
+        <button class="ln-dropdown-toggle" id="fileActionsBtn" title="More actions">⋯</button>
+        <div class="ln-dropdown-menu" id="fileActionsMenu">
+          <button id="renameBtn">
+            <i class="fas fa-pen" style="width:14px;color:var(--accent)"></i> Rename
+          </button>
+          <button id="duplicateBtn">
+            <i class="fas fa-copy" style="width:14px;color:var(--accent)"></i> Duplicate
+          </button>
+          <button id="versionHistoryBtn">
+            <i class="fas fa-clock-rotate-left" style="width:14px;color:var(--accent)"></i> Version History
+          </button>
+          <hr class="ln-sep">
+          <button id="exportMDBtn">
+            <i class="fas fa-file-lines" style="width:14px;color:var(--text-tertiary)"></i> Export as .md
+          </button>
+          <button id="exportJSONBtn">
+            <i class="fas fa-file-code" style="width:14px;color:var(--text-tertiary)"></i> Export as JSON
+          </button>
+          <hr class="ln-sep">
+          <button id="deleteBtn" class="danger">
+            <i class="fas fa-trash" style="width:14px;"></i> Delete Note
+          </button>
         </div>
-    </div>
+      </div>
 
-    <div id="tagModal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Edit Tags</h3>
-            <div id="tagInputs"></div>
-            <div class="modal-actions">
-                <button id="saveTags" class="btn btn-primary">Save</button>
-                <button id="cancelTags" class="btn btn-secondary">Cancel</button>
-            </div>
+      <div id="saveIndicator" class="save-indicator">Saved</div>
+    </div>
+  </nav>
+
+  <!-- ═══════════ APP ═══════════ -->
+  <div class="app-container">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <input type="text" id="searchNotes" class="search-input" placeholder="Search notes…">
+      </div>
+      <div class="sidebar-actions">
+        <button id="newNoteBtn" class="wf-btn wf-btn-filled wf-btn-sm">
+          <i class="fas fa-plus"></i> New
+        </button>
+        <button id="newTagBtn" class="wf-btn wf-btn-outlined wf-btn-sm">
+          <i class="fas fa-tag"></i> Tag
+        </button>
+      </div>
+      <div id="notesList" class="notes-list"></div>
+    </aside>
+
+    <!-- Editor area -->
+    <main class="editor-area">
+
+      <!-- Editing mode -->
+      <div id="editingMode" class="mode-panel">
+        <div class="note-header">
+          <h1 id="noteTitle" class="note-title editable" contenteditable="false">Untitled</h1>
+          <div id="noteTags" class="note-tags"></div>
         </div>
-    </div>
+        <textarea id="editor" class="editor"
+          placeholder="Start writing in Markdown… (Ctrl+S to save, Ctrl+/ to toggle preview)"></textarea>
+      </div>
 
-    <div id="versionModal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Version History</h3>
-            <div id="versionList"></div>
-            <div class="modal-actions">
-                <button id="closeVersionModal" class="btn btn-secondary">Close</button>
-            </div>
+      <!-- Preview mode -->
+      <div id="previewMode" class="mode-panel hidden">
+        <div class="note-header">
+          <h1 id="previewTitle" class="note-title">Untitled</h1>
+          <div id="previewTags" class="note-tags"></div>
         </div>
-    </div>
+        <div id="preview" class="preview"></div>
+      </div>
 
-    <!-- Toast -->
-    <div id="toast" class="toast hidden"></div>
-    <script src="notes.js"></script>
+      <!-- Both / Split mode -->
+      <div id="bothMode" class="mode-panel split-view hidden">
+        <div class="split-panel">
+          <div class="note-header">
+            <h1 id="bothTitle" class="note-title editable" contenteditable="false">Untitled</h1>
+            <div id="bothTags" class="note-tags"></div>
+          </div>
+          <textarea id="editorBoth" class="editor"
+            placeholder="Start writing in Markdown…"></textarea>
+        </div>
+        <div class="split-panel">
+          <div class="note-header">
+            <h1 id="bothPreviewTitle" class="note-title">Preview</h1>
+            <div id="bothPreviewTags" class="note-tags"></div>
+          </div>
+          <div id="previewBoth" class="preview"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════ MODALS ═══════════ -->
+
+  <!-- Delete -->
+  <div id="deleteModal" class="modal hidden">
+    <div class="modal-content">
+      <h3><i class="fas fa-trash" style="color:var(--error);margin-right:8px;"></i>Delete Note</h3>
+      <p>Are you sure you want to delete this note? You can undo immediately after.</p>
+      <div class="modal-actions">
+        <button id="cancelDelete" class="wf-btn wf-btn-ghost">Cancel</button>
+        <button id="confirmDelete" class="wf-btn wf-btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag editor -->
+  <div id="tagModal" class="modal hidden">
+    <div class="modal-content">
+      <h3><i class="fas fa-tag" style="color:var(--accent);margin-right:8px;"></i>Edit Tags</h3>
+      <div id="tagInputs"></div>
+      <div class="modal-actions">
+        <button id="cancelTags"  class="wf-btn wf-btn-ghost">Cancel</button>
+        <button id="saveTags"    class="wf-btn wf-btn-filled">Save Tags</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version history -->
+  <div id="versionModal" class="modal hidden">
+    <div class="modal-content" style="max-width:600px;">
+      <h3><i class="fas fa-clock-rotate-left" style="color:var(--accent);margin-right:8px;"></i>Version History</h3>
+      <div id="versionList"></div>
+      <div class="modal-actions">
+        <button id="closeVersionModal" class="wf-btn wf-btn-ghost">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden"></div>
+
+  <script src="notes.js"></script>
 </body>
 </html>

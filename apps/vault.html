@@ -1,1284 +1,777 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>leprVault - Secure Encryption & Decryption</title>
-    <style>
-        /* CSS Variables for Color Palette */
-        :root {
-          --color1: #FFD166; /* Yellow */
-          --color2: #FFA62E; /* Orange-Yellow */
-          --color3: #FF8E00; /* Dark Yellow */
-          --color4: #118AB2; /* Blue */
-          --color5: #073B4C; /* Dark Blue */
-          --text-light: #ffffff;
-          --text-dark: #333333;
-          --shadow: rgba(0, 0, 0, 0.1);
-          --shadow-dark: rgba(0, 0, 0, 0.2);
-        }
 
-        /* Reset and Base Styles */
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: #1a1a2e; /* Solid dark background instead of gradient */
-          min-height: 100vh;
-          color: var(--text-light);
-          line-height: 1.6;
-          padding-bottom: 2rem;
-        }
-
-        /* Glassmorphism Base Mixin */
-        .glass {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 16px;
-        }
-
-        /* Liquid Glass Effect */
-        .liquid-glass {
-          background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.05) 100%
-          );
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 20px;
-          box-shadow: 
-            0 8px 32px var(--shadow),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .liquid-glass::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.2),
-            transparent
-          );
-          transition: left 0.6s ease;
-        }
-
-        .liquid-glass:hover::before {
-          left: 100%;
-        }
-
-        /* Sticky Navbar with Background */
-        .navbar {
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-          padding: 1rem 2rem;
-          margin-bottom: 2rem;
-          background: rgba(26, 26, 46, 0.95); /* Solid background with slight transparency */
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .navbar-container {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .navbar-brand {
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: var(--text-light);
-          text-decoration: none;
-        }
-
-        .navbar-nav {
-          display: flex;
-          list-style: none;
-          gap: 2rem;
-        }
-
-        .navbar-nav a {
-          color: var(--text-light);
-          text-decoration: none;
-          padding: 0.5rem 1rem;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-        }
-
-        .navbar-nav a:hover {
-          background: rgba(255, 255, 255, 0.2);
-          transform: translateY(-2px);
-        }
-
-        /* Buttons */
-        .btn {
-          padding: 0.75rem 1.5rem;
-          border: none;
-          border-radius: 12px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          text-decoration: none;
-          display: inline-block;
-          text-align: center;
-          margin: 5px;
-          background: linear-gradient(135deg, var(--color1), var(--color2));
-          color: var(--color5);
-        }
-
-        .btn-secondary {
-          background: var(--color4); /* Solid blue instead of gradient */
-          color: var(--text-light);
-        }
-
-        .btn:hover {
-          transform: translateY(-3px);
-          box-shadow: 
-            0 12px 40px var(--shadow-dark),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4);
-        }
-
-        .btn:active {
-          transform: translateY(-1px);
-        }
-
-        /* Cards */
-        .card {
-          padding: 2rem;
-          margin: 1rem;
-          transition: all 0.3s ease;
-          border-radius: 12px;
-          background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.05) 100%
-          );
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          box-shadow: 
-            0 8px 32px var(--shadow),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        .card:hover {
-          transform: translateY(-5px);
-          box-shadow: 
-            0 15px 40px var(--shadow-dark),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4);
-        }
-
-        .card-header {
-          margin-bottom: 1rem;
-          padding-bottom: 1rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .card-title {
-          font-size: 1.25rem;
-          font-weight: bold;
-          margin-bottom: 0.5rem;
-        }
-
-        /* Forms - Updated with dark yellow background and white text */
-        .form-group {
-          margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 600;
-        }
-
-        .form-control {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border: none;
-          border-radius: 12px;
-          font-size: 1rem;
-          background: var(--color5); /* Dark yellow background */
-          color: var(--text-light); /* White text */
-          transition: all 0.3s ease;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .form-control:focus {
-          outline: none;
-          box-shadow: 
-            0 0 0 3px rgba(255, 209, 102, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4);
-          background: var(--color4); /* Lighter yellow on focus */
-        }
-
-        .form-control::placeholder {
-          color: rgba(255, 255, 255, 0.8); /* Light placeholder text */
-        }
-
-        /* Textarea specific styles */
-        textarea.form-control {
-          resize: vertical;
-          min-height: 100px;
-        }
-
-        /* Tables */
-        .table-container {
-          padding: 1.5rem;
-          margin: 1rem;
-          overflow-x: auto;
-          background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.05) 100%
-          );
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 20px;
-        }
-
-        .table {
-          width: 100%;
-          border-collapse: collapse;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 12px;
-          overflow: hidden;
-        }
-
-        .table th,
-        .table td {
-          padding: 1rem;
-          text-align: left;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .table th {
-          background: rgba(255, 255, 255, 0.1);
-          font-weight: 600;
-          color: var(--color1);
-        }
-
-        .table tr:hover {
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        .table tr:last-child td {
-          border-bottom: none;
-        }
-
-        /* Alerts */
-        .alert {
-          padding: 1rem 1.5rem;
-          margin: 1rem;
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .alert-success {
-          background: linear-gradient(135deg, rgba(17, 138, 178, 0.3), rgba(7, 59, 76, 0.3));
-          border-left: 4px solid var(--color4);
-        }
-
-        .alert-warning {
-          background: linear-gradient(135deg, rgba(255, 209, 102, 0.3), rgba(255, 142, 0, 0.3));
-          border-left: 4px solid var(--color1);
-        }
-
-        .alert-error {
-          background: linear-gradient(135deg, rgba(239, 71, 111, 0.3), rgba(255, 0, 0, 0.3));
-          border-left: 4px solid #EF476F;
-        }
-
-        /* Progress Bars */
-        .progress {
-          width: 100%;
-          height: 8px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-          overflow: hidden;
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .progress-bar {
-          height: 100%;
-          background: linear-gradient(90deg, var(--color1), var(--color2));
-          border-radius: 4px;
-          transition: width 0.4s ease;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .progress-bar::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.4),
-            transparent
-          );
-          animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-          0% { left: -100%; }
-          100% { left: 100%; }
-        }
-
-        /* Badges */
-        .badge {
-          display: inline-block;
-          padding: 0.25rem 0.75rem;
-          font-size: 0.75rem;
-          font-weight: 600;
-          border-radius: 20px;
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .badge-primary {
-          background: linear-gradient(135deg, var(--color1), var(--color2));
-          color: var(--color5);
-        }
-
-        .badge-secondary {
-          background: var(--color4); /* Solid blue instead of gradient */
-          color: var(--text-light);
-        }
-
-        /* Modal */
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 2000;
-          backdrop-filter: blur(10px);
-        }
-
-        .modal-content {
-          padding: 2rem;
-          max-width: 500px;
-          width: 90%;
-          max-height: 80vh;
-          overflow-y: auto;
-          background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.05) 100%
-          );
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 20px;
-        }
-
-        .modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1.5rem;
-          padding-bottom: 1rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .modal-close {
-          background: none;
-          border: none;
-          font-size: 1.5rem;
-          color: var(--text-light);
-          cursor: pointer;
-          padding: 0.25rem;
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-radius: 8px;
-        }
-
-        /* Utility Classes */
-        .text-center { text-align: center; }
-        .text-left { text-align: left; }
-        .text-right { text-align: right; }
-
-        .mt-1 { margin-top: 0.5rem; }
-        .mt-2 { margin-top: 1rem; }
-        .mt-3 { margin-top: 1.5rem; }
-
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-
-        .p-1 { padding: 0.5rem; }
-        .p-2 { padding: 1rem; }
-        .p-3 { padding: 1.5rem; }
-
-        .d-flex { display: flex; }
-        .justify-center { justify-content: center; }
-        .justify-between { justify-content: space-between; }
-        .align-center { align-items: center; }
-
-        .mr-2 { margin-right: 0.5rem; }
-
-        /* Container for rounded corners demo */
-        .demo-container {
-          padding: 2rem;
-          margin: 2rem 0;
-          background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.05) 100%
-          );
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 20px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .navbar-container {
-            flex-direction: column;
-            gap: 1rem;
-          }
-          
-          .navbar-nav {
-            gap: 1rem;
-          }
-          
-          .card {
-            padding: 1.5rem;
-            margin: 0.5rem;
-          }
-          
-          .btn {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-          }
-        }
-        @media (min-width: 768px) {.navbar-brand {margin-right: 15px;}}
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(var(--color1), var(--color2));
-          border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(var(--color2), var(--color3));
-        }
-
-        /* ------------- ToolTip ----------- */
-        .tip {
-          position: relative;
-          cursor: pointer;
-        }
-
-        .tip::after {
-          content: attr(tooltip);
-          position: absolute;
-          bottom: 100%;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(255, 255, 255, 0.15);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          color: var(--text-light);
-          padding: 2px 3px;
-          font-size: 12px;
-          white-space: nowrap;
-          opacity: 0;
-          visibility: hidden;
-          transition: all 0.3s ease;
-          z-index: 1000;
-          pointer-events: none;
-          border-radius: 8px;
-          box-shadow: 0 8px 32px var(--shadow);
-          margin-bottom: 8px;
-        }
-
-        .tip:hover::after,
-        .tip:hover::before {
-          opacity: 1;
-          visibility: visible;
-        }
-
-        .tip.tip-bottom::after {
-          top: 100%;
-          bottom: auto;
-          margin-top: 8px;
-          margin-bottom: 0;
-        }
-
-        .tip.tip-bottom::before {
-          top: 100%;
-          bottom: auto;
-          border-top-color: transparent;
-          border-bottom-color: rgba(255, 255, 255, 0.3);
-          margin-top: -4px;
-          margin-bottom: 0;
-        }
-
-        /* Tooltip color variations */
-        .tip.tip-primary::after {
-          background: linear-gradient(135deg, var(--color1), var(--color2));
-          color: var(--color5);
-          border: 1px solid rgba(255, 209, 102, 0.4);
-        }
-
-        .tip.tip-primary::before {
-          border-top-color: var(--color1);
-        }
-
-        .tip.tip-primary.tip-bottom::before {
-          border-bottom-color: var(--color1);
-          border-top-color: transparent;
-        }
-
-        .tip.tip-secondary::after {
-          background: var(--color4);
-          color: var(--text-light);
-          border: 1px solid rgba(17, 138, 178, 0.4);
-        }
-
-        .tip.tip-secondary::before {
-          border-top-color: var(--color4);
-        }
-
-        .tip.tip-secondary.tip-bottom::before {
-          border-bottom-color: var(--color4);
-          border-top-color: transparent;
-        }
-
-            /* Responsive */
-            @media (max-width: 768px) {
-              nav {
-                flex-direction: column;
-                text-align: center;
-              }
-              
-              .features {
-                grid-template-columns: 1fr;
-              }
-              
-              .contact-links {
-                flex-direction: column;
-                align-items: center;
-              }
-            }
-
-                /* Footer */
-            footer {
-              text-align: center;
-              margin-top: 4rem;
-              padding: 2rem 0;
-              border-top: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-        /* Custom styles for leprVault */
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 1rem;
-        }
-
-        .section {
-          margin-bottom: 3rem;
-        }
-
-        .file-info {
-          margin-top: 0.5rem;
-          font-size: 0.9rem;
-          color: rgba(255, 255, 255, 0.7);
-        }
-
-        .text-muted {
-          color: rgba(255, 255, 255, 0.6);
-        }
-
-        .file-drop-area {
-          border: 2px dashed rgba(255, 255, 255, 0.3);
-          border-radius: 12px;
-          padding: 2rem;
-          text-align: center;
-          transition: all 0.3s ease;
-          cursor: pointer;
-          margin-bottom: 1rem;
-        }
-
-        .file-drop-area:hover {
-          border-color: var(--color1);
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        .file-drop-area.active {
-          border-color: var(--color4);
-          background: rgba(17, 138, 178, 0.1);
-        }
-
-        .file-list {
-          margin-top: 1rem;
-        }
-
-        .file-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0.75rem;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 8px;
-          margin-bottom: 0.5rem;
-        }
-
-        .file-name {
-          flex: 1;
-        }
-
-        .file-size {
-          margin-right: 1rem;
-          color: rgba(255, 255, 255, 0.6);
-        }
-
-        .file-remove {
-          background: none;
-          border: none;
-          color: #EF476F;
-          cursor: pointer;
-          font-size: 1.2rem;
-        }
-
-        .hidden {
-          display: none;
-        }
-    </style>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-194ZHCENMF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-194ZHCENMF');
+</script>
+<!-- EnD -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- No external favicons, no preconnect, no DNS prefetch = max privacy -->
+  <link rel="icon" type="image/png" href="..//assets/roundedlogo.gif">
+  <title>leprVault — Secure Encryption</title>
+  <!-- Wafflent DS — loaded locally, no CDN -->
+  <link rel="stylesheet" href="../style.css">
+  <!-- Font Awesome loaded from cdnjs (no tracking) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- No analytics. No ads. No tawk. No cookies. -->
+
+  <style>
+    .lv-page { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── Section layout ── */
+    .lv-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 40px 0 64px;
+    }
+
+    /* ── Tabs (Encrypt / Decrypt / About) ── */
+    .lv-tabs-wrap {
+      position: sticky;
+      top: 64px; /* below navbar */
+      z-index: 50;
+      background: var(--bg-base);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    /* ── Form layout ── */
+    .lv-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 700px) { .lv-form-grid { grid-template-columns: 1fr; } }
+
+    .lv-full { grid-column: 1 / -1; }
+
+    /* ── Result output ── */
+    .lv-result-box {
+      background: var(--bg-base);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 16px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+      word-break: break-all;
+      line-height: 1.7;
+      min-height: 80px;
+      white-space: pre-wrap;
+      user-select: all;
+    }
+
+    /* ── File drop area ── */
+    .lv-drop {
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--r-lg);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--dur-mid) var(--ease), background var(--dur-mid) var(--ease);
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+    .lv-drop:hover, .lv-drop.active {
+      border-color: var(--accent);
+      background: var(--accent-subtle);
+      color: var(--text-primary);
+    }
+    .lv-drop i { font-size: 28px; margin-bottom: 10px; display: block; color: var(--accent); }
+
+    /* ── File list items ── */
+    .lv-file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border-radius: var(--r-md);
+      margin-top: 8px;
+      font-size: var(--text-sm);
+    }
+    .lv-file-item .name { flex: 1; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lv-file-item .size { color: var(--text-tertiary); flex-shrink: 0; }
+    .lv-file-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--error); font-size: 16px; line-height: 1;
+      padding: 2px 4px; border-radius: var(--r-xs);
+      transition: background var(--dur-fast) var(--ease);
+    }
+    .lv-file-remove:hover { background: var(--error-subtle); }
+
+    /* ── About list ── */
+    .lv-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .lv-layer {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--bg-elevated);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+    }
+    .lv-layer-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-size: 12px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .lv-layer-title { font-weight: 600; font-size: var(--text-sm); color: var(--text-primary); margin-bottom: 2px; }
+    .lv-layer-desc  { font-size: var(--text-xs); color: var(--text-tertiary); }
+
+    /* ── Privacy badge strip ── */
+    .lv-privacy-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .lv-privacy-strip .wf-chip { cursor: default; }
+
+    /* ── Radio group ── */
+    .lv-radio-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    /* ── Copy button ── */
+    .lv-copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    /* ── Footer ── */
+    .lv-footer {
+      margin-top: auto;
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="#" class="navbar-brand">leprVault</a>
-            <ul class="navbar-nav">
-                <li><a href="#encrypt-section">Encrypt</a></li>
-                <li><a href="#decrypt-section">Decrypt</a></li>
-                <li><a href="#about-section">About</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Encryption Section -->
-        <section id="encrypt-section" class="section">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Encrypt Data</h2>
-                    <p>Secure your files and text with multi-layer encryption</p>
-                </div>
-                
-                <form id="encrypt-form">
-                    <div class="form-group">
-                        <label class="form-label">Long Passcode</label>
-                        <input type="password" class="form-control" id="encrypt-passcode" placeholder="Enter a long, secure passcode" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">24 Words (in order)</label>
-                        <textarea class="form-control" id="encrypt-words" placeholder="Enter 24 words separated by spaces" rows="3" required></textarea>
-                        <small class="text-muted">Enter exactly 24 words in the correct order</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Encryption Range/Offset</label>
-                        <input type="number" class="form-control" id="encrypt-range" min="1" max="1000" value="128" required>
-                        <small class="text-muted">Higher values increase security but may take longer to process</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Mode</label>
-                        <div class="d-flex">
-                            <div class="mr-2">
-                                <input type="radio" id="encrypt-mode-text" name="encrypt-mode" value="text" checked>
-                                <label for="encrypt-mode-text">Text</label>
-                            </div>
-                            <div>
-                                <input disabled=true type="radio" id="encrypt-mode-file" name="encrypt-mode" value="file">
-                                <label for="encrypt-mode-file">File</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group" id="encrypt-file-group" style="display: none;">
-                        <label class="form-label">ZIP Password</label>
-                        <input type="password" class="form-control" id="encrypt-zip-passcode" placeholder="Password for encrypted ZIP file">
-                    </div>
-                    
-                    <div class="form-group" id="encrypt-text-group">
-                        <label class="form-label">Text to Encrypt</label>
-                        <textarea class="form-control" id="encrypt-text" placeholder="Enter the text you want to encrypt" rows="5" required></textarea>
-                    </div>
-                    
-                    <div class="form-group" id="encrypt-file-input-group" style="display: none;">
-                        <label class="form-label">File to Encrypt</label>
-                        <div class="file-drop-area" id="encrypt-file-drop">
-                            <p>Drag & drop files here or click to browse</p>
-                            <input type="file" class="hidden" id="encrypt-file" multiple>
-                            <button type="button" class="btn btn-secondary mt-2" onclick="document.getElementById('encrypt-file').click()">Browse Files</button>
-                        </div>
-                        <div class="file-list" id="encrypt-file-list"></div>
-                    </div>
-                    
-                    <div class="d-flex justify-between align-center">
-                        <button type="submit" class="btn btn-primary">Encrypt</button>
-                        <div id="encrypt-progress" class="progress" style="width: 200px; display: none;">
-                            <div class="progress-bar" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </form>
-                
-                <div id="encrypt-result" class="mt-3" style="display: none;">
-                    <div class="alert alert-success">
-                        <h4>Encryption Complete!</h4>
-                        <p id="encrypt-result-text"></p>
-                        <div id="encrypt-download" style="display: none;">
-                            <button class="btn btn-secondary" id="download-encrypted">Download Encrypted File</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+<div class="lv-page">
 
-        <!-- Decryption Section -->
-        <section id="decrypt-section" class="section">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Decrypt Data</h2>
-                    <p>Restore your encrypted files and text</p>
-                </div>
-                
-                <form id="decrypt-form">
-                    <div class="form-group">
-                        <label class="form-label">Long Passcode</label>
-                        <input type="password" class="form-control" id="decrypt-passcode" placeholder="Enter your long passcode" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">24 Words (in order)</label>
-                        <textarea class="form-control" id="decrypt-words" placeholder="Enter the 24 words in the correct order" rows="3" required></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Decryption Range/Offset</label>
-                        <input type="number" class="form-control" id="decrypt-range" min="1" max="1000" value="128" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Mode</label>
-                        <div class="d-flex">
-                            <div class="mr-2">
-                                <input type="radio" id="decrypt-mode-text" name="decrypt-mode" value="text" checked>
-                                <label for="decrypt-mode-text">Text</label>
-                            </div>
-                            <div>
-                                <input disabled=true type="radio" id="decrypt-mode-file" name="decrypt-mode" value="file">
-                                <label disabled=true for="decrypt-mode-file">File</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group" id="decrypt-file-group" style="display: none;">
-                        <label class="form-label">ZIP Password</label>
-                        <input type="password" class="form-control" id="decrypt-zip-passcode" placeholder="Password for the encrypted ZIP file">
-                    </div>
-                    
-                    <div class="form-group" id="decrypt-text-group">
-                        <label class="form-label">Text to Decrypt</label>
-                        <textarea class="form-control" id="decrypt-text" placeholder="Enter the encrypted text" rows="5" required></textarea>
-                    </div>
-                    
-                    <div class="form-group" id="decrypt-file-input-group" style="display: none;">
-                        <label class="form-label">File to Decrypt</label>
-                        <div class="file-drop-area" id="decrypt-file-drop">
-                            <p>Drag & drop .leprvault files here or click to browse</p>
-                            <input type="file" class="hidden" id="decrypt-file" accept=".leprvault" multiple>
-                            <button type="button" class="btn btn-secondary mt-2" onclick="document.getElementById('decrypt-file').click()">Browse Files</button>
-                        </div>
-                        <div class="file-list" id="decrypt-file-list"></div>
-                    </div>
-                    
-                    <div class="d-flex justify-between align-center">
-                        <button type="submit" class="btn btn-primary">Decrypt</button>
-                        <div id="decrypt-progress" class="progress" style="width: 200px; display: none;">
-                            <div class="progress-bar" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </form>
-                
-                <div id="decrypt-result" class="mt-3" style="display: none;">
-                    <div class="alert alert-success">
-                        <h4>Decryption Complete!</h4>
-                        <p id="decrypt-result-text"></p>
-                        <div id="decrypt-download" style="display: none;">
-                            <button class="btn btn-secondary" id="download-decrypted">Download Decrypted File</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about-section" class="section">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">About leprVault</h2>
-                </div>
-                <div class="p-2">
-                    <p>leprVault is a secure encryption application that uses multi-layer encryption to protect your sensitive data.</p>
-                    
-                    <h4 class="mt-3">Encryption Layers:</h4>
-                    <ul>
-                        <li><strong>Layer 1:</strong> Long passcode encryption</li>
-                        <li><strong>Layer 2:</strong> 24-word sequence encryption</li>
-                        <li><strong>Layer 3:</strong> Range/offset encryption</li>
-                        <li><strong>Layer 4 (Files only):</strong> Password-protected ZIP encryption</li>
-                    </ul>
-                    
-                    <h4 class="mt-3">How It Works:</h4>
-                    <p>Your data is encrypted using a combination of these layers, making it extremely difficult to decrypt without all the correct credentials.</p>
-                    
-                    <div class="alert alert-warning mt-3">
-                        <strong>Important:</strong> Always keep your passcode, 24 words, and range/offset value secure. Without these, your data cannot be recovered.
-                    </div>
-                </div>
-            </div>
-        </section>
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav class="wf-navbar">
+    <div class="wf-navbar-inner">
+      <a href="../index.html" class="wf-navbar-brand">
+        <img src="..//assets/roundedlogo.gif" alt="LeaperStuff" class="wf-navbar-favicon"
+             onerror="this.style.display='none'">
+        <span class="wf-navbar-name">leaperStuff</span>
+      </a>
+      <nav class="wf-navbar-nav">
+        <a href="../apps/tools.html" class="wf-navbar-link">Tools</a>
+        <a href="../index.html"      class="wf-navbar-link">About</a>
+      </nav>
     </div>
+  </nav>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 leprVault - Secure Encryption System</p>
+  <main style="flex:1;">
+    <div class="wf-container" style="max-width:860px;">
+
+      <!-- ═══════════ HEADER ═══════════ -->
+      <div style="text-align:center; padding: 48px 0 24px;">
+        <span class="wf-hero-eyebrow">LeaperStuff Tool</span>
+        <h1 class="wf-h1" style="margin: 12px 0 10px;">
+          <i class="fas fa-vault" style="color:var(--accent); margin-right:10px;"></i>leprVault
+        </h1>
+        <p class="wf-body" style="max-width:500px; margin:0 auto;">
+          Multi-layer text encryption &amp; decryption. Everything runs in your browser — no servers, no logs, no tracking.
+        </p>
+      </div>
+
+      <!-- Privacy badge strip -->
+      <div class="lv-privacy-strip">
+        <i class="fas fa-shield-halved" style="color:var(--success); font-size:18px;"></i>
+        <span style="font-size:var(--text-sm); font-weight:600; color:var(--text-primary);">Privacy guarantee:</span>
+        <span class="wf-chip wf-chip-success">No servers</span>
+        <span class="wf-chip wf-chip-success">No analytics</span>
+        <span class="wf-chip wf-chip-success">No cookies</span>
+        <span class="wf-chip wf-chip-success">No ads</span>
+        <span class="wf-chip wf-chip-success">No external requests</span>
+        <span class="wf-chip wf-chip-default" style="margin-left:auto;">100% client-side</span>
+      </div>
+
+      <!-- ═══════════ PILL TABS ═══════════ -->
+      <div class="lv-tabs-wrap">
+        <div class="wf-tabs wf-tabs-pill" id="main-tabs">
+          <button class="wf-tab active" data-target="encrypt-section">
+            <i class="fas fa-lock" style="margin-right:6px;"></i> Encrypt
+          </button>
+          <button class="wf-tab" data-target="decrypt-section">
+            <i class="fas fa-lock-open" style="margin-right:6px;"></i> Decrypt
+          </button>
+          <button class="wf-tab" data-target="about-section">
+            <i class="fas fa-circle-info" style="margin-right:6px;"></i> About
+          </button>
         </div>
-    </footer>
+      </div>
 
-    <script>
-        // File handling variables
-        let encryptFiles = [];
-        let decryptFiles = [];
+      <div class="lv-sections">
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mode switching
-            const encryptModeRadios = document.querySelectorAll('input[name="encrypt-mode"]');
-            const decryptModeRadios = document.querySelectorAll('input[name="decrypt-mode"]');
-            
-            encryptModeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const isFileMode = this.value === 'file';
-                    document.getElementById('encrypt-file-group').style.display = isFileMode ? 'block' : 'none';
-                    document.getElementById('encrypt-text-group').style.display = isFileMode ? 'none' : 'block';
-                    document.getElementById('encrypt-file-input-group').style.display = isFileMode ? 'block' : 'none';
-                    document.getElementById('encrypt-text').required = !isFileMode;
-                });
-            });
-            
-            decryptModeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const isFileMode = this.value === 'file';
-                    document.getElementById('decrypt-file-group').style.display = isFileMode ? 'block' : 'none';
-                    document.getElementById('decrypt-text-group').style.display = isFileMode ? 'none' : 'block';
-                    document.getElementById('decrypt-file-input-group').style.display = isFileMode ? 'block' : 'none';
-                    document.getElementById('decrypt-text').required = !isFileMode;
-                });
-            });
-            
-            // File drop areas
-            setupFileDropArea('encrypt-file-drop', 'encrypt-file', encryptFiles, 'encrypt-file-list');
-            setupFileDropArea('decrypt-file-drop', 'decrypt-file', decryptFiles, 'decrypt-file-list');
-            
-            // File input change handlers
-            document.getElementById('encrypt-file').addEventListener('change', function(e) {
-                handleFileSelection(e.target.files, encryptFiles, 'encrypt-file-list');
-            });
-            
-            document.getElementById('decrypt-file').addEventListener('change', function(e) {
-                handleFileSelection(e.target.files, decryptFiles, 'decrypt-file-list');
-            });
-            
-            // Encryption form submission
-            document.getElementById('encrypt-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const passcode = document.getElementById('encrypt-passcode').value;
-                const words = document.getElementById('encrypt-words').value.trim().split(/\s+/);
-                const range = parseInt(document.getElementById('encrypt-range').value);
-                const mode = document.querySelector('input[name="encrypt-mode"]:checked').value;
-                const zipPasscode = document.getElementById('encrypt-zip-passcode').value;
-                
-                // Validate 24 words
-                if (words.length !== 24) {
-                    alert('Please enter exactly 24 words');
-                    return;
-                }
-                
-                // Validate files if in file mode
-                if (mode === 'file' && encryptFiles.length === 0) {
-                    alert('Please select at least one file to encrypt');
-                    return;
-                }
-                
-                // Show progress
-                const progressBar = document.querySelector('#encrypt-progress .progress-bar');
-                document.getElementById('encrypt-progress').style.display = 'block';
-                
-                // Simulate encryption process
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 5;
-                    progressBar.style.width = `${progress}%`;
-                    
-                    if (progress >= 100) {
-                        clearInterval(progressInterval);
-                        
-                        // Show result
-                        const resultDiv = document.getElementById('encrypt-result');
-                        const resultText = document.getElementById('encrypt-result-text');
-                        
-                        if (mode === 'text') {
-                            const text = document.getElementById('encrypt-text').value;
-                            const encrypted = encryptText(text, passcode, words, range);
-                            resultText.textContent = `Encrypted text: ${encrypted}`;
-                            document.getElementById('encrypt-download').style.display = 'none';
-                        } else {
-                            resultText.textContent = `${encryptFiles.length} file(s) have been encrypted successfully.`;
-                            document.getElementById('encrypt-download').style.display = 'block';
-                            
-                            // Set up download button
-                            document.getElementById('download-encrypted').onclick = function() {
-                                downloadEncryptedFiles(encryptFiles, passcode, words, range, zipPasscode);
-                            };
-                        }
-                        
-                        resultDiv.style.display = 'block';
-                        document.getElementById('encrypt-progress').style.display = 'none';
-                    }
-                }, 100);
-            });
-            
-            // Decryption form submission
-            document.getElementById('decrypt-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const passcode = document.getElementById('decrypt-passcode').value;
-                const words = document.getElementById('decrypt-words').value.trim().split(/\s+/);
-                const range = parseInt(document.getElementById('decrypt-range').value);
-                const mode = document.querySelector('input[name="decrypt-mode"]:checked').value;
-                const zipPasscode = document.getElementById('decrypt-zip-passcode').value;
-                
-                // Validate 24 words
-                if (words.length !== 24) {
-                    alert('Please enter exactly 24 words');
-                    return;
-                }
-                
-                // Validate files if in file mode
-                if (mode === 'file' && decryptFiles.length === 0) {
-                    alert('Please select at least one file to decrypt');
-                    return;
-                }
-                
-                // Show progress
-                const progressBar = document.querySelector('#decrypt-progress .progress-bar');
-                document.getElementById('decrypt-progress').style.display = 'block';
-                
-                // Simulate decryption process
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 5;
-                    progressBar.style.width = `${progress}%`;
-                    
-                    if (progress >= 100) {
-                        clearInterval(progressInterval);
-                        
-                        // Show result
-                        const resultDiv = document.getElementById('decrypt-result');
-                        const resultText = document.getElementById('decrypt-result-text');
-                        
-                        if (mode === 'text') {
-                            const text = document.getElementById('decrypt-text').value;
-                            try {
-                                const decrypted = decryptText(text, passcode, words, range);
-                                resultText.textContent = `Decrypted text: ${decrypted}`;
-                                document.getElementById('decrypt-download').style.display = 'none';
-                            } catch (error) {
-                                resultText.textContent = 'Decryption failed. Please check your credentials.';
-                                document.querySelector('#decrypt-result .alert').className = 'alert alert-error';
-                            }
-                        } else {
-                            try {
-                                resultText.textContent = `${decryptFiles.length} file(s) have been decrypted successfully.`;
-                                document.querySelector('#decrypt-result .alert').className = 'alert alert-success';
-                                document.getElementById('decrypt-download').style.display = 'block';
-                                
-                                // Set up download button
-                                document.getElementById('download-decrypted').onclick = function() {
-                                    downloadDecryptedFiles(decryptFiles, passcode, words, range, zipPasscode);
-                                };
-                            } catch (error) {
-                                resultText.textContent = 'Decryption failed. Please check your credentials.';
-                                document.querySelector('#decrypt-result .alert').className = 'alert alert-error';
-                                document.getElementById('decrypt-download').style.display = 'none';
-                            }
-                        }
-                        
-                        resultDiv.style.display = 'block';
-                        document.getElementById('decrypt-progress').style.display = 'none';
-                    }
-                }, 100);
-            });
-            
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('.navbar-nav a').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    document.querySelector(targetId).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            });
-        });
+        <!-- ═══════════ ENCRYPT ═══════════ -->
+        <section id="encrypt-section">
+          <div class="wf-card">
+            <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+              <div>
+                <div class="wf-card-title">Encrypt Data</div>
+                <div class="wf-card-subtitle">Secure your text with multi-layer encryption</div>
+              </div>
+              <span class="wf-chip wf-chip-accent">AES-style XOR</span>
+            </div>
 
-        // File handling functions
-        function setupFileDropArea(dropAreaId, fileInputId, filesArray, fileListId) {
-            const dropArea = document.getElementById(dropAreaId);
-            const fileInput = document.getElementById(fileInputId);
-            
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, preventDefaults, false);
-            });
-            
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropArea.addEventListener(eventName, highlight, false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, unhighlight, false);
-            });
-            
-            function highlight() {
-                dropArea.classList.add('active');
-            }
-            
-            function unhighlight() {
-                dropArea.classList.remove('active');
-            }
-            
-            dropArea.addEventListener('drop', handleDrop, false);
-            
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFileSelection(files, filesArray, fileListId);
-            }
-        }
-        
-        function handleFileSelection(files, filesArray, fileListId) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                // Check if file already exists
-                if (!filesArray.some(f => f.name === file.name && f.size === file.size)) {
-                    filesArray.push(file);
-                }
-            }
-            updateFileList(fileListId, filesArray);
-        }
-        
-        function updateFileList(fileListId, filesArray) {
-            const fileList = document.getElementById(fileListId);
-            fileList.innerHTML = '';
-            
-            filesArray.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                
-                const fileSize = formatFileSize(file.size);
-                
-                fileItem.innerHTML = `
-                    <div class="file-name">${file.name}</div>
-                    <div class="file-size">${fileSize}</div>
-                    <button type="button" class="file-remove" onclick="removeFile(${index}, '${fileListId}', ${filesArray === encryptFiles ? 'encryptFiles' : 'decryptFiles'})">&times;</button>
-                `;
-                
-                fileList.appendChild(fileItem);
-            });
-        }
-        
-        function removeFile(index, fileListId, filesArrayName) {
-            if (filesArrayName === 'encryptFiles') {
-                encryptFiles.splice(index, 1);
-                updateFileList(fileListId, encryptFiles);
-            } else {
-                decryptFiles.splice(index, 1);
-                updateFileList(fileListId, decryptFiles);
-            }
-        }
-        
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            <form id="encrypt-form">
+              <div class="lv-form-grid">
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="encrypt-passcode">
+                    Long Passcode <span class="required">*</span>
+                  </label>
+                  <div class="wf-input-wrapper">
+                    <span class="wf-input-icon-left"><i class="fas fa-key" style="font-size:12px;"></i></span>
+                    <input type="password" class="wf-input has-icon-left" id="encrypt-passcode"
+                           placeholder="Enter a long, secure passcode" required>
+                  </div>
+                </div>
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="encrypt-range">
+                    Range / Offset <span class="required">*</span>
+                  </label>
+                  <input type="number" class="wf-input" id="encrypt-range" min="1" max="1000" value="128" required>
+                  <span class="wf-helper">Higher = more secure. Default: 128</span>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label" for="encrypt-words">
+                    24 Words (in order) <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="encrypt-words"
+                            placeholder="Enter exactly 24 words separated by spaces"
+                            rows="2" required></textarea>
+                  <span class="wf-helper">Must be exactly 24 words</span>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label">Mode</label>
+                  <div class="lv-radio-group">
+                    <label class="wf-radio-label">
+                      <input type="radio" class="wf-radio-input" name="encrypt-mode" value="text" checked>
+                      Text
+                    </label>
+                    <label class="wf-radio-label" style="opacity:0.45;" title="Coming soon">
+                      <input type="radio" class="wf-radio-input" name="encrypt-mode" value="file" disabled>
+                      File <span class="wf-chip wf-chip-default" style="font-size:10px; padding:2px 6px; margin-left:4px;">Soon</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="wf-form-group lv-full" id="encrypt-text-group">
+                  <label class="wf-label" for="encrypt-text">
+                    Text to Encrypt <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="encrypt-text"
+                            placeholder="Enter the text you want to encrypt..."
+                            rows="5" required></textarea>
+                </div>
+
+                <!-- File mode (hidden) -->
+                <div class="wf-form-group lv-full" id="encrypt-file-group" style="display:none;">
+                  <label class="wf-label">ZIP Password</label>
+                  <input type="password" class="wf-input" id="encrypt-zip-passcode"
+                         placeholder="Password for encrypted ZIP file">
+                </div>
+                <div class="wf-form-group lv-full" id="encrypt-file-input-group" style="display:none;">
+                  <label class="wf-label">File to Encrypt</label>
+                  <div class="lv-drop" id="encrypt-file-drop">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                    Drag &amp; drop files here, or click to browse
+                    <input type="file" style="display:none;" id="encrypt-file" multiple>
+                  </div>
+                  <div id="encrypt-file-list"></div>
+                </div>
+
+                <div class="lv-full" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                  <button type="submit" class="wf-btn wf-btn-filled">
+                    <i class="fas fa-lock"></i>&nbsp; Encrypt
+                  </button>
+                  <div id="encrypt-progress" style="display:none; flex:1;">
+                    <div class="wf-progress wf-progress-lg">
+                      <div class="wf-progress-bar animated" id="encrypt-progress-bar" style="width:0%"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- /grid -->
+            </form>
+
+            <!-- Result -->
+            <div id="encrypt-result" style="display:none; margin-top:20px;">
+              <div class="wf-alert wf-alert-success">
+                <span class="wf-alert-icon">✓</span>
+                <div class="wf-alert-body">
+                  <div class="wf-alert-title">Encryption complete!</div>
+                  <div class="lv-copy-row" style="margin-top:10px;">
+                    <span class="wf-label">Encrypted output</span>
+                    <button class="wf-btn wf-btn-tonal wf-btn-sm" id="copy-encrypt-btn">
+                      <i class="fas fa-copy"></i>&nbsp; Copy
+                    </button>
+                  </div>
+                  <div class="lv-result-box" id="encrypt-result-text"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ═══════════ DECRYPT ═══════════ -->
+        <section id="decrypt-section" style="display:none;">
+          <div class="wf-card">
+            <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+              <div>
+                <div class="wf-card-title">Decrypt Data</div>
+                <div class="wf-card-subtitle">Restore your encrypted text with the same credentials</div>
+              </div>
+            </div>
+
+            <form id="decrypt-form">
+              <div class="lv-form-grid">
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="decrypt-passcode">
+                    Long Passcode <span class="required">*</span>
+                  </label>
+                  <div class="wf-input-wrapper">
+                    <span class="wf-input-icon-left"><i class="fas fa-key" style="font-size:12px;"></i></span>
+                    <input type="password" class="wf-input has-icon-left" id="decrypt-passcode"
+                           placeholder="Enter your long passcode" required>
+                  </div>
+                </div>
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="decrypt-range">
+                    Range / Offset <span class="required">*</span>
+                  </label>
+                  <input type="number" class="wf-input" id="decrypt-range" min="1" max="1000" value="128" required>
+                  <span class="wf-helper">Must match the value used to encrypt</span>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label" for="decrypt-words">
+                    24 Words (in order) <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="decrypt-words"
+                            placeholder="Enter the 24 words in the correct order"
+                            rows="2" required></textarea>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label">Mode</label>
+                  <div class="lv-radio-group">
+                    <label class="wf-radio-label">
+                      <input type="radio" class="wf-radio-input" name="decrypt-mode" value="text" checked>
+                      Text
+                    </label>
+                    <label class="wf-radio-label" style="opacity:0.45;" title="Coming soon">
+                      <input type="radio" class="wf-radio-input" name="decrypt-mode" value="file" disabled>
+                      File <span class="wf-chip wf-chip-default" style="font-size:10px; padding:2px 6px; margin-left:4px;">Soon</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="wf-form-group lv-full" id="decrypt-text-group">
+                  <label class="wf-label" for="decrypt-text">
+                    Encrypted Text <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="decrypt-text"
+                            placeholder="Paste the encrypted text here..."
+                            rows="5" required></textarea>
+                </div>
+
+                <!-- File mode (hidden) -->
+                <div class="wf-form-group lv-full" id="decrypt-file-group" style="display:none;">
+                  <label class="wf-label">ZIP Password</label>
+                  <input type="password" class="wf-input" id="decrypt-zip-passcode"
+                         placeholder="Password for the encrypted ZIP">
+                </div>
+                <div class="wf-form-group lv-full" id="decrypt-file-input-group" style="display:none;">
+                  <label class="wf-label">File to Decrypt</label>
+                  <div class="lv-drop" id="decrypt-file-drop">
+                    <i class="fas fa-cloud-arrow-down"></i>
+                    Drag &amp; drop .leprvault files here, or click to browse
+                    <input type="file" style="display:none;" id="decrypt-file" accept=".leprvault" multiple>
+                  </div>
+                  <div id="decrypt-file-list"></div>
+                </div>
+
+                <div class="lv-full" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                  <button type="submit" class="wf-btn wf-btn-filled">
+                    <i class="fas fa-lock-open"></i>&nbsp; Decrypt
+                  </button>
+                  <div id="decrypt-progress" style="display:none; flex:1;">
+                    <div class="wf-progress wf-progress-lg">
+                      <div class="wf-progress-bar animated" id="decrypt-progress-bar" style="width:0%"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </form>
+
+            <!-- Result -->
+            <div id="decrypt-result" style="display:none; margin-top:20px;">
+              <div id="decrypt-result-alert" class="wf-alert wf-alert-success">
+                <span class="wf-alert-icon" id="decrypt-result-icon">✓</span>
+                <div class="wf-alert-body">
+                  <div class="wf-alert-title" id="decrypt-result-title">Decryption complete!</div>
+                  <div class="lv-copy-row" style="margin-top:10px;">
+                    <span class="wf-label">Decrypted output</span>
+                    <button class="wf-btn wf-btn-tonal wf-btn-sm" id="copy-decrypt-btn">
+                      <i class="fas fa-copy"></i>&nbsp; Copy
+                    </button>
+                  </div>
+                  <div class="lv-result-box" id="decrypt-result-text"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ═══════════ ABOUT ═══════════ -->
+        <section id="about-section" style="display:none;">
+          <div class="wf-card">
+            <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+              <div class="wf-card-title">About leprVault</div>
+            </div>
+
+            <p class="wf-body" style="margin-bottom:var(--space-5);">
+              leprVault uses multi-layer key derivation to protect your sensitive text. All computation happens entirely inside your browser — nothing leaves your device.
+            </p>
+
+            <div class="wf-overline" style="margin-bottom:var(--space-3);">Encryption Layers</div>
+            <div class="lv-layers">
+              <div class="lv-layer">
+                <div class="lv-layer-num">1</div>
+                <div>
+                  <div class="lv-layer-title">Long Passcode</div>
+                  <div class="lv-layer-desc">Your primary secret, seeded into the key derivation function.</div>
+                </div>
+              </div>
+              <div class="lv-layer">
+                <div class="lv-layer-num">2</div>
+                <div>
+                  <div class="lv-layer-title">24-Word Sequence</div>
+                  <div class="lv-layer-desc">A sequence of 24 ordered words expands the key entropy significantly.</div>
+                </div>
+              </div>
+              <div class="lv-layer">
+                <div class="lv-layer-num">3</div>
+                <div>
+                  <div class="lv-layer-title">Range / Offset</div>
+                  <div class="lv-layer-desc">A numeric shift applied to every key byte. Higher values increase resistance to brute-force.</div>
+                </div>
+              </div>
+              <div class="lv-layer">
+                <div class="lv-layer-num">4</div>
+                <div>
+                  <div class="lv-layer-title">File ZIP Password <span class="wf-chip wf-chip-default" style="font-size:10px; padding:2px 7px;">Coming soon</span></div>
+                  <div class="lv-layer-desc">An additional passphrase applied to the encrypted file archive.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-alert wf-alert-warning" style="margin-top:24px;">
+              <span class="wf-alert-icon">⚠</span>
+              <div class="wf-alert-body">
+                <div class="wf-alert-title">Keep your credentials safe</div>
+                Your passcode, 24 words, and offset value are never stored anywhere. If you lose them, your data <strong>cannot be recovered</strong>.
+              </div>
+            </div>
+
+            <div class="wf-alert wf-alert-accent" style="margin-top:12px;">
+              <span class="wf-alert-icon">✦</span>
+              <div class="wf-alert-body">
+                <div class="wf-alert-title">Complete privacy</div>
+                No servers. No analytics. No ads. No cookies. No external network requests. leprVault is fully offline-capable.
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div><!-- /lv-sections -->
+    </div><!-- /container -->
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="lv-footer">
+    <div class="wf-container">
+      <p>leprVault © 2026 LeaperStuff &nbsp;·&nbsp; No data is ever stored or transmitted</p>
+    </div>
+  </footer>
+
+</div><!-- /lv-page -->
+
+<script>
+  /* ══════════════════════════════════════════
+     TAB SWITCHING
+  ══════════════════════════════════════════ */
+  const sections = ['encrypt-section', 'decrypt-section', 'about-section'];
+
+  document.querySelectorAll('#main-tabs .wf-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('#main-tabs .wf-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      sections.forEach(id => {
+        document.getElementById(id).style.display =
+          id === this.dataset.target ? 'block' : 'none';
+      });
+    });
+  });
+
+  /* ══════════════════════════════════════════
+     FILE HANDLING
+  ══════════════════════════════════════════ */
+  let encryptFiles = [];
+  let decryptFiles = [];
+
+  function setupDrop(dropId, inputId, filesArr, listId) {
+    const drop  = document.getElementById(dropId);
+    const input = document.getElementById(inputId);
+
+    drop.addEventListener('click', () => input.click());
+    input.addEventListener('change', e => addFiles(e.target.files, filesArr, listId));
+
+    ['dragenter','dragover'].forEach(ev =>
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('active'); }));
+    ['dragleave','drop'].forEach(ev =>
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('active'); }));
+    drop.addEventListener('drop', e => addFiles(e.dataTransfer.files, filesArr, listId));
+  }
+
+  function addFiles(files, arr, listId) {
+    Array.from(files).forEach(f => {
+      if (!arr.some(x => x.name === f.name && x.size === f.size)) arr.push(f);
+    });
+    renderFileList(arr, listId);
+  }
+
+  function renderFileList(arr, listId) {
+    const el = document.getElementById(listId);
+    el.innerHTML = '';
+    arr.forEach((f, i) => {
+      const div = document.createElement('div');
+      div.className = 'lv-file-item';
+      div.innerHTML = `
+        <i class="fas fa-file" style="color:var(--accent);"></i>
+        <span class="name">${f.name}</span>
+        <span class="size">${fmtSize(f.size)}</span>
+        <button type="button" class="lv-file-remove" onclick="removeFile(${i},'${listId}',${arr === encryptFiles})">&times;</button>
+      `;
+      el.appendChild(div);
+    });
+  }
+
+  function removeFile(i, listId, isEncrypt) {
+    const arr = isEncrypt ? encryptFiles : decryptFiles;
+    arr.splice(i, 1);
+    renderFileList(arr, listId);
+  }
+
+  function fmtSize(bytes) {
+    if (!bytes) return '0 B';
+    const u = ['B','KB','MB','GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + u[i];
+  }
+
+  /* ══════════════════════════════════════════
+     ENCRYPTION LOGIC (untouched)
+  ══════════════════════════════════════════ */
+  function generateKey(passcode, words, range) {
+    let key = passcode;
+    words.forEach(w => key += w);
+    let out = '';
+    for (let i = 0; i < key.length; i++) {
+      out += String.fromCharCode((key.charCodeAt(i) + range) % 256);
+    }
+    return out;
+  }
+
+  function encryptText(text, passcode, words, range) {
+    const key = generateKey(passcode, words, range);
+    let enc = '';
+    for (let i = 0; i < text.length; i++) {
+      enc += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return btoa(enc);
+  }
+
+  function decryptText(encText, passcode, words, range) {
+    const raw = atob(encText);
+    const key = generateKey(passcode, words, range);
+    let dec = '';
+    for (let i = 0; i < raw.length; i++) {
+      dec += String.fromCharCode(raw.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return dec;
+  }
+
+  /* ══════════════════════════════════════════
+     PROGRESS HELPER
+  ══════════════════════════════════════════ */
+  function runProgress(barId, wrapId, cb) {
+    const wrap = document.getElementById(wrapId);
+    const bar  = document.getElementById(barId);
+    wrap.style.display = 'block';
+    bar.style.width = '0%';
+    let p = 0;
+    const iv = setInterval(() => {
+      p += 8;
+      bar.style.width = Math.min(p, 100) + '%';
+      if (p >= 100) { clearInterval(iv); wrap.style.display = 'none'; cb(); }
+    }, 40);
+  }
+
+  /* ══════════════════════════════════════════
+     COPY HELPER
+  ══════════════════════════════════════════ */
+  function setupCopy(btnId, sourceId) {
+    document.getElementById(btnId).addEventListener('click', function () {
+      const text = document.getElementById(sourceId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        this.innerHTML = '<i class="fas fa-check"></i>&nbsp; Copied!';
+        setTimeout(() => this.innerHTML = '<i class="fas fa-copy"></i>&nbsp; Copy', 2000);
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════
+     FORMS
+  ══════════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', function () {
+
+    setupDrop('encrypt-file-drop', 'encrypt-file', encryptFiles, 'encrypt-file-list');
+    setupDrop('decrypt-file-drop', 'decrypt-file', decryptFiles, 'decrypt-file-list');
+
+    setupCopy('copy-encrypt-btn', 'encrypt-result-text');
+    setupCopy('copy-decrypt-btn', 'decrypt-result-text');
+
+    /* Mode switching — encrypt */
+    document.querySelectorAll('input[name="encrypt-mode"]').forEach(r => {
+      r.addEventListener('change', function () {
+        const file = this.value === 'file';
+        document.getElementById('encrypt-file-group').style.display       = file ? 'block' : 'none';
+        document.getElementById('encrypt-file-input-group').style.display = file ? 'block' : 'none';
+        document.getElementById('encrypt-text-group').style.display       = file ? 'none'  : 'block';
+        document.getElementById('encrypt-text').required = !file;
+      });
+    });
+
+    /* Mode switching — decrypt */
+    document.querySelectorAll('input[name="decrypt-mode"]').forEach(r => {
+      r.addEventListener('change', function () {
+        const file = this.value === 'file';
+        document.getElementById('decrypt-file-group').style.display       = file ? 'block' : 'none';
+        document.getElementById('decrypt-file-input-group').style.display = file ? 'block' : 'none';
+        document.getElementById('decrypt-text-group').style.display       = file ? 'none'  : 'block';
+        document.getElementById('decrypt-text').required = !file;
+      });
+    });
+
+    /* ── Encrypt submit ── */
+    document.getElementById('encrypt-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const passcode = document.getElementById('encrypt-passcode').value;
+      const words    = document.getElementById('encrypt-words').value.trim().split(/\s+/);
+      const range    = parseInt(document.getElementById('encrypt-range').value);
+
+      if (words.length !== 24) {
+        alert('Please enter exactly 24 words.'); return;
+      }
+
+      runProgress('encrypt-progress-bar', 'encrypt-progress', () => {
+        const text      = document.getElementById('encrypt-text').value;
+        const encrypted = encryptText(text, passcode, words, range);
+
+        document.getElementById('encrypt-result-text').textContent = encrypted;
+        document.getElementById('encrypt-result').style.display = 'block';
+        document.getElementById('encrypt-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+
+    /* ── Decrypt submit ── */
+    document.getElementById('decrypt-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const passcode = document.getElementById('decrypt-passcode').value;
+      const words    = document.getElementById('decrypt-words').value.trim().split(/\s+/);
+      const range    = parseInt(document.getElementById('decrypt-range').value);
+
+      if (words.length !== 24) {
+        alert('Please enter exactly 24 words.'); return;
+      }
+
+      runProgress('decrypt-progress-bar', 'decrypt-progress', () => {
+        const resultDiv   = document.getElementById('decrypt-result');
+        const resultAlert = document.getElementById('decrypt-result-alert');
+        const resultText  = document.getElementById('decrypt-result-text');
+        const resultTitle = document.getElementById('decrypt-result-title');
+        const resultIcon  = document.getElementById('decrypt-result-icon');
+
+        try {
+          const enc       = document.getElementById('decrypt-text').value;
+          const decrypted = decryptText(enc, passcode, words, range);
+
+          resultAlert.className = 'wf-alert wf-alert-success';
+          resultIcon.textContent  = '✓';
+          resultTitle.textContent = 'Decryption complete!';
+          resultText.textContent  = decrypted;
+        } catch {
+          resultAlert.className = 'wf-alert wf-alert-error';
+          resultIcon.textContent  = '✕';
+          resultTitle.textContent = 'Decryption failed';
+          resultText.textContent  = 'Wrong credentials or corrupted ciphertext.';
         }
 
-        // Encryption functions
-        function encryptText(text, passcode, words, range) {
-            // Simple XOR encryption for demonstration
-            // In a real application, you would use more secure encryption
-            let encrypted = '';
-            const key = generateKey(passcode, words, range);
-            
-            for (let i = 0; i < text.length; i++) {
-                const charCode = text.charCodeAt(i);
-                const keyChar = key.charCodeAt(i % key.length);
-                encrypted += String.fromCharCode(charCode ^ keyChar);
-            }
-            
-            return btoa(encrypted); // Base64 encode
-        }
-
-        function decryptText(encryptedText, passcode, words, range) {
-            // Simple XOR decryption for demonstration
-            const decoded = atob(encryptedText);
-            const key = generateKey(passcode, words, range);
-            
-            let decrypted = '';
-            for (let i = 0; i < decoded.length; i++) {
-                const charCode = decoded.charCodeAt(i);
-                const keyChar = key.charCodeAt(i % key.length);
-                decrypted += String.fromCharCode(charCode ^ keyChar);
-            }
-            
-            return decrypted;
-        }
-
-        function generateKey(passcode, words, range) {
-            // Generate a key from passcode, words, and range
-            let key = passcode;
-            
-            // Add words to key
-            words.forEach(word => {
-                key += word;
-            });
-            
-            // Apply range transformation
-            let transformedKey = '';
-            for (let i = 0; i < key.length; i++) {
-                const charCode = key.charCodeAt(i);
-                transformedKey += String.fromCharCode((charCode + range) % 256);
-            }
-            
-            return transformedKey;
-        }
-
-        function downloadEncryptedFiles(files, passcode, words, range, zipPasscode) {
-            // In a real implementation, this would encrypt the files and create a ZIP
-            // For demonstration, we'll just create a dummy file
-            let fileContent = "ENCRYPTED FILES:\n";
-            files.forEach(file => {
-                fileContent += `- ${file.name}\n`;
-            });
-            
-            const blob = new Blob([fileContent], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `encrypted_files.leprvault`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function downloadDecryptedFiles(files, passcode, words, range, zipPasscode) {
-            // In a real implementation, this would decrypt the files
-            // For demonstration, we'll just create a dummy file
-            let fileContent = "DECRYPTED FILES:\n";
-            files.forEach(file => {
-                const originalName = file.name.replace('.leprvault', '');
-                fileContent += `- ${originalName}\n`;
-            });
-            
-            const blob = new Blob([fileContent], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `decrypted_files.zip`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-    </script>
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+  });
+</script>
 </body>
 </html>

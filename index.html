@@ -1,141 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-194ZHCENMF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-194ZHCENMF');
+</script>
+<!-- EnD -->
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="assets/roundedlogo.gif">
+  <link rel="icon" type="image/png" href="/assets/roundedlogo.gif">
   <title>LeaperStuff</title>
-
-  <!-- Glassmorphism UI System -->
+  <!-- Wafflent Design System -->
   <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/main/styles.css">
   <!-- TrustBox script -->
-<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-<!-- End TrustBox script -->
+  <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ── Page shell ── */
+    .ls-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Hero ── */
+    .ls-hero {
+      padding: 96px 0 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .ls-hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(ellipse at center, rgba(245,166,35,0.08) 0%, transparent 68%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ls-hero > * { position: relative; z-index: 1; }
+
+    /* ── Features grid ── */
+    .ls-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      padding-bottom: 64px;
+    }
+
+    /* Feature card icon badge */
+    .ls-feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--r-lg);
+      background: var(--accent-subtle);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: var(--space-4);
+    }
+
+    /* ── Contact ── */
+    .ls-contact {
+      max-width: 600px;
+      margin: 0 auto 64px;
+    }
+    .ls-contact-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    /* ── Footer ── */
+    .ls-footer {
+      margin-top: auto;
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .ls-footer p { color: var(--text-tertiary); font-size: var(--text-sm); }
+    .ls-footer p + p { margin-top: 6px; }
+
+    /* ── Ad passthrough ── */
+    #ad-container { margin: 0 auto 48px; max-width: 728px; }
+  </style>
 </head>
-
 <body>
-  <main class="page">
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div class="navbar-container">
-        <a href="#" class="navbar-brand brand">LeaperStuff</a>
-        <ul class="navbar-nav">
-          <li><a href="apps/tools.html" class="tip tip-bottom" tooltip="Explore our tools">Tools</a></li>
-          <li><a href="#contact" class="tip tip-bottom" tooltip="Get in touch">Contact</a></li>
-        </ul>
-      </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="hero card text-center">
-      <h1 style="font-size: 3rem; margin-bottom: 1rem; color: var(--color1);">LeaperStuff</h1>
-      <p style="font-size: 1.3rem; margin-bottom: 2rem;">Powerful tools for developers and creators</p>
-      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="apps/tools.html" class="btn btn-primary">Explore Tools</a>
-        <a href="#features" class="btn btn-secondary">Learn More</a>
-      </div>
-    </section>
+<div class="ls-page">
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-      <div class="feature card">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-code"></i> Developer Tools</h3>
-          <span class="badge badge-primary">New</span>
-        </div>
-        <p>Powerful tools for developers, including code editors, system utilities, and debugging assistants.</p>
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav class="wf-navbar">
+    <div class="wf-navbar-inner">
+
+      <a href="#" class="wf-navbar-brand">
+        <img src="/assets/roundedlogo.gif" alt="LeaperStuff" class="wf-navbar-favicon"
+             onerror="this.style.display='none'">
+        <span class="wf-navbar-name">
+          leaperStuff
+          <span class="wf-brand-ds">DS</span>
+        </span>
+      </a>
+
+      <nav class="wf-navbar-nav" id="nav-links">
+        <a href="apps/tools.html" class="wf-navbar-link" data-tooltip="Explore our tools">Tools</a>
+        <a href="#contact"        class="wf-navbar-link" data-tooltip="Get in touch">Contact</a>
+      </nav>
+
+      <div class="wf-navbar-actions">
+        <button class="wf-navbar-hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
       </div>
 
-      <div class="feature card">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-palette"></i> Creative Visuals</h3>
-          <span class="badge badge-secondary">Popular</span>
-        </div>
-        <p>Chart makers and visual tools to bring your data and creative ideas to life with stunning graphics.</p>
-      </div>
+    </div>
+  </nav>
 
-      <div class="feature card">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-lightbulb"></i> Innovative Projects</h3>
-        </div>
-        <p>Unique applications and utilities designed to enhance your digital experience and boost productivity.</p>
-      </div>
+  <main style="flex:1;">
+    <div class="wf-container">
 
-      
-
-      <div class="feature card">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fab fa-github"></i> Open Source</h3>
-        </div>
-        <p>
-          Most of our code is open-source and available on 
-          <a href="https://github.com/ivaansrivastavadev/leaperStuff" 
-             style="color: var(--color1); text-decoration: none;">
-            GitHub
+      <!-- ═══════════ HERO ═══════════ -->
+      <section class="ls-hero">
+        <span class="wf-hero-eyebrow">Welcome to LeaperStuff</span>
+        <h1 class="wf-hero-title">LeaperStuff</h1>
+        <p class="wf-hero-desc">Powerful tools for developers and creators</p>
+        <div class="wf-hero-actions">
+          <a href="apps/tools.html" class="wf-btn wf-btn-filled wf-btn-lg">
+            <i class="fas fa-rocket"></i>&nbsp; Explore Tools
           </a>
-          for collaboration and learning.
-        </p>
-        <div style="margin-top: 1rem;">
-          <span class="badge badge-primary">JavaScript</span>
-          <span class="badge badge-secondary">CSS</span>
-          <span class="badge badge-primary">HTML</span>
+          <a href="#features" class="wf-btn wf-btn-outlined wf-btn-lg">
+            Learn More
+          </a>
         </div>
-      </div>
-    </section>
+      </section>
 
-<div id="ad-container"></div>
+      <!-- ═══════════ FEATURES ═══════════ -->
+      <section id="features" class="ls-features">
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact card">
-      <h2 style="text-align: center; margin-bottom: 2rem; color: var(--color1);">Get In Touch</h2>
-      <p style="margin-bottom: 2rem;">Have questions or want to collaborate? Reach out to us through any of these channels:</p>
-      
-      <div class="contact-links">
-        <a href="mailto:tickets@leaperstuff.p.tawk.email" class="btn btn-primary">
-          <i class="fas fa-envelope"></i> Email
-        </a>
-        <a href="https://github.com/ivaansrivastavadev" class="btn btn-secondary">
-          <i class="fab fa-github"></i> GitHub
-        </a>
-        <a href="https://t.me/leaperstuff" class="btn btn-primary">
-          <i class="fab fa-telegram"></i> Telegram
-        </a>
-      </div><br><br>
-      <!-- TrustBox widget - Review Collector -->
-<div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="693ea31affffdcbe6fcadd4e" data-style-height="52px" data-style-width="100%" data-token="0e258dcf-64ef-4ca3-a390-f863af256a1a">
-  <a href="https://www.trustpilot.com/review/leaperstuff.vercel.app" target="_blank" rel="noopener">Trustpilot</a>
-</div>
-<!-- End TrustBox widget -->
-    </section>
+        <!-- Developer Tools -->
+        <div class="wf-card wf-card-hover">
+          <div class="ls-feature-icon"><i class="fas fa-code"></i></div>
+          <div class="wf-card-header">
+            <div class="wf-card-title">Developer Tools</div>
+            <span class="wf-chip wf-chip-accent">New</span>
+          </div>
+          <div class="wf-card-body" style="margin-top: var(--space-3);">
+            Powerful tools for developers, including code editors, system utilities, and debugging assistants.
+          </div>
+        </div>
 
-    <!-- Footer -->
-    <footer class="glass">
-      <p>© 2026 LeaperStuff. All rights reserved.</p>
-      <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
-        Built with <i class="fas fa-heart" style="color: var(--color1);"></i> by Ivaan Srivastava
-      </p>
-    </footer>
+        <!-- Creative Visuals -->
+        <div class="wf-card wf-card-hover">
+          <div class="ls-feature-icon"><i class="fas fa-palette"></i></div>
+          <div class="wf-card-header">
+            <div class="wf-card-title">Creative Visuals</div>
+            <span class="wf-chip wf-chip-success">Popular</span>
+          </div>
+          <div class="wf-card-body" style="margin-top: var(--space-3);">
+            Chart makers and visual tools to bring your data and creative ideas to life with stunning graphics.
+          </div>
+        </div>
 
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6915e4cd6ca233195dc74ce5/1j9uobgui';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+        <!-- Innovative Projects -->
+        <div class="wf-card wf-card-hover">
+          <div class="ls-feature-icon"><i class="fas fa-lightbulb"></i></div>
+          <div class="wf-card-header">
+            <div class="wf-card-title">Innovative Projects</div>
+          </div>
+          <div class="wf-card-body" style="margin-top: var(--space-3);">
+            Unique applications and utilities designed to enhance your digital experience and boost productivity.
+          </div>
+        </div>
 
-    <script src="main/app.js"></script>
-    <script src="main/ad.js"></script>
-    </script>
+        <!-- Open Source -->
+        <div class="wf-card wf-card-hover wf-card-accent">
+          <div class="ls-feature-icon"><i class="fab fa-github"></i></div>
+          <div class="wf-card-header">
+            <div class="wf-card-title">Open Source</div>
+          </div>
+          <div class="wf-card-body" style="margin-top: var(--space-3);">
+            Most of our code is open-source and available on
+            <a href="https://github.com/ivaansrivastavadev/leaperStuff">GitHub</a>
+            for collaboration and learning.
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: var(--space-4);">
+            <span class="wf-chip wf-chip-accent">JavaScript</span>
+            <span class="wf-chip wf-chip-default">CSS</span>
+            <span class="wf-chip wf-chip-default">HTML</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Ad container — populated by ad.js -->
+      <div id="ad-container"></div>
+
+      <!-- ═══════════ CONTACT ═══════════ -->
+      <section id="contact" class="ls-contact">
+        <div class="wf-card">
+          <div class="wf-overline" style="text-align:center; margin-bottom:var(--space-3);">Contact</div>
+          <h2 class="wf-h2" style="text-align:center; margin-bottom:var(--space-4);">Get In Touch</h2>
+          <p class="wf-body" style="text-align:center; margin-bottom:var(--space-6);">
+            Have questions or want to collaborate? Reach out through any of these channels:
+          </p>
+
+          <div class="ls-contact-links">
+            <a href="mailto:tickets@leaperstuff.p.tawk.email" class="wf-btn wf-btn-outlined">
+              <i class="fas fa-envelope"></i>&nbsp; Email
+            </a>
+            <a href="https://github.com/ivaansrivastavadev" class="wf-btn wf-btn-outlined">
+              <i class="fab fa-github"></i>&nbsp; GitHub
+            </a>
+            <a href="https://t.me/leaperstuff" class="wf-btn wf-btn-filled">
+              <i class="fab fa-telegram"></i>&nbsp; Telegram
+            </a>
+          </div>
+
+          <!-- TrustBox widget - Review Collector -->
+          <div class="trustpilot-widget"
+               data-locale="en-US"
+               data-template-id="56278e9abfbbba0bdcd568bc"
+               data-businessunit-id="693ea31affffdcbe6fcadd4e"
+               data-style-height="52px"
+               data-style-width="100%"
+               data-token="0e258dcf-64ef-4ca3-a390-f863af256a1a">
+            <a href="https://www.trustpilot.com/review/leaperstuff.vercel.app" target="_blank" rel="noopener">Trustpilot</a>
+          </div>
+          <!-- End TrustBox widget -->
+
+        </div>
+      </section>
+
+    </div><!-- /wf-container -->
   </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="ls-footer">
+    <div class="wf-container">
+      <p>© 2026 LeaperStuff. All rights reserved.</p>
+      <p>
+        Built with <i class="fas fa-heart" style="color:var(--accent);"></i> by Ivaan Srivastava
+      </p>
+    </div>
+  </footer>
+
+</div><!-- /ls-page -->
+
+<!-- Your existing scripts — untouched -->
+<script src="main/app.js"></script>
+<script src="main/ad.js"></script>
+
+<script>
+  // Hamburger menu toggle
+  document.getElementById('hamburger').addEventListener('click', function () {
+    document.getElementById('nav-links').classList.toggle('open');
+  });
+</script>
+
 </body>
 </html>
