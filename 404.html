@@ -3,84 +3,440 @@
 <head>
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-194ZHCENMF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-194ZHCENMF');
-</script>
-<!-- EnD -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-194ZHCENMF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-194ZHCENMF');
+  </script>
+  <!-- EnD -->
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/gif" href="assets/roundedlogo.gif">
-  <title>leaperStuff - 404</title>
+  <title>leaperStuff — 404</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ── 404-specific extras ── */
+    .error-glitch {
+      font-size: clamp(100px, 20vw, 180px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -6px;
+      color: var(--accent);
+      position: relative;
+      display: inline-block;
+      user-select: none;
+      text-shadow: 0 0 40px rgba(245, 166, 35, 0.3);
+    }
+
+    /* Subtle glitch flicker */
+    .error-glitch::before,
+    .error-glitch::after {
+      content: '404';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+    }
+    .error-glitch::before {
+      color: var(--error);
+      clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+      animation: glitch-a 4s infinite;
+    }
+    .error-glitch::after {
+      color: var(--info);
+      clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+      animation: glitch-b 4s infinite;
+    }
+    @keyframes glitch-a {
+      0%, 88%, 92%, 100% { opacity: 0; transform: none; }
+      89% { opacity: 0.6; transform: translateX(-4px); }
+      91% { opacity: 0.4; transform: translateX(4px); }
+    }
+    @keyframes glitch-b {
+      0%, 88%, 94%, 100% { opacity: 0; transform: none; }
+      90% { opacity: 0.5; transform: translateX(3px); }
+      93% { opacity: 0.3; transform: translateX(-3px); }
+    }
+
+    /* Page fade-in */
+    @keyframes page-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-in {
+      animation: page-in 0.55s cubic-bezier(0.2, 0, 0, 1) both;
+    }
+    .anim-in-delay-1 { animation-delay: 0.08s; }
+    .anim-in-delay-2 { animation-delay: 0.16s; }
+    .anim-in-delay-3 { animation-delay: 0.24s; }
+
+    /* Main layout */
+    .page-404 {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-12) var(--space-6);
+      gap: var(--space-6);
+    }
+
+    /* Hero card */
+    .card-404 {
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Easter egg card */
+    .card-easter {
+      max-width: 520px;
+      width: 100%;
+    }
+
+    /* Game board grid */
+    .game-board-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-2);
+      margin: 0 auto;
+    }
+
+    .game-cell {
+      aspect-ratio: 1;
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      transition: background var(--dur-mid) var(--ease),
+                  border-color var(--dur-mid) var(--ease),
+                  transform var(--dur-fast) var(--ease-spring),
+                  color var(--dur-mid) var(--ease);
+      user-select: none;
+    }
+    .game-cell:hover:not(.matched) {
+      background: var(--bg-overlay);
+      border-color: var(--border-strong);
+      transform: scale(1.06);
+    }
+    .game-cell.flipped {
+      background: var(--accent-subtle);
+      border-color: rgba(245, 166, 35, 0.4);
+      color: var(--accent);
+    }
+    .game-cell.matched {
+      background: var(--success-subtle);
+      border-color: rgba(76, 175, 80, 0.4);
+      color: var(--success);
+      cursor: default;
+      animation: match-pop 0.35s var(--ease-spring);
+    }
+    @keyframes match-pop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    /* Win banner */
+    .win-banner {
+      display: none;
+      animation: page-in 0.4s var(--ease-spring);
+    }
+    .win-banner.show { display: block; }
+
+    /* Pulse dot on tip */
+    .tip-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: var(--space-2);
+      animation: pulse-dot 1.8s ease infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    /* Footer */
+    .wf-footer {
+      border-top: 1px solid var(--border);
+      padding: var(--space-5) 0;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="/index.html" class="navbar-brand">leaperStuff</a>
-      <ul class="navbar-nav">
-        <li><a href="/index.html">Home</a></li>
-        <li><a href="/apps/tools.html">Tools</a></li>
-      </ul>
+
+  <!-- ── Navbar ── -->
+  <nav class="wf-navbar">
+    <div class="wf-navbar-inner">
+      <a href="/index.html" class="wf-navbar-brand">
+        <img src="assets/roundedlogo.gif" alt="leaperStuff logo" class="wf-navbar-favicon">
+        <span class="wf-navbar-name">
+          leaperStuff
+          <span class="wf-brand-ds">DS</span>
+        </span>
+      </a>
+
+      <button class="wf-navbar-hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="wf-navbar-nav" id="navMenu">
+        <a href="/index.html" class="wf-navbar-link">Home</a>
+        <a href="/apps/tools.html" class="wf-navbar-link">Tools</a>
+      </div>
+
+      <div class="wf-navbar-actions">
+        <!-- placeholder for future actions -->
+      </div>
     </div>
   </nav>
 
-  <main class="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 2rem;">
-    <!-- Error Container -->
-    <section class="card text-center liquid-glass" style="max-width: 600px; width: 90%; padding: 3rem 2rem;">
-      <div class="error-code" style="font-size: 8rem; font-weight: bold; color: var(--color1); text-shadow: 0 0 20px rgba(255, 209, 102, 0.5); margin-bottom: 1rem; line-height: 1;">404</div>
-      
-      <h2 style="font-size: 1.5rem; margin-bottom: 2rem; color: var(--text-light);">Oops! The page you're looking for doesn't exist.</h2>
-      
-      <div class="alert alert-warning" style="margin-bottom: 2rem;">
-        <i class="fas fa-lightbulb"></i> Tip: Try exploring the homepage or... maybe a secret code? Press down arrow 🎮
-      </div>
-      
-      <a href="/index.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.8rem;">
-        <i class="fas fa-home"></i>
-        <span>Back to Home</span>
-      </a>
-    </section>
+  <!-- ── Main ── -->
+  <main class="page-404">
 
-    <!-- Easter Egg Section -->
-    <div id="secret" class="card liquid-glass" style="display: none; max-width: 500px; width: 90%; margin-top: 2rem; text-align: center;">
-      <h3 style="color: var(--color1); margin-bottom: 1rem;">✨ You found the easter egg! ✨</h3>
-      <p style="margin-bottom: 1.5rem;">Let's play a memory game! Match the pairs of icons.</p>
-      
-      <div class="game-container" style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-        <div class="game-instructions" style="margin-bottom: 1rem; font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);">
-          Click on cards to reveal icons. Match all pairs to win!
-        </div>
-        
-        <div class="game-board" id="gameBoard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 auto; max-width: 300px;">
-          <!-- Game cells will be generated by JavaScript -->
-        </div>
-        
-        <div class="game-stats" style="display: flex; justify-content: space-between; margin-top: 1rem; font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);">
-          <div>Moves: <span id="movesCount">0</span></div>
-          <div>Pairs Found: <span id="pairsCount">0</span>/<span id="totalPairs">0</span></div>
-        </div>
-        
-        <div class="game-controls" style="margin-top: 1.5rem; display: flex; gap: 10px; justify-content: center;">
-          <button class="btn btn-secondary" id="restartGame">Restart Game</button>
-          <button class="btn btn-secondary" id="closeGame">Close</button>
+    <!-- 404 Hero Card -->
+    <div class="wf-card wf-card-accent card-404 anim-in">
+      <div style="margin-bottom: var(--space-4);">
+        <span class="wf-hero-eyebrow">Error</span>
+      </div>
+
+      <div class="error-glitch">404</div>
+
+      <h1 class="wf-h3" style="margin-top: var(--space-5); margin-bottom: var(--space-3); color: var(--text-primary);">
+        Page not found
+      </h1>
+      <p class="wf-body" style="margin-bottom: var(--space-6);">
+        The page you're looking for doesn't exist or may have been moved.
+      </p>
+
+      <div class="wf-alert wf-alert-accent anim-in anim-in-delay-1" style="margin-bottom: var(--space-6); text-align: left;">
+        <span class="wf-alert-icon"><i class="fas fa-gamepad"></i></span>
+        <div class="wf-alert-body">
+          <span class="tip-dot"></span>
+          <strong>Psst!</strong> There's a hidden easter egg on this page.
+          Try pressing <kbd style="background: var(--bg-overlay); border: 1px solid var(--border); border-radius: var(--r-xs); padding: 1px 6px; font-size: var(--text-xs); font-family: monospace;">↓</kbd> on your keyboard.
         </div>
       </div>
+
+      <div class="wf-row wf-center anim-in anim-in-delay-2" style="gap: var(--space-3); flex-wrap: wrap;">
+        <a href="/index.html" class="wf-btn wf-btn-filled wf-btn-lg">
+          <i class="fas fa-house"></i>
+          Back to Home
+        </a>
+        <a href="/apps/tools.html" class="wf-btn wf-btn-outlined">
+          <i class="fas fa-wrench"></i>
+          Explore Tools
+        </a>
+      </div>
+    </div>
+
+    <!-- ── Easter Egg Section ── -->
+    <div id="secret" class="wf-card card-easter anim-in anim-in-delay-3" style="display: none;">
+
+      <!-- Header -->
+      <div class="wf-card-header">
+        <div>
+          <div class="wf-overline" style="margin-bottom: var(--space-1);">Easter Egg</div>
+          <div class="wf-card-title">✨ You found it!</div>
+          <div class="wf-card-subtitle">Match all pairs of icons to win.</div>
+        </div>
+        <button class="wf-btn wf-btn-icon sm" id="closeGame" aria-label="Close game" data-tooltip="Close">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Win banner -->
+      <div class="wf-alert wf-alert-success win-banner" id="winBanner">
+        <span class="wf-alert-icon">🎉</span>
+        <div class="wf-alert-body">
+          <div class="wf-alert-title">You won!</div>
+          Completed in <strong id="winMoves">0</strong> moves. Impressive!
+        </div>
+      </div>
+
+      <!-- Game board -->
+      <div class="game-board-grid" id="gameBoard" style="margin: var(--space-4) 0;"></div>
+
+      <!-- Stats row -->
+      <div class="wf-between" style="margin-top: var(--space-3);">
+        <div class="wf-row" style="gap: var(--space-4);">
+          <div>
+            <div class="wf-stat-label">Moves</div>
+            <div class="wf-stat-value" style="font-size: var(--text-2xl);" id="movesCount">0</div>
+          </div>
+          <div>
+            <div class="wf-stat-label">Pairs</div>
+            <div class="wf-stat-value" style="font-size: var(--text-2xl);">
+              <span id="pairsCount">0</span><span class="wf-muted" style="font-size: var(--text-md);">/<span id="totalPairs">0</span></span>
+            </div>
+          </div>
+        </div>
+        <button class="wf-btn wf-btn-tonal" id="restartGame">
+          <i class="fas fa-rotate-right"></i>
+          Restart
+        </button>
+      </div>
+
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="glass text-center" style="margin-top: 2rem; padding: 1.5rem;">
-    <p>© 2026 LeaperStuff. All rights reserved.</p>
+  <!-- ── Footer ── -->
+  <footer class="wf-footer">
+    <div class="wf-container">
+      <p class="wf-caption">© 2026 LeaperStuff. All rights reserved.</p>
+    </div>
   </footer>
 
-  <script src="/main/404.js"></script>
+  <!-- ── Scripts ── -->
+  <script>
+    // Hamburger nav toggle
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('navMenu').classList.toggle('open');
+    });
+
+    // Easter Egg: down arrow key
+    const secretEl = document.getElementById('secret');
+    let downArrowPressed = false;
+
+    window.addEventListener('keydown', e => {
+      if ((e.key === 'ArrowDown' || e.keyCode === 40) && !downArrowPressed) {
+        downArrowPressed = true;
+        secretEl.style.display = 'block';
+        secretEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        initGame();
+      }
+    });
+
+    // ── Memory Game ──
+    let gameState = {
+      cards: [],
+      flippedIndices: [],
+      matchedPairs: 0,
+      totalPairs: 0,
+      moves: 0,
+      canFlip: true
+    };
+
+    const icons = ['star', 'heart', 'bolt', 'gem', 'flag', 'key', 'bell', 'crown'];
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function updateStats() {
+      document.getElementById('movesCount').textContent = gameState.moves;
+      document.getElementById('pairsCount').textContent  = gameState.matchedPairs;
+      document.getElementById('totalPairs').textContent  = gameState.totalPairs;
+    }
+
+    function initGame() {
+      const board = document.getElementById('gameBoard');
+      board.innerHTML = '';
+      document.getElementById('winBanner').classList.remove('show');
+
+      const deck = shuffleArray([...icons, ...icons]);
+      gameState = {
+        cards: deck,
+        flippedIndices: [],
+        matchedPairs: 0,
+        totalPairs: icons.length,
+        moves: 0,
+        canFlip: true
+      };
+      updateStats();
+
+      deck.forEach((icon, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'game-cell';
+        cell.dataset.index = i;
+        cell.dataset.icon  = icon;
+        cell.innerHTML = '<i class="fas fa-question"></i>';
+        cell.addEventListener('click', () => flipCard(i));
+        board.appendChild(cell);
+      });
+    }
+
+    function getCell(i) {
+      return document.querySelector(`.game-cell[data-index="${i}"]`);
+    }
+
+    function showCard(cell, icon) {
+      cell.innerHTML = `<i class="fas fa-${icon}"></i>`;
+      cell.classList.add('flipped');
+    }
+
+    function hideCard(cell) {
+      cell.innerHTML = '<i class="fas fa-question"></i>';
+      cell.classList.remove('flipped');
+    }
+
+    function flipCard(index) {
+      if (!gameState.canFlip) return;
+      const cell = getCell(index);
+      if (!cell || cell.classList.contains('matched') || cell.classList.contains('flipped')) return;
+
+      showCard(cell, gameState.cards[index]);
+      gameState.flippedIndices.push(index);
+
+      if (gameState.flippedIndices.length < 2) return;
+
+      const [a, b] = gameState.flippedIndices;
+      gameState.moves++;
+      updateStats();
+      gameState.canFlip = false;
+
+      const cellA = getCell(a);
+      const cellB = getCell(b);
+
+      if (gameState.cards[a] === gameState.cards[b]) {
+        // Match!
+        cellA.classList.add('matched');
+        cellB.classList.add('matched');
+        gameState.matchedPairs++;
+        updateStats();
+        gameState.flippedIndices = [];
+        gameState.canFlip = true;
+
+        if (gameState.matchedPairs === gameState.totalPairs) {
+          const banner = document.getElementById('winBanner');
+          document.getElementById('winMoves').textContent = gameState.moves;
+          banner.classList.add('show');
+          banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      } else {
+        // No match — flip back
+        setTimeout(() => {
+          hideCard(cellA);
+          hideCard(cellB);
+          gameState.flippedIndices = [];
+          gameState.canFlip = true;
+        }, 600);
+      }
+    }
+
+    document.getElementById('restartGame').addEventListener('click', initGame);
+    document.getElementById('closeGame').addEventListener('click', () => {
+      secretEl.style.display = 'none';
+      downArrowPressed = false;
+    });
+  </script>
+
 </body>
 </html>

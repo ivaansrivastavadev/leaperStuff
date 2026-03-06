@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>leprOCR — Smart Text Recognition</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=DM+Mono:ital,wght@0,400;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root { --scan-color: rgba(245,166,35,0.7); }
+
+    /* ── Layout ── */
+    .ocr-layout {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      min-height: calc(100vh - 64px);
+    }
+    @media (max-width: 880px) {
+      .ocr-layout { grid-template-columns: 1fr; }
+      .ocr-sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: none; }
+    }
+
+    /* ── Sidebar ── */
+    .ocr-sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--bg-surface);
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      overflow-y: auto;
+      max-height: calc(100vh - 64px);
+      position: sticky;
+      top: 64px;
+    }
+
+    /* ── Main area ── */
+    .ocr-main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-base);
+    }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--r-xl);
+      background: var(--bg-elevated);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      cursor: pointer;
+      transition: all var(--dur-mid) var(--ease);
+      padding: var(--space-6) var(--space-4);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-subtle);
+      transform: scale(1.01);
+    }
+    .drop-zone .dz-icon {
+      width: 52px; height: 52px;
+      border-radius: var(--r-lg);
+      background: var(--accent-subtle);
+      border: 1.5px solid rgba(245,166,35,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: var(--accent);
+      transition: transform var(--dur-mid) var(--ease-spring);
+    }
+    .drop-zone:hover .dz-icon { transform: scale(1.12) rotate(-6deg); }
+
+    /* ── Thumb strip ── */
+    .thumb-strip {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .thumb-item {
+      position: relative;
+      width: 60px; height: 60px;
+      border-radius: var(--r-md);
+      overflow: hidden;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+    }
+    .thumb-item:hover { border-color: var(--accent); transform: scale(1.07); }
+    .thumb-item.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,0.2); }
+    .thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb-remove {
+      position: absolute; top: 2px; right: 2px;
+      width: 16px; height: 16px;
+      background: var(--error); color: #fff;
+      border-radius: 50%; font-size: 8px;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; cursor: pointer; border: none;
+      transition: opacity var(--dur-fast) var(--ease);
+    }
+    .thumb-item:hover .thumb-remove { opacity: 1; }
+    .thumb-status {
+      position: absolute; bottom: 2px; left: 2px;
+      background: rgba(0,0,0,0.65); color: #fff;
+      font-size: 8px; font-weight: 700;
+      padding: 1px 4px; border-radius: 3px;
+    }
+    .thumb-status.done { background: var(--success); }
+
+    /* ── Canvas ── */
+    .canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: auto;
+      background: repeating-conic-gradient(var(--bg-elevated) 0% 25%, var(--bg-base) 0% 50%) 0 0 / 20px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      min-height: 400px;
+    }
+    .canvas-wrap.empty { align-items: center; justify-content: center; }
+    #imageCanvas { display: block; position: relative; z-index: 1; }
+
+    /* ── Text overlay ── */
+    #overlayLayer {
+      position: absolute; top: 0; left: 0;
+      pointer-events: none; z-index: 2;
+    }
+    .ov-word {
+      position: absolute;
+      white-space: nowrap;
+      color: var(--accent);
+      background: rgba(245,166,35,0.09);
+      border: 1px solid rgba(245,166,35,0.22);
+      border-radius: 3px;
+      padding: 0 2px;
+      cursor: default;
+      line-height: 1.1;
+      transition: background var(--dur-fast), color var(--dur-fast);
+      pointer-events: all;
+    }
+    .ov-word:hover {
+      background: rgba(245,166,35,0.28);
+      color: var(--text-primary);
+      z-index: 10;
+    }
+
+    /* ── Scan line ── */
+    .scan-line {
+      position: absolute; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--scan-color), transparent);
+      box-shadow: 0 0 14px var(--scan-color);
+      z-index: 5; display: none; pointer-events: none;
+      animation: scan 1.6s linear infinite;
+    }
+    @keyframes scan {
+      0%   { top: 0%;   opacity: 0; }
+      5%   { opacity: 1; }
+      95%  { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* ── Progress ── */
+    .progress-bar-wrap {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      padding: var(--space-3) var(--space-5);
+      display: none; flex-direction: column; gap: var(--space-2);
+      z-index: 10;
+    }
+    .progress-bar-wrap.on { display: flex; }
+
+    /* ── Results ── */
+    .results-panel {
+      border-top: 1px solid var(--border);
+      background: var(--bg-surface);
+      padding: var(--space-4) var(--space-5);
+      display: none;
+      flex-direction: column;
+      gap: var(--space-3);
+      max-height: 280px;
+      overflow-y: auto;
+      transition: max-height var(--dur-slow) var(--ease);
+    }
+    .results-panel.open  { display: flex; }
+    .results-panel.coll  { max-height: 50px; overflow: hidden; }
+
+    #fullTextBox {
+      width: 100%; min-height: 120px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--space-4);
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-sm); line-height: 1.7;
+      resize: vertical; outline: none;
+      transition: border-color var(--dur-fast) var(--ease);
+    }
+    #fullTextBox:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,0.12); }
+
+    /* ── Mode buttons ── */
+    .mode-row { display: flex; gap: var(--space-2); }
+    .mode-btn {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      padding: var(--space-3) var(--space-2);
+      border-radius: var(--r-lg);
+      border: 1.5px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      cursor: pointer; font-size: 11px; font-weight: 600;
+      transition: all var(--dur-fast) var(--ease);
+      font-family: inherit;
+    }
+    .mode-btn i { font-size: 17px; }
+    .mode-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
+    .mode-btn.active { background: var(--accent-subtle); border-color: rgba(245,166,35,0.45); color: var(--accent); }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: var(--space-8); left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      z-index: 999; transition: transform var(--dur-mid) var(--ease-spring);
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── Empty state ── */
+    .empty-st {
+      display: flex; flex-direction: column;
+      align-items: center; gap: var(--space-4);
+      padding: var(--space-12); text-align: center;
+    }
+    .empty-st-icon {
+      font-size: 60px; opacity: 0.18;
+      animation: bob 3s ease-in-out infinite;
+    }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    /* ── Branding ── */
+    .leprocr-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: var(--text-xl); font-weight: 800;
+      letter-spacing: -1px; color: var(--text-primary);
+    }
+    .leprocr-logo span { color: var(--accent); }
+
+    /* ── India refinement badge ── */
+    .india-card {
+      background: linear-gradient(135deg, rgba(255,153,51,0.08), rgba(19,136,8,0.08));
+      border: 1px solid rgba(255,153,51,0.25);
+      border-radius: var(--r-lg);
+      padding: var(--space-3);
+    }
+
+    /* ── Stat pill ── */
+    .spill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--r-pill); padding: 3px 10px;
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    }
+    .spill i { color: var(--accent); }
+
+    /* ── Page anim ── */
+    @keyframes fade-up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .fu  { animation: fade-up .45s var(--ease) both; }
+    .fu1 { animation-delay: .07s; }
+    .fu2 { animation-delay: .14s; }
+  </style>
+</head>
+<body>
+
+<!-- ══ Navbar ══ -->
+<nav class="wf-navbar">
+  <div class="wf-navbar-inner">
+    <a href="/index.html" class="wf-navbar-brand" style="text-decoration:none;">
+      <img src="assets/roundedlogo.gif" alt="" class="wf-navbar-favicon" onerror="this.style.display='none'">
+      <span class="leprocr-logo">lepr<span>OCR</span></span>
+    </a>
+    <div class="wf-navbar-nav">
+      <a href="/index.html" class="wf-navbar-link">Home</a>
+      <a href="/apps/tools.html" class="wf-navbar-link">Tools</a>
+    </div>
+    <div class="wf-navbar-actions">
+      <span class="wf-chip wf-chip-accent"><i class="fas fa-language"></i>&nbsp;20+ Languages</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ App ══ -->
+<div class="ocr-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="ocr-sidebar fu">
+
+    <!-- Input mode -->
+    <div>
+      <div class="wf-overline" style="margin-bottom:10px;">Input Source</div>
+      <div class="mode-row">
+        <button class="mode-btn active" id="modeFile"   onclick="setMode('file')">
+          <i class="fas fa-folder-open"></i>File(s)
+        </button>
+        <button class="mode-btn" id="modeCamera" onclick="setMode('camera')">
+          <i class="fas fa-camera"></i>Camera
+        </button>
+        <button class="mode-btn" id="modePaste"  onclick="setMode('paste')">
+          <i class="fas fa-link"></i>URL
+        </button>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div id="fileZoneWrap">
+      <div class="drop-zone" id="dropZone" onclick="triggerFile()" tabindex="0" role="button" aria-label="Upload images">
+        <div class="dz-icon"><i class="fas fa-file-image"></i></div>
+        <div>
+          <div class="wf-h5" style="color:var(--text-primary);font-size:14px;">Drop images here</div>
+          <div class="wf-caption" style="margin-top:3px;">JPG · PNG · WEBP · BMP · or click</div>
+        </div>
+        <span class="wf-chip wf-chip-default" style="font-size:10px;">Multi-file</span>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+    </div>
+
+    <!-- URL input -->
+    <div id="urlZoneWrap" style="display:none;">
+      <div class="wf-input-wrapper">
+        <span class="wf-input-icon-left"><i class="fas fa-globe"></i></span>
+        <input type="url" id="urlInput" class="wf-input has-icon-left wf-input-sm" placeholder="https://…/image.jpg">
+      </div>
+      <button class="wf-btn wf-btn-tonal wf-w-full" style="margin-top:8px;font-size:13px;" onclick="loadFromURL()">
+        <i class="fas fa-arrow-down-to-line"></i> Load
+      </button>
+    </div>
+
+    <hr class="wf-divider" style="margin:0;">
+
+    <!-- Language -->
+    <div>
+      <div class="wf-overline" style="margin-bottom:10px;">Language</div>
+      <div class="wf-form-group" style="margin-bottom:10px;">
+        <label class="wf-label">Primary</label>
+        <div class="wf-select-wrapper">
+          <select class="wf-select wf-input-sm" id="primaryLang">
+            <option value="eng">🇮🇳 English (India)</option>
+            <option value="hin">🇮🇳 Hindi — हिन्दी</option>
+            <option value="ben">🇮🇳 Bengali — বাংলা</option>
+            <option value="tel">🇮🇳 Telugu — తెలుగు</option>
+            <option value="tam">🇮🇳 Tamil — தமிழ்</option>
+            <option value="mar">🇮🇳 Marathi — मराठी</option>
+            <option value="guj">🇮🇳 Gujarati — ગુજરાતી</option>
+            <option value="kan">🇮🇳 Kannada — ಕನ್ನಡ</option>
+            <option value="mal">🇮🇳 Malayalam — മലയാളം</option>
+            <option value="pan">🇮🇳 Punjabi — ਪੰਜਾਬੀ</option>
+            <option value="ori">🇮🇳 Odia — ଓଡ଼ିଆ</option>
+            <option value="urd">🕌 Urdu — اردو</option>
+            <option value="ara">🇸🇦 Arabic</option>
+            <option value="fra">🇫🇷 French</option>
+            <option value="deu">🇩🇪 German</option>
+            <option value="spa">🇪🇸 Spanish</option>
+            <option value="por">🇧🇷 Portuguese</option>
+            <option value="ita">🇮🇹 Italian</option>
+            <option value="rus">🇷🇺 Russian</option>
+            <option value="chi_sim">🇨🇳 Chinese Simplified</option>
+            <option value="chi_tra">🇨🇳 Chinese Traditional</option>
+            <option value="jpn">🇯🇵 Japanese</option>
+            <option value="kor">🇰🇷 Korean</option>
+            <option value="tha">🇹🇭 Thai</option>
+            <option value="vie">🇻🇳 Vietnamese</option>
+            <option value="nld">🇳🇱 Dutch</option>
+            <option value="pol">🇵🇱 Polish</option>
+            <option value="tur">🇹🇷 Turkish</option>
+            <option value="swe">🇸🇪 Swedish</option>
+          </select>
+        </div>
+      </div>
+      <div class="wf-form-group" style="margin-bottom:10px;">
+        <label class="wf-label">Secondary (optional)</label>
+        <div class="wf-select-wrapper">
+          <select class="wf-select wf-input-sm" id="secondLang">
+            <option value="">None</option>
+            <option value="eng" selected>English</option>
+            <option value="hin">Hindi</option>
+            <option value="ben">Bengali</option>
+            <option value="tel">Telugu</option>
+            <option value="tam">Tamil</option>
+            <option value="mar">Marathi</option>
+            <option value="guj">Gujarati</option>
+            <option value="kan">Kannada</option>
+            <option value="mal">Malayalam</option>
+            <option value="pan">Punjabi</option>
+            <option value="fra">French</option>
+            <option value="deu">German</option>
+            <option value="spa">Spanish</option>
+            <option value="ara">Arabic</option>
+            <option value="rus">Russian</option>
+            <option value="chi_sim">Chinese Simplified</option>
+            <option value="jpn">Japanese</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- India English refine card -->
+      <div class="india-card">
+        <div class="wf-between" style="margin-bottom:6px;">
+          <span class="wf-label" style="display:flex;align-items:center;gap:5px;font-size:12px;">
+            🇮🇳 India English Refinement
+          </span>
+          <label class="wf-toggle-label" style="gap:0;">
+            <input type="checkbox" class="wf-toggle" id="indiaRefine" checked>
+          </label>
+        </div>
+        <p class="wf-caption" style="font-size:10px;line-height:1.5;">
+          Fixes ₹ symbol, DD/MM/YYYY dates, +91 numbers, Aadhaar/PAN patterns, and common Indian OCR noise.
+        </p>
+      </div>
+    </div>
+
+    <hr class="wf-divider" style="margin:0;">
+
+    <!-- Options -->
+    <div>
+      <div class="wf-overline" style="margin-bottom:10px;">Options</div>
+      <div class="wf-stack" style="gap:10px;">
+        <label class="wf-toggle-label" style="font-size:13px;">
+          <input type="checkbox" class="wf-toggle" id="showOverlay" checked>
+          <span>Text overlay on image</span>
+        </label>
+        <label class="wf-toggle-label" style="font-size:13px;">
+          <input type="checkbox" class="wf-toggle" id="cursiveMode" checked>
+          <span>Cursive overlay font</span>
+        </label>
+        <label class="wf-toggle-label" style="font-size:13px;">
+          <input type="checkbox" class="wf-toggle" id="autoEnhance" checked>
+          <span>Auto enhance image</span>
+        </label>
+      </div>
+      <div class="wf-form-group" style="margin-top:12px;">
+        <label class="wf-label">OCR Engine</label>
+        <div class="wf-select-wrapper">
+          <select class="wf-select wf-input-sm" id="ocrMode">
+            <option value="1">LSTM Neural Net (Best)</option>
+            <option value="3">Fast Mode</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Run button -->
+    <button class="wf-btn wf-btn-filled wf-btn-lg wf-w-full" id="runBtn" onclick="runOCR()" style="margin-top:auto;" data-tooltip="Ctrl+Enter">
+      <i class="fas fa-wand-magic-sparkles"></i>
+      Run OCR
+    </button>
+
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="ocr-main fu fu1">
+
+    <!-- Thumb strip -->
+    <div class="thumb-strip" id="thumbStrip" style="display:none;"></div>
+
+    <!-- Canvas / empty -->
+    <div class="canvas-wrap empty" id="canvasWrap">
+      <div class="empty-st" id="emptyState">
+        <div class="empty-st-icon">🔍</div>
+        <div class="wf-h4" style="color:var(--text-secondary);font-size:18px;">No image loaded</div>
+        <div class="wf-body-sm">Upload, paste, or take a photo to begin</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
+          <span class="spill"><i class="fas fa-language"></i> 20+ languages</span>
+          <span class="spill"><i class="fas fa-pen-nib"></i> Cursive support</span>
+          <span class="spill"><i class="fas fa-flag"></i> India English</span>
+          <span class="spill"><i class="fas fa-layer-group"></i> Multi-file</span>
+        </div>
+      </div>
+
+      <canvas id="imageCanvas" style="display:none;"></canvas>
+      <div id="overlayLayer"></div>
+      <div class="scan-line" id="scanLine"></div>
+
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="wf-between">
+          <span class="wf-label" style="font-size:12px;" id="progLabel">Starting…</span>
+          <span class="wf-caption" id="progPct">0%</span>
+        </div>
+        <div class="wf-progress">
+          <div class="wf-progress-bar animated" id="progBar" style="width:0%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-panel" id="resultsPanel">
+      <!-- Header -->
+      <div class="wf-between" style="flex-wrap:wrap;gap:8px;">
+        <div class="wf-row" style="gap:10px;flex-wrap:wrap;">
+          <span class="wf-h5">Extracted Text</span>
+          <div id="statsRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        </div>
+        <button class="wf-btn wf-btn-ghost wf-btn-sm" id="collapseBtn" onclick="collapseResults()" data-tooltip="Collapse panel">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+
+      <!-- Textbox -->
+      <textarea id="fullTextBox" placeholder="Recognised text will appear here…" readonly></textarea>
+
+      <!-- Action row -->
+      <div class="wf-row" style="gap:8px;flex-wrap:wrap;">
+        <button class="wf-btn wf-btn-filled wf-btn-sm" onclick="copyAll()">
+          <i class="fas fa-copy"></i> Copy All
+        </button>
+        <button class="wf-btn wf-btn-tonal wf-btn-sm" onclick="dlTxt()">
+          <i class="fas fa-file-arrow-down"></i> .txt
+        </button>
+        <button class="wf-btn wf-btn-outlined wf-btn-sm" onclick="clearAll()">
+          <i class="fas fa-trash"></i> Clear
+        </button>
+        <label class="wf-toggle-label" style="margin-left:auto;font-size:12px;gap:8px;">
+          <input type="checkbox" class="wf-toggle" id="editTog" onchange="setEdit()">
+          Edit
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ Camera Modal ══ -->
+<div class="wf-modal-backdrop" id="camModal" style="display:none;">
+  <div class="wf-modal" style="max-width:540px;">
+    <div class="wf-modal-header">
+      <span class="wf-modal-title"><i class="fas fa-camera" style="color:var(--accent);margin-right:8px;"></i>Take Photo</span>
+      <button class="wf-modal-close" onclick="closeCam()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+      <video id="camVideo" autoplay playsinline muted style="width:100%;border-radius:var(--r-lg);background:#000;max-height:300px;object-fit:cover;"></video>
+      <canvas id="camCanvas" style="display:none;"></canvas>
+      <div class="wf-row wf-center" style="gap:12px;">
+        <button class="wf-btn wf-btn-filled wf-btn-lg" onclick="capturePhoto()">
+          <i class="fas fa-circle-dot"></i> Capture
+        </button>
+        <button class="wf-btn wf-btn-ghost" onclick="closeCam()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Toast ══ -->
+<div id="toast">
+  <div class="wf-snackbar" id="toastInner">
+    <i class="fas fa-check-circle" style="color:var(--success);"></i>
+    <span id="toastMsg">Done!</span>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
+<script>
+// ══════════════════════════════════════════
+//  leprOCR v1.0
+// ══════════════════════════════════════════
+
+let files      = [];
+let activeIdx  = 0;
+let results    = {};   // idx → { text, words, confidence, scaleX, scaleY }
+let camStream  = null;
+let collapsed  = false;
+let currentImgW = 1, currentImgH = 1;
+
+// ── Mode ────────────────────────────────
+function setMode(m) {
+  ['file','camera','paste'].forEach(k => {
+    const id = 'mode' + k.charAt(0).toUpperCase() + k.slice(1);
+    document.getElementById(id).classList.toggle('active', k === m);
+  });
+  document.getElementById('fileZoneWrap').style.display = m === 'paste'   ? 'none'  : 'block';
+  document.getElementById('urlZoneWrap').style.display  = m === 'paste'   ? 'block' : 'none';
+  if (m === 'camera') { openCam(); setTimeout(()=>setMode('file'), 150); }
+}
+
+// ── File input ──────────────────────────
+function triggerFile() { document.getElementById('fileInput').click(); }
+
+document.getElementById('fileInput').addEventListener('change', e => {
+  addFiles(Array.from(e.target.files));
+  e.target.value = '';
+});
+
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('dragover');
+  addFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+});
+dz.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') triggerFile(); });
+
+// Paste from clipboard
+document.addEventListener('paste', e => {
+  const items = Array.from(e.clipboardData?.items||[]);
+  const imgItem = items.find(i => i.type.startsWith('image/'));
+  if (imgItem) {
+    const blob = imgItem.getAsFile();
+    addFiles([new File([blob], `paste-${Date.now()}.png`, { type: blob.type })]);
+    showToast('Image pasted from clipboard!');
+  }
+});
+
+function addFiles(newFiles) {
+  newFiles.forEach(f => {
+    if (!files.find(x => x.name===f.name && x.size===f.size)) files.push(f);
+  });
+  renderThumbs();
+  if (files.length) loadImg(files.length - 1);
+}
+
+// ── URL ─────────────────────────────────
+async function loadFromURL() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+  try {
+    showToast('Fetching image…');
+    const r = await fetch(url);
+    const b = await r.blob();
+    addFiles([new File([b], 'url-img.jpg', { type: b.type||'image/jpeg' })]);
+  } catch { showToast('Could not load URL', 'error'); }
+}
+
+// ── Thumbnails ───────────────────────────
+function renderThumbs() {
+  const strip = document.getElementById('thumbStrip');
+  if (!files.length) { strip.style.display = 'none'; return; }
+  strip.style.display = 'flex';
+  strip.innerHTML = `<span class="wf-caption" style="color:var(--text-tertiary);flex-shrink:0;padding-right:6px;">
+    <i class="fas fa-images"></i> ${files.length}
+  </span>`;
+  files.forEach((f, i) => {
+    const src = URL.createObjectURL(f);
+    const el  = document.createElement('div');
+    el.className = 'thumb-item' + (i===activeIdx?' active':'');
+    const done = !!results[i];
+    el.innerHTML = `<img src="${src}">
+      <span class="thumb-status ${done?'done':''}">${done?'✓':i+1}</span>
+      <button class="thumb-remove" onclick="removeFile(${i},event)"><i class="fas fa-xmark"></i></button>`;
+    el.addEventListener('click', () => loadImg(i));
+    strip.appendChild(el);
+  });
+}
+
+function removeFile(i, e) {
+  e.stopPropagation();
+  files.splice(i, 1);
+  // re-key results
+  const nr = {};
+  Object.keys(results).forEach(k => {
+    const nk = parseInt(k) > i ? parseInt(k)-1 : parseInt(k);
+    nr[nk] = results[k];
+  });
+  results = nr;
+  activeIdx = Math.min(activeIdx, Math.max(0, files.length-1));
+  renderThumbs();
+  if (files.length) loadImg(activeIdx); else clearCanvas();
+}
+
+// ── Load image to canvas ─────────────────
+function loadImg(idx) {
+  activeIdx = idx;
+  renderThumbs();
+  const url = URL.createObjectURL(files[idx]);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById('imageCanvas');
+    const wrap   = document.getElementById('canvasWrap');
+    const maxW   = wrap.clientWidth  || window.innerWidth - 320;
+    const maxH   = Math.floor(window.innerHeight * 0.52);
+    currentImgW  = img.naturalWidth;
+    currentImgH  = img.naturalHeight;
+    const scale  = Math.min(1, maxW/currentImgW, maxH/currentImgH);
+    canvas.width  = Math.round(currentImgW * scale);
+    canvas.height = Math.round(currentImgH * scale);
+
+    const ctx = canvas.getContext('2d');
+    if (document.getElementById('autoEnhance').checked) {
+      ctx.filter = 'contrast(1.12) brightness(1.04)';
+    }
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.filter = 'none';
+
+    canvas.style.display = 'block';
+    document.getElementById('emptyState').style.display = 'none';
+    wrap.classList.remove('empty');
+
+    const ol = document.getElementById('overlayLayer');
+    ol.innerHTML = '';
+    ol.style.width  = canvas.width  + 'px';
+    ol.style.height = canvas.height + 'px';
+
+    // show cached result
+    if (results[idx]) {
+      renderOverlay(results[idx].words, results[idx].scaleX, results[idx].scaleY);
+      openResultsPanel(idx);
+    }
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+// ── Camera ───────────────────────────────
+async function openCam() {
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment' } });
+    document.getElementById('camVideo').srcObject = camStream;
+    document.getElementById('camModal').style.display = 'flex';
+  } catch { showToast('Camera access denied', 'error'); }
+}
+function capturePhoto() {
+  const v = document.getElementById('camVideo');
+  const c = document.getElementById('camCanvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  c.toBlob(b => {
+    addFiles([new File([b], `photo-${Date.now()}.jpg`, { type:'image/jpeg' })]);
+    closeCam();
+  }, 'image/jpeg', 0.93);
+}
+function closeCam() {
+  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  document.getElementById('camModal').style.display = 'none';
+}
+
+// ── OCR ──────────────────────────────────
+async function runOCR() {
+  if (!files.length) { showToast('Load an image first', 'error'); return; }
+
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
+  document.getElementById('scanLine').style.display = 'block';
+  document.getElementById('progressWrap').classList.add('on');
+
+  const p1 = document.getElementById('primaryLang').value;
+  const p2 = document.getElementById('secondLang').value;
+  const langStr = p2 ? `${p1}+${p2}` : p1;
+  const oem = parseInt(document.getElementById('ocrMode').value);
+
+  try {
+    const worker = await Tesseract.createWorker(langStr, oem, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const pct = Math.round(m.progress * 100);
+          document.getElementById('progBar').style.width = pct + '%';
+          document.getElementById('progPct').textContent = pct + '%';
+          document.getElementById('progLabel').textContent = `Recognising… ${pct}%`;
+        } else {
+          document.getElementById('progLabel').textContent = m.status;
+        }
+      }
+    });
+
+    for (let i = 0; i < files.length; i++) {
+      document.getElementById('progLabel').textContent = `File ${i+1}/${files.length}…`;
+      const blobUrl = URL.createObjectURL(files[i]);
+      const res = await worker.recognize(blobUrl);
+      URL.revokeObjectURL(blobUrl);
+
+      // Compute scale factors (tesseract reports coords in original image space)
+      const canvas = document.getElementById('imageCanvas');
+      const scaleX = canvas.width  / (res.data.blocks?.[0] ? currentImgW : canvas.width);
+      const scaleY = canvas.height / (res.data.blocks?.[0] ? currentImgH : canvas.height);
+
+      let text = res.data.text || '';
+      if (document.getElementById('indiaRefine').checked) text = refineIndia(text);
+
+      results[i] = {
+        text,
+        words:      res.data.words || [],
+        confidence: res.data.confidence || 0,
+        scaleX, scaleY
+      };
+
+      if (i === activeIdx) {
+        renderOverlay(results[i].words, scaleX, scaleY);
+        openResultsPanel(i);
+      }
+    }
+
+    await worker.terminate();
+    renderThumbs();
+    showToast(`Done! ${files.length} image${files.length>1?'s':''} processed.`);
+  } catch(err) {
+    console.error(err);
+    showToast('OCR error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Run OCR';
+    document.getElementById('scanLine').style.display = 'none';
+    document.getElementById('progressWrap').classList.remove('on');
+    document.getElementById('progBar').style.width = '0%';
+  }
+}
+
+// ── Overlay rendering ────────────────────
+function renderOverlay(words, scaleX, scaleY) {
+  const layer   = document.getElementById('overlayLayer');
+  const canvas  = document.getElementById('imageCanvas');
+  layer.innerHTML = '';
+  layer.style.width  = canvas.width  + 'px';
+  layer.style.height = canvas.height + 'px';
+
+  if (!document.getElementById('showOverlay').checked || !words?.length) return;
+
+  const cursive = document.getElementById('cursiveMode').checked;
+  const font    = cursive ? "'Caveat', cursive" : "'DM Mono', monospace";
+
+  words.forEach(w => {
+    if (!w.text.trim() || w.confidence < 15) return;
+    const b   = w.bbox;
+    const x   = b.x0 * scaleX, y = b.y0 * scaleY;
+    const bw  = (b.x1 - b.x0) * scaleX;
+    const bh  = (b.y1 - b.y0) * scaleY;
+    const div = document.createElement('div');
+    div.className    = 'ov-word';
+    div.style.left   = x + 'px';
+    div.style.top    = y + 'px';
+    div.style.width  = bw + 'px';
+    div.style.height = bh + 'px';
+    div.style.fontSize  = Math.max(9, bh * 0.70) + 'px';
+    div.style.fontFamily = font;
+    div.title        = `${w.text} (${Math.round(w.confidence)}%)`;
+    div.textContent  = w.text;
+    layer.appendChild(div);
+  });
+}
+
+// live toggle overlay
+['showOverlay','cursiveMode'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    if (results[activeIdx]) renderOverlay(results[activeIdx].words, results[activeIdx].scaleX, results[activeIdx].scaleY);
+  });
+});
+
+// ── Results panel ────────────────────────
+function openResultsPanel(idx) {
+  const panel = document.getElementById('resultsPanel');
+  panel.classList.add('open');
+  panel.classList.remove('coll');
+  collapsed = false;
+  document.getElementById('collapseBtn').innerHTML = '<i class="fas fa-chevron-down"></i>';
+
+  const allText = files.map((_,i) => {
+    const txt = results[i]?.text || '';
+    return files.length > 1 ? `── File ${i+1}: ${files[i].name} ──\n${txt}` : txt;
+  }).filter(Boolean).join('\n\n');
+
+  document.getElementById('fullTextBox').value = allText;
+
+  const r    = results[idx];
+  const conf = Math.round(r?.confidence || 0);
+  const wc   = r?.words?.length || 0;
+  const lc   = (r?.text||'').split('\n').filter(l=>l.trim()).length;
+
+  document.getElementById('statsRow').innerHTML = `
+    <span class="spill"><i class="fas fa-percent"></i> ${conf}%</span>
+    <span class="spill"><i class="fas fa-font"></i> ${wc} words</span>
+    <span class="spill"><i class="fas fa-align-left"></i> ${lc} lines</span>
+  `;
+}
+
+function collapseResults() {
+  collapsed = !collapsed;
+  const panel = document.getElementById('resultsPanel');
+  panel.classList.toggle('coll', collapsed);
+  document.getElementById('collapseBtn').innerHTML = collapsed
+    ? '<i class="fas fa-chevron-up"></i>'
+    : '<i class="fas fa-chevron-down"></i>';
+}
+
+// ── India English Refinement ─────────────
+function refineIndia(t) {
+  return t
+    .replace(/\bRs\.?\s*/g,  '₹')
+    .replace(/\bINR\s*/g,    '₹')
+    .replace(/\bRe\.?\s*/g,  '₹')
+    // Rupee sign look-alikes
+    .replace(/\u20B9/g, '₹')
+    // Phone formatting
+    .replace(/\+\s*91\s+/g, '+91 ')
+    // Date normalisation DD/MM/YYYY or DD-MM-YYYY
+    .replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/g,
+      (_, d, m, y) => `${d.padStart(2,'0')}/${m.padStart(2,'0')}/${y}`)
+    // Aadhaar grouping
+    .replace(/\b(\d{4})\s*(\d{4})\s*(\d{4})\b/g, '$1 $2 $3')
+    // PAN card cleanup
+    .replace(/([A-Z]{5})\s*(\d{4})\s*([A-Z])\b/g, '$1$2$3')
+    // Common OCR confusions
+    .replace(/\bl\b(?=\d)/g,          '1')
+    .replace(/(?<=\d)O(?=\d)/g,       '0')
+    .replace(/\|/g,                   'I')
+    .replace(/`/g,                    "'")
+    // Common Indian misreads
+    .replace(/Governrnent/g,          'Government')
+    .replace(/Departrnent/g,          'Department')
+    .replace(/Municipalit[yi]/g,      'Municipality')
+    // Crore/lakh formatting hint
+    .replace(/(\d+),(\d{2}),(\d{3})/g, (_, a, b, c) => `${a},${b},${c}`)
+    // % sign confusion
+    .replace(/(\d)\s*°/g,             '$1%')
+    // Trim trailing junk chars per line
+    .split('\n').map(l => l.trimEnd()).join('\n');
+}
+
+// ── Actions ──────────────────────────────
+function copyAll() {
+  const t = document.getElementById('fullTextBox').value;
+  if (!t) { showToast('Nothing to copy', 'error'); return; }
+  navigator.clipboard.writeText(t).then(() => showToast('Copied to clipboard ✓'));
+}
+
+function dlTxt() {
+  const t = document.getElementById('fullTextBox').value;
+  if (!t) { showToast('Nothing to download', 'error'); return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([t], { type:'text/plain' }));
+  a.download = 'leprOCR-output.txt';
+  a.click();
+}
+
+function clearAll() {
+  files = []; results = {}; activeIdx = 0;
+  document.getElementById('thumbStrip').style.display = 'none';
+  document.getElementById('fullTextBox').value = '';
+  document.getElementById('resultsPanel').classList.remove('open');
+  clearCanvas();
+}
+
+function clearCanvas() {
+  const c = document.getElementById('imageCanvas');
+  c.style.display = 'none';
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('canvasWrap').classList.add('empty');
+  document.getElementById('overlayLayer').innerHTML = '';
+}
+
+function setEdit() {
+  const tb = document.getElementById('fullTextBox');
+  tb.readOnly = !document.getElementById('editTog').checked;
+  tb.style.borderColor = tb.readOnly ? '' : 'var(--accent)';
+}
+
+// ── Toast ─────────────────────────────────
+let toastT;
+function showToast(msg, type='success') {
+  const el = document.getElementById('toast');
+  const icon = type==='error' ? 'fa-circle-xmark' : 'fa-circle-check';
+  const col  = type==='error' ? 'var(--error)'   : 'var(--success)';
+  document.getElementById('toastInner').innerHTML =
+    `<i class="fas ${icon}" style="color:${col};"></i><span>${msg}</span>`;
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── Keyboard shortcuts ───────────────────
+window.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); runOCR(); }
+});
+</script>
+</body>
+</html>
