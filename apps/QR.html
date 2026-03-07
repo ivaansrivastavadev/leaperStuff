@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>leprQR — LeaperStuff</title>
+  <link rel="icon" href="/assets/roundedlogo.gif" />
+  <link rel="stylesheet" href="../../style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    body { background: var(--bg-base); }
+    .page-wrap { min-height: 100vh; display: flex; flex-direction: column; }
+    .main { flex: 1; padding: var(--space-8) 0 var(--space-16); }
+
+    /* ── Hero ── */
+    .hero { text-align: center; padding: var(--space-8) 0 var(--space-6); }
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-subtle); border: 1px solid rgba(245,166,35,.2);
+      color: var(--accent); font-size: var(--text-xs); font-weight: 700;
+      letter-spacing: 1.6px; text-transform: uppercase;
+      padding: 5px 14px; border-radius: var(--r-pill); margin-bottom: var(--space-4);
+    }
+    .hero h1 {
+      font-size: clamp(32px,5vw,46px); font-weight: 800;
+      letter-spacing: -1.5px; color: var(--text-primary); margin-bottom: 6px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p { color: var(--text-secondary); font-size: var(--text-md); }
+
+    .mode-bar { display: flex; justify-content: center; margin-bottom: var(--space-8); }
+
+    /* ── Quick mode ── */
+    #quickWrap { max-width: 520px; margin: 0 auto; }
+    .q-field { position: relative; margin-bottom: var(--space-5); }
+    .q-field input {
+      width: 100%; padding: 15px 56px 15px 20px; font-size: var(--text-md);
+      background: var(--bg-surface); border: 1.5px solid var(--border);
+      border-radius: var(--r-pill); color: var(--text-primary); font-family: var(--font);
+      outline: none; transition: border-color 150ms, box-shadow 150ms;
+    }
+    .q-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,.14); }
+    .q-go {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px; border-radius: 50%; background: var(--accent);
+      color: var(--text-on-accent); border: none; cursor: pointer; font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 150ms, transform 150ms;
+    }
+    .q-go:hover { background: var(--accent-dim); }
+    .q-go:active { transform: translateY(-50%) scale(.9); }
+
+    /* QR result box */
+    .qr-result {
+      display: none; flex-direction: column; align-items: center;
+      gap: var(--space-4); animation: wf-slide-up .28s var(--ease-spring);
+    }
+    .qr-result.vis { display: flex; }
+
+    .qr-frame {
+      background: #fff; border-radius: var(--r-xl); padding: 14px;
+      box-shadow: 0 8px 32px rgba(245,166,35,.18), 0 2px 8px rgba(0,0,0,.26);
+      display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .qr-frame canvas, .qr-frame img { display: block; border-radius: 6px; }
+
+    .lbl-text {
+      font-weight: 700; letter-spacing: .8px; text-align: center;
+      display: none; padding: 4px 14px; border-radius: 20px;
+    }
+    .lbl-text.vis { display: block; }
+
+    .dl-row { display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+
+    /* ── Studio layout ── */
+    .st-grid {
+      display: grid; grid-template-columns: 350px 1fr;
+      gap: var(--space-6); align-items: start;
+    }
+    @media (max-width: 840px) { .st-grid { grid-template-columns: 1fr; } }
+
+    .ctrl-panel { display: flex; flex-direction: column; gap: var(--space-3); }
+
+    /* Collapsible card */
+    .cc {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: var(--r-xl); overflow: hidden;
+    }
+    .cc-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px var(--space-5); cursor: pointer; user-select: none;
+      border-bottom: 1px solid var(--border); transition: background 120ms;
+    }
+    .cc-head:hover { background: var(--bg-elevated); }
+    .cc-hl { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+    .cc-hl i { color: var(--accent); font-size: 13px; }
+    .cc-chev { font-size: 11px; color: var(--text-tertiary); transition: transform 200ms; }
+    .cc.closed .cc-chev { transform: rotate(-90deg); }
+    .cc-body { padding: var(--space-4) var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); }
+    .cc.closed .cc-body { display: none; }
+
+    /* Form primitives */
+    .fr { display: flex; flex-direction: column; gap: 5px; }
+    .fl { font-size: 10px; font-weight: 700; letter-spacing: .9px; text-transform: uppercase; color: var(--text-tertiary); }
+    .fr input[type=text], .fr textarea, .fr select {
+      background: var(--bg-input); border: 1.5px solid var(--border);
+      border-radius: var(--r-lg); color: var(--text-primary);
+      padding: 9px 13px; font-size: var(--text-sm); font-family: var(--font);
+      outline: none; width: 100%; transition: border-color 150ms, box-shadow 150ms;
+    }
+    .fr input:focus, .fr textarea:focus, .fr select:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,.13);
+    }
+    .fr textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+    .fr select {
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B6559'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px;
+    }
+    .fr select option { background: var(--bg-elevated); }
+    .fc2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+
+    /* Slider */
+    .sl { display: flex; flex-direction: column; gap: 5px; }
+    .sl-h { display: flex; justify-content: space-between; align-items: center; }
+    .sl-v { font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-subtle); padding: 2px 8px; border-radius: var(--r-pill); }
+
+    /* Toggle */
+    .tog-row { display: flex; align-items: center; justify-content: space-between; }
+    .tog-lbl { font-size: 10px; font-weight: 700; letter-spacing: .9px; text-transform: uppercase; color: var(--text-tertiary); }
+
+    /* Palette grid — presets only, no custom color picker */
+    .pal-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-2);
+    }
+    .pal {
+      aspect-ratio: 1; border-radius: var(--r-md); cursor: pointer;
+      border: 2px solid transparent; transition: transform 150ms, border-color 150ms;
+      position: relative; overflow: hidden;
+    }
+    .pal:hover { transform: scale(1.06); }
+    .pal.on { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(245,166,35,.3); }
+    .pal .chk {
+      position: absolute; inset: 0; display: none; align-items: center;
+      justify-content: center; color: #fff; font-size: 11px;
+      text-shadow: 0 1px 4px rgba(0,0,0,.7);
+    }
+    .pal.on .chk { display: flex; }
+    .pal-name { font-size: 9px; font-weight: 700; text-align: center; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .4px; margin-top: 4px; }
+
+    /* Shape chips — just 2 */
+    .shape-row { display: flex; gap: var(--space-3); }
+    .shape-chip {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 12px 8px; background: var(--bg-input); border: 1.5px solid var(--border);
+      border-radius: var(--r-lg); cursor: pointer; transition: all 150ms;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .4px; color: var(--text-tertiary); user-select: none;
+    }
+    .shape-chip svg { width: 32px; height: 32px; }
+    .shape-chip:hover { border-color: rgba(245,166,35,.4); }
+    .shape-chip.on { border-color: var(--accent); background: var(--accent-subtle); color: var(--accent); }
+
+    /* EC */
+    .ec-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+    .ec {
+      padding: 9px 4px; background: var(--bg-input); border: 1.5px solid var(--border);
+      border-radius: var(--r-lg); cursor: pointer; text-align: center;
+      font-size: 10px; font-weight: 700; color: var(--text-tertiary); user-select: none; transition: all 150ms;
+    }
+    .ec:hover { border-color: rgba(245,166,35,.4); }
+    .ec.on { border-color: var(--accent); background: var(--accent-subtle); color: var(--accent); }
+    .ec .lv { font-size: 17px; font-weight: 800; display: block; color: inherit; line-height: 1.3; }
+    .ec .pct { font-size: 8px; text-transform: uppercase; letter-spacing: .3px; opacity: .8; }
+
+    /* Logo */
+    .logo-zone {
+      border: 2px dashed var(--border); border-radius: var(--r-lg);
+      padding: var(--space-4); text-align: center; cursor: pointer;
+      transition: all 150ms; position: relative;
+    }
+    .logo-zone:hover { border-color: var(--accent); background: var(--accent-subtle); }
+    .logo-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+    .logo-zone i { font-size: 20px; color: var(--accent); margin-bottom: 4px; display: block; }
+    .logo-zone p { font-size: var(--text-xs); color: var(--text-tertiary); }
+    .logo-ld { display: none; align-items: center; gap: var(--space-3); background: var(--bg-elevated); border-radius: var(--r-lg); padding: var(--space-3); }
+    .logo-ld.vis { display: flex; }
+    .logo-th { width: 36px; height: 36px; border-radius: var(--r-md); object-fit: contain; background: #fff; padding: 3px; }
+    .logo-fn { font-size: var(--text-xs); color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .logo-rm { color: var(--error); font-size: 13px; cursor: pointer; padding: 4px; }
+
+    /* CT tabs */
+    .ct-tabs { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+    .ct-tab {
+      padding: 5px 13px; border-radius: var(--r-pill); font-size: var(--text-xs); font-weight: 600;
+      border: 1.5px solid var(--border); background: var(--bg-input); color: var(--text-secondary);
+      cursor: pointer; transition: all 150ms; display: flex; align-items: center; gap: 5px; user-select: none;
+    }
+    .ct-tab:hover { border-color: rgba(245,166,35,.4); }
+    .ct-tab.on { border-color: var(--accent); background: var(--accent-subtle); color: var(--accent); }
+    .fg { display: none; flex-direction: column; gap: var(--space-3); }
+    .fg.vis { display: flex; }
+
+    /* Preview panel */
+    .prev-panel { position: sticky; top: 80px; display: flex; flex-direction: column; gap: var(--space-4); }
+
+    .prev-card {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: var(--space-8);
+      display: flex; flex-direction: column; align-items: center;
+      gap: var(--space-5); min-height: 300px; justify-content: center;
+    }
+
+    /* Empty state */
+    .empty-st { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); text-align: center; }
+    .empty-ico { font-size: 42px; color: var(--accent); opacity: .2; }
+    .empty-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-tertiary); }
+
+    /* DL bar */
+    .dl-bar { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-xl); padding: var(--space-5); }
+    .dl-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); text-align: center; margin-bottom: var(--space-3); }
+    .dl-btns { display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+
+    #genBtn { width: 100%; justify-content: center; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999;
+      background: var(--bg-overlay); color: var(--text-primary); border: 1px solid var(--border);
+      padding: 11px 18px; border-radius: var(--r-pill); font-size: var(--text-sm); font-weight: 500;
+      box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: var(--space-2);
+      animation: wf-slide-up .25s var(--ease-spring); pointer-events: none;
+    }
+  </style>
+</head>
+<body class="page-wrap">
+
+  <nav class="wf-navbar">
+    <div class="wf-navbar-inner">
+      <a href="../index.html" class="wf-navbar-brand">
+        <img src="/assets/roundedlogo.gif" alt="" class="wf-navbar-favicon" />
+        <span class="wf-navbar-name">leprQR</span>
+      </a>
+      <nav class="wf-navbar-nav">
+        <a href="../index.html" class="wf-navbar-link">About</a>
+      </nav>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="wf-container">
+
+      <div class="hero">
+        <div class="hero-pill"><i class="fa-solid fa-qrcode"></i> Free · No signup · Instant</div>
+        <h1>lepr<span>QR</span></h1>
+        <p>Generate beautiful, scannable QR codes instantly.</p>
+      </div>
+
+      <div class="mode-bar">
+        <div class="wf-tabs-pill">
+          <button class="wf-tab active" id="btnQ" onclick="setMode('quick')"><i class="fa-solid fa-bolt"></i> Quick</button>
+          <button class="wf-tab" id="btnS" onclick="setMode('studio')"><i class="fa-solid fa-sliders"></i> Studio</button>
+        </div>
+      </div>
+
+      <!-- ══ QUICK ══ -->
+      <div id="quickMode">
+        <div id="quickWrap">
+          <div class="q-field">
+            <input id="qIn" type="text"
+              placeholder="URL, text, email — paste anything…"
+              oninput="qDebounce()" autocomplete="off" spellcheck="false" />
+            <button class="q-go" onclick="qRun()"><i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+          <div class="qr-result" id="qResult">
+            <div class="qr-frame" id="qFrame">
+              <div id="qQrTarget"></div>
+            </div>
+            <div class="dl-row">
+              <button class="wf-btn wf-btn-filled wf-btn-sm" onclick="dlQ('png')"><i class="fa-solid fa-download"></i> PNG</button>
+              <button class="wf-btn wf-btn-outlined wf-btn-sm" onclick="dlQ('svg')"><i class="fa-solid fa-code"></i> SVG</button>
+              <button class="wf-btn wf-btn-ghost wf-btn-sm" onclick="cpQ()"><i class="fa-regular fa-copy"></i> Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ STUDIO ══ -->
+      <div id="studioMode" style="display:none;">
+        <div class="st-grid">
+
+          <!-- Controls -->
+          <div class="ctrl-panel">
+
+            <!-- Content type -->
+            <div class="cc" id="cc-ct">
+              <div class="cc-head" onclick="tog('cc-ct')">
+                <div class="cc-hl"><i class="fa-solid fa-pen-nib"></i> Content</div>
+                <i class="fa-solid fa-chevron-down cc-chev"></i>
+              </div>
+              <div class="cc-body">
+                <div class="ct-tabs">
+                  <div class="ct-tab on" data-t="url"   onclick="setCT('url')"  ><i class="fa-solid fa-link"></i> URL</div>
+                  <div class="ct-tab"    data-t="text"  onclick="setCT('text')" ><i class="fa-solid fa-align-left"></i> Text</div>
+                  <div class="ct-tab"    data-t="email" onclick="setCT('email')"><i class="fa-solid fa-envelope"></i> Email</div>
+                  <div class="ct-tab"    data-t="phone" onclick="setCT('phone')"><i class="fa-solid fa-phone"></i> Phone</div>
+                  <div class="ct-tab"    data-t="sms"   onclick="setCT('sms')"  ><i class="fa-solid fa-comment-sms"></i> SMS</div>
+                  <div class="ct-tab"    data-t="wifi"  onclick="setCT('wifi')" ><i class="fa-solid fa-wifi"></i> WiFi</div>
+                  <div class="ct-tab"    data-t="vcard" onclick="setCT('vcard')"><i class="fa-solid fa-address-card"></i> Contact</div>
+                  <div class="ct-tab"    data-t="geo"   onclick="setCT('geo')"  ><i class="fa-solid fa-location-dot"></i> Location</div>
+                </div>
+                <div id="ct-fields">
+                  <div class="fg vis" id="fg-url">
+                    <div class="fr"><label class="fl">URL</label><input type="text" id="f-url" placeholder="https://example.com" /></div>
+                  </div>
+                  <div class="fg" id="fg-text">
+                    <div class="fr"><label class="fl">Text</label><textarea id="f-text" placeholder="Enter any text…"></textarea></div>
+                  </div>
+                  <div class="fg" id="fg-email">
+                    <div class="fr"><label class="fl">To</label><input type="text" id="f-email-to" placeholder="user@example.com" /></div>
+                    <div class="fr"><label class="fl">Subject</label><input type="text" id="f-email-sub" placeholder="Hello!" /></div>
+                    <div class="fr"><label class="fl">Body</label><textarea id="f-email-body" placeholder="Message…"></textarea></div>
+                  </div>
+                  <div class="fg" id="fg-phone">
+                    <div class="fr"><label class="fl">Phone Number</label><input type="text" id="f-phone" placeholder="+91 98765 43210" /></div>
+                  </div>
+                  <div class="fg" id="fg-sms">
+                    <div class="fr"><label class="fl">To</label><input type="text" id="f-sms-to" placeholder="+91 98765 43210" /></div>
+                    <div class="fr"><label class="fl">Message</label><textarea id="f-sms-body" placeholder="Your message…"></textarea></div>
+                  </div>
+                  <div class="fg" id="fg-wifi">
+                    <div class="fr"><label class="fl">Network Name (SSID)</label><input type="text" id="f-wifi-ssid" placeholder="MyWiFi" /></div>
+                    <div class="fr"><label class="fl">Password</label><input type="text" id="f-wifi-pass" placeholder="password123" /></div>
+                    <div class="fr">
+                      <label class="fl">Security</label>
+                      <select id="f-wifi-sec"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">None</option></select>
+                    </div>
+                    <div class="tog-row"><span class="tog-lbl">Hidden Network</span><input type="checkbox" class="wf-toggle" id="f-wifi-hid" /></div>
+                  </div>
+                  <div class="fg" id="fg-vcard">
+                    <div class="fr"><label class="fl">Full Name</label><input type="text" id="f-vc-name" placeholder="Jane Doe" /></div>
+                    <div class="fr"><label class="fl">Phone</label><input type="text" id="f-vc-ph" placeholder="+91 98765 43210" /></div>
+                    <div class="fr"><label class="fl">Email</label><input type="text" id="f-vc-em" placeholder="jane@example.com" /></div>
+                    <div class="fr"><label class="fl">Organisation</label><input type="text" id="f-vc-org" placeholder="Acme Inc." /></div>
+                    <div class="fr"><label class="fl">Website</label><input type="text" id="f-vc-web" placeholder="https://jane.dev" /></div>
+                    <div class="fr"><label class="fl">Address</label><input type="text" id="f-vc-addr" placeholder="123 Main St, City" /></div>
+                  </div>
+                  <div class="fg" id="fg-geo">
+                    <div class="fc2">
+                      <div class="fr"><label class="fl">Latitude</label><input type="text" id="f-geo-lat" placeholder="28.6139" /></div>
+                      <div class="fr"><label class="fl">Longitude</label><input type="text" id="f-geo-lng" placeholder="77.2090" /></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Color presets — no custom picker -->
+            <div class="cc" id="cc-clr">
+              <div class="cc-head" onclick="tog('cc-clr')">
+                <div class="cc-hl"><i class="fa-solid fa-palette"></i> Color</div>
+                <i class="fa-solid fa-chevron-down cc-chev"></i>
+              </div>
+              <div class="cc-body">
+                <div class="fr">
+                  <label class="fl">Choose a preset</label>
+                  <div class="pal-grid" id="palGrid"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Size -->
+            <div class="cc" id="cc-sz">
+              <div class="cc-head" onclick="tog('cc-sz')">
+                <div class="cc-hl"><i class="fa-solid fa-expand"></i> Size</div>
+                <i class="fa-solid fa-chevron-down cc-chev"></i>
+              </div>
+              <div class="cc-body">
+                <div class="sl">
+                  <div class="sl-h"><label class="fl">Size</label><span class="sl-v" id="vSz">300 px</span></div>
+                  <input type="range" class="wf-range" id="rSz" min="128" max="600" step="8" value="300" oninput="document.getElementById('vSz').textContent=this.value+' px'" />
+                </div>
+                <div class="fr">
+                  <label class="fl">Download Scale</label>
+                  <select id="dlSc">
+                    <option value="1">1× – screen</option>
+                    <option value="2" selected>2× – sharp screens</option>
+                    <option value="3">3× – print</option>
+                    <option value="4">4× – hi-res</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Error correction -->
+            <div class="cc" id="cc-ec">
+              <div class="cc-head" onclick="tog('cc-ec')">
+                <div class="cc-hl"><i class="fa-solid fa-shield-halved"></i> Error Correction</div>
+                <i class="fa-solid fa-chevron-down cc-chev"></i>
+              </div>
+              <div class="cc-body">
+                <div class="ec-row">
+                  <div class="ec"    data-ec="L" onclick="setEC('L')"><span class="lv">L</span><span class="pct">7%</span></div>
+                  <div class="ec on" data-ec="M" onclick="setEC('M')"><span class="lv">M</span><span class="pct">15%</span></div>
+                  <div class="ec"    data-ec="Q" onclick="setEC('Q')"><span class="lv">Q</span><span class="pct">25%</span></div>
+                  <div class="ec"    data-ec="H" onclick="setEC('H')"><span class="lv">H</span><span class="pct">30%</span></div>
+                </div>
+                <p class="wf-caption">Use H when adding a center logo.</p>
+              </div>
+            </div>
+
+            <!-- Center logo -->
+            <div class="cc" id="cc-logo">
+              <div class="cc-head" onclick="tog('cc-logo')">
+                <div class="cc-hl"><i class="fa-solid fa-image"></i> Center Logo</div>
+                <i class="fa-solid fa-chevron-down cc-chev"></i>
+              </div>
+              <div class="cc-body">
+                <div class="logo-zone" id="lZone">
+                  <input type="file" id="lFile" accept="image/*" onchange="handleLogo(event)" />
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <p>Click or drag an image (PNG, SVG, JPG)</p>
+                </div>
+                <div class="logo-ld" id="lLoaded">
+                  <img id="lThumb" class="logo-th" src="" alt="" />
+                  <span class="logo-fn" id="lFname"></span>
+                  <i class="fa-solid fa-xmark logo-rm" onclick="removeLogo()" data-tooltip="Remove"></i>
+                </div>
+                <div class="sl">
+                  <div class="sl-h"><label class="fl">Logo Size</label><span class="sl-v" id="vLg">20%</span></div>
+                  <input type="range" class="wf-range" id="rLg" min="8" max="28" value="20" oninput="document.getElementById('vLg').textContent=this.value+'%'" />
+                </div>
+                <div class="tog-row">
+                  <span class="tog-lbl">White Padding</span>
+                  <input type="checkbox" class="wf-toggle" id="lPad" checked />
+                </div>
+              </div>
+            </div>
+
+            <!-- Label text -->
+            <div class="cc" id="cc-lbl">
+              <div class="cc-head" onclick="tog('cc-lbl')">
+                <div class="cc-hl"><i class="fa-solid fa-t"></i> Label Text</div>
+                <i class="fa-solid fa-chevron-down cc-chev"></i>
+              </div>
+              <div class="cc-body">
+                <div class="fr"><label class="fl">Above QR</label><input type="text" id="lAbove" placeholder="e.g. Scan to visit" oninput="refreshLabels()" /></div>
+                <div class="fr"><label class="fl">Below QR</label><input type="text" id="lBelow" placeholder="e.g. lepr.vercel.app" oninput="refreshLabels()" /></div>
+                <div class="sl">
+                  <div class="sl-h"><label class="fl">Font Size</label><span class="sl-v" id="vLF">13 px</span></div>
+                  <input type="range" class="wf-range" id="rLF" min="9" max="22" value="13" oninput="document.getElementById('vLF').textContent=this.value+' px';refreshLabels()" />
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /ctrl-panel -->
+
+          <!-- Preview -->
+          <div class="prev-panel">
+            <div class="prev-card" id="prevCard">
+              <div class="empty-st" id="stEmpty">
+                <div class="empty-ico"><i class="fa-solid fa-qrcode"></i></div>
+                <div class="empty-lbl">Fill in content &amp; hit Generate</div>
+              </div>
+              <div class="qr-result" id="stResult">
+                <div class="lbl-text" id="stLblAbove"></div>
+                <div class="qr-frame" id="stFrame"><div id="qrTarget"></div></div>
+                <div class="lbl-text" id="stLblBelow"></div>
+                <div class="qr-meta" style="display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:center;">
+                  <span class="wf-chip wf-chip-default" id="dimBadge">—</span>
+                  <span class="wf-chip wf-chip-accent" id="ecBadge">EC: M</span>
+                  <span class="wf-chip wf-chip-default" id="typeBadge">URL</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dl-bar" id="dlBar" style="display:none;">
+              <div class="dl-lbl">Download as</div>
+              <div class="dl-btns">
+                <button class="wf-btn wf-btn-filled"   onclick="stDl('png')" ><i class="fa-solid fa-image"></i> PNG</button>
+                <button class="wf-btn wf-btn-outlined" onclick="stDl('svg')" ><i class="fa-solid fa-code"></i> SVG</button>
+                <button class="wf-btn wf-btn-tonal"    onclick="stDl('webp')"><i class="fa-solid fa-file-image"></i> WebP</button>
+                <button class="wf-btn wf-btn-ghost"    onclick="stCopy()"   ><i class="fa-regular fa-copy"></i> Copy</button>
+              </div>
+            </div>
+
+            <button class="wf-btn wf-btn-filled wf-btn-lg" id="genBtn" onclick="studioGen()">
+              <i class="fa-solid fa-qrcode"></i> Generate
+            </button>
+          </div>
+
+        </div>
+      </div><!-- /studioMode -->
+
+    </div>
+  </div>
+
+  <!-- ANALYTICS_TAG_HERE -->
+
+  <script>
+  /* ═══════════════════════════════════════
+     CONSTANTS
+  ═══════════════════════════════════════ */
+
+  // Preset palettes — all high-contrast, all safe
+  const PALETTES = [
+    { fg:'#000000', bg:'#FFFFFF', name:'Classic'     },
+    { fg:'#1A1814', bg:'#F5A623', name:'Leaper Gold' },
+    { fg:'#F5A623', bg:'#1A1814', name:'Leaper Dark' },
+    { fg:'#0D47A1', bg:'#FFFFFF', name:'Navy'        },
+    { fg:'#1B5E20', bg:'#FFFFFF', name:'Forest'      },
+    { fg:'#4A148C', bg:'#FFFFFF', name:'Violet'      },
+    { fg:'#B71C1C', bg:'#FFFFFF', name:'Crimson'     },
+    { fg:'#000000', bg:'#FFF9C4', name:'Warm'        },
+    { fg:'#FFFFFF', bg:'#000000', name:'Inverted'    },
+    { fg:'#006064', bg:'#E0F7FA', name:'Teal'        },
+  ];
+
+  // Only 2 shapes — both reliably scannable
+  const SHAPES = [
+    {
+      id: 'square',
+      label: 'Square',
+      svg: `<svg viewBox="0 0 32 32" fill="currentColor">
+        <rect x="2"  y="2"  width="10" height="10"/>
+        <rect x="20" y="2"  width="10" height="10"/>
+        <rect x="2"  y="20" width="10" height="10"/>
+        <rect x="20" y="20" width="10" height="10"/>
+        <rect x="13" y="2"  width="6"  height="6"/>
+        <rect x="2"  y="13" width="6"  height="6"/>
+        <rect x="13" y="13" width="6"  height="6"/>
+      </svg>`,
+    },
+    {
+      id: 'rounded',
+      label: 'Rounded',
+      svg: `<svg viewBox="0 0 32 32" fill="currentColor">
+        <rect x="2"  y="2"  width="10" height="10" rx="3"/>
+        <rect x="20" y="2"  width="10" height="10" rx="3"/>
+        <rect x="2"  y="20" width="10" height="10" rx="3"/>
+        <rect x="20" y="20" width="10" height="10" rx="3"/>
+        <rect x="13" y="2"  width="6"  height="6"  rx="1.5"/>
+        <rect x="2"  y="13" width="6"  height="6"  rx="1.5"/>
+        <rect x="13" y="13" width="6"  height="6"  rx="1.5"/>
+      </svg>`,
+    },
+  ];
+
+  const ECMap = {
+    L: QRCode.CorrectLevel.L,
+    M: QRCode.CorrectLevel.M,
+    Q: QRCode.CorrectLevel.Q,
+    H: QRCode.CorrectLevel.H,
+  };
+
+  /* ═══════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════ */
+  let palIdx    = 0;   // current palette index
+  let shape     = 'square';
+  let currentCT = 'url';
+  let currentEC = 'M';
+  let logoData  = null;
+  let stCanvas  = null; // final canvas for studio downloads
+  let qCanvas   = null; // final canvas for quick downloads
+
+  /* ═══════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════ */
+  (function init() {
+    // Palette grid
+    const grid = document.getElementById('palGrid');
+    PALETTES.forEach((p, i) => {
+      const wrap = document.createElement('div');
+      const dot  = document.createElement('div');
+      dot.className = 'pal' + (i === 0 ? ' on' : '');
+      dot.style.background = p.fg;
+      dot.style.border     = `3px solid ${p.bg}`;
+      dot.style.boxShadow  = `inset 0 0 0 3px ${p.fg}`;
+      // Diagonal split trick using background
+      dot.style.background = `linear-gradient(135deg, ${p.fg} 50%, ${p.bg} 50%)`;
+      dot.setAttribute('data-tooltip', p.name);
+      dot.innerHTML = '<span class="chk"><i class="fa-solid fa-check"></i></span>';
+      dot.onclick = () => {
+        document.querySelectorAll('.pal').forEach(e => e.classList.remove('on'));
+        dot.classList.add('on');
+        palIdx = i;
+      };
+      wrap.appendChild(dot);
+      // Name label
+      const nm = document.createElement('div');
+      nm.className = 'pal-name';
+      nm.textContent = p.name;
+      wrap.appendChild(nm);
+      grid.appendChild(wrap);
+    });
+
+    // Shape row
+    const row = document.getElementById('shapeRow');
+    SHAPES.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'shape-chip' + (s.id === 'square' ? ' on' : '');
+      el.innerHTML = s.svg + `<span>${s.label}</span>`;
+      el.onclick = () => {
+        document.querySelectorAll('.shape-chip').forEach(e => e.classList.remove('on'));
+        el.classList.add('on');
+        shape = s.id;
+      };
+      row.appendChild(el);
+    });
+  })();
+
+  /* ═══════════════════════════════════════
+     UI HELPERS
+  ═══════════════════════════════════════ */
+  function setMode(m) {
+    document.getElementById('quickMode').style.display  = m === 'quick'  ? 'block' : 'none';
+    document.getElementById('studioMode').style.display = m === 'studio' ? 'block' : 'none';
+    document.getElementById('btnQ').classList.toggle('active', m === 'quick');
+    document.getElementById('btnS').classList.toggle('active', m === 'studio');
+  }
+
+  function tog(id) { document.getElementById(id).classList.toggle('closed'); }
+
+  function setCT(t) {
+    currentCT = t;
+    document.querySelectorAll('.ct-tab').forEach(e => e.classList.toggle('on', e.dataset.t === t));
+    document.querySelectorAll('.fg').forEach(e => e.classList.remove('vis'));
+    const fg = document.getElementById('fg-' + t);
+    if (fg) fg.classList.add('vis');
+    document.getElementById('typeBadge').textContent = t.toUpperCase();
+  }
+
+  function setEC(l) {
+    currentEC = l;
+    document.querySelectorAll('.ec').forEach(e => e.classList.toggle('on', e.dataset.ec === l));
+    document.getElementById('ecBadge').textContent = 'EC: ' + l;
+  }
+
+  /* ═══════════════════════════════════════
+     DATA STRING BUILDER
+  ═══════════════════════════════════════ */
+  function buildData(t) {
+    switch (t) {
+      case 'url':   return document.getElementById('f-url').value.trim();
+      case 'text':  return document.getElementById('f-text').value.trim();
+      case 'email': {
+        const to = document.getElementById('f-email-to').value;
+        const s  = document.getElementById('f-email-sub').value;
+        const b  = document.getElementById('f-email-body').value;
+        return `mailto:${to}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`;
+      }
+      case 'phone': return `tel:${document.getElementById('f-phone').value}`;
+      case 'sms':   return `smsto:${document.getElementById('f-sms-to').value}:${document.getElementById('f-sms-body').value}`;
+      case 'wifi': {
+        const s  = document.getElementById('f-wifi-ssid').value;
+        const p  = document.getElementById('f-wifi-pass').value;
+        const t2 = document.getElementById('f-wifi-sec').value;
+        const h  = document.getElementById('f-wifi-hid').checked ? 'true' : 'false';
+        return `WIFI:T:${t2};S:${s};P:${p};H:${h};;`;
+      }
+      case 'vcard': {
+        const n  = document.getElementById('f-vc-name').value;
+        const ph = document.getElementById('f-vc-ph').value;
+        const e  = document.getElementById('f-vc-em').value;
+        const o  = document.getElementById('f-vc-org').value;
+        const w  = document.getElementById('f-vc-web').value;
+        const a  = document.getElementById('f-vc-addr').value;
+        return `BEGIN:VCARD\nVERSION:3.0\nFN:${n}\nTEL:${ph}\nEMAIL:${e}\nORG:${o}\nURL:${w}\nADR:;;${a};;;;\nEND:VCARD`;
+      }
+      case 'geo': return `geo:${document.getElementById('f-geo-lat').value},${document.getElementById('f-geo-lng').value}`;
+    }
+    return '';
+  }
+
+  /* ═══════════════════════════════════════
+     CORE: generate + style canvas
+  ═══════════════════════════════════════ */
+  function makeQR(data, size, fg, bg, ec) {
+    return new Promise(resolve => {
+      const tmp = document.createElement('div');
+      tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;';
+      document.body.appendChild(tmp);
+      new QRCode(tmp, { text: data, width: size, height: size, colorDark: fg, colorLight: bg, correctLevel: ECMap[ec] });
+      // QRCode renders synchronously to canvas on most builds, but give one frame
+      requestAnimationFrame(() => {
+        const c = tmp.querySelector('canvas');
+        document.body.removeChild(tmp);
+        resolve(c || null);
+      });
+    });
+  }
+
+  // Apply rounded module style to a QR canvas.
+  // Finder patterns (eyes) are always drawn with their own border-radius treatment
+  // so the code stays readable. Square style is untouched.
+  function applyRounded(src, fg, bg) {
+    const W = src.width, H = src.height;
+    const sctx = src.getContext('2d');
+    const px   = sctx.getImageData(0, 0, W, H).data;
+
+    const fR = parseInt(fg.slice(1,3), 16);
+    const fG = parseInt(fg.slice(3,5), 16);
+    const fB = parseInt(fg.slice(5,7), 16);
+
+    // Detect module size by scanning a mid row
+    let ms = 0, fd = -1;
+    const scanY = Math.floor(H * 0.4);
+    for (let x = 0; x < W; x++) {
+      const i = (scanY * W + x) * 4;
+      const dk = Math.abs(px[i]-fR)<80 && Math.abs(px[i+1]-fG)<80 && Math.abs(px[i+2]-fB)<80;
+      if (dk && fd < 0) fd = x;
+      else if (!dk && fd >= 0 && ms === 0) { ms = x - fd; break; }
+    }
+    if (ms < 2) return src; // can't detect — return as-is
+
+    const mods = Math.round(W / ms);
+    const out  = document.createElement('canvas');
+    out.width = W; out.height = H;
+    const ctx  = out.getContext('2d');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Finder pattern top-left module positions
+    const fp = [{r:0,c:0},{r:0,c:mods-7},{r:mods-7,c:0}];
+    const inFP = (r, c) => fp.some(f => r >= f.r && r < f.r+7 && c >= f.c && c < f.c+7);
+
+    const r_mod = ms * 0.32; // corner radius for data modules
+
+    for (let row = 0; row < mods; row++) {
+      for (let col = 0; col < mods; col++) {
+        const mx = Math.floor(col * ms + ms * 0.5);
+        const my = Math.floor(row * ms + ms * 0.5);
+        if (mx >= W || my >= H) continue;
+        const i  = (my * W + mx) * 4;
+        const dk = Math.abs(px[i]-fR)<80 && Math.abs(px[i+1]-fG)<80 && Math.abs(px[i+2]-fB)<80;
+        if (!dk) continue;
+
+        ctx.fillStyle = fg;
+
+        if (inFP(row, col)) {
+          // Finder cells: square, handled after
+          ctx.fillRect(col * ms, row * ms, ms, ms);
+          continue;
+        }
+
+        const x = col * ms, y = row * ms, pad = ms * 0.07;
+        ctx.beginPath();
+        rrect(ctx, x + pad, y + pad, ms - pad*2, ms - pad*2, r_mod);
+        ctx.fill();
+      }
+    }
+
+    // Redraw finder patterns cleanly with rounded outer border
+    fp.forEach(f => {
+      const x = f.c * ms, y = f.r * ms, sz = ms * 7;
+      const bw = ms; // 1-module border width
+      const r_outer = ms * 1.4;
+      const r_inner = ms * 0.6;
+
+      // Clear finder area first
+      ctx.fillStyle = bg;
+      ctx.fillRect(x, y, sz, sz);
+
+      // Outer square (rounded)
+      ctx.fillStyle = fg;
+      ctx.beginPath();
+      rrect(ctx, x, y, sz, sz, r_outer);
+      ctx.fill();
+
+      // White inner
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      rrect(ctx, x + bw, y + bw, sz - bw*2, sz - bw*2, r_inner);
+      ctx.fill();
+
+      // Inner dot (rounded)
+      const dx = x + bw*2, dy = y + bw*2, dsz = sz - bw*4;
+      ctx.fillStyle = fg;
+      ctx.beginPath();
+      rrect(ctx, dx, dy, dsz, dsz, r_inner);
+      ctx.fill();
+    });
+
+    return out;
+  }
+
+  function rrect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w/2, h/2);
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);   ctx.quadraticCurveTo(x+w, y,   x+w, y+r);
+    ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);   ctx.quadraticCurveTo(x,   y+h, x,   y+h-r);
+    ctx.lineTo(x, y+r);     ctx.quadraticCurveTo(x,   y,   x+r, y);
+    ctx.closePath();
+  }
+
+  /* ═══════════════════════════════════════
+     LOGO OVERLAY
+  ═══════════════════════════════════════ */
+  function applyLogo(canvas, pct, padded) {
+    return new Promise(resolve => {
+      if (!logoData) { resolve(canvas); return; }
+      const W  = canvas.width;
+      const lw = W * (pct / 100), lh = lw;
+      const lx = (W - lw) / 2, ly = (W - lh) / 2;
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        if (padded) {
+          const pd = lw * 0.18;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          rrect(ctx, lx - pd, ly - pd, lw + pd*2, lh + pd*2, pd);
+          ctx.fill();
+        }
+        ctx.drawImage(img, lx, ly, lw, lh);
+        resolve(canvas);
+      };
+      img.onerror = () => resolve(canvas);
+      img.src = logoData;
+    });
+  }
+
+  /* ═══════════════════════════════════════
+     QUICK MODE
+  ═══════════════════════════════════════ */
+  let qT = null;
+  function qDebounce() { clearTimeout(qT); qT = setTimeout(qRun, 350); }
+
+  async function qRun() {
+    const val = document.getElementById('qIn').value.trim();
+    if (!val) {
+      document.getElementById('qResult').classList.remove('vis');
+      qCanvas = null;
+      return;
+    }
+    const raw = await makeQR(val, 280, '#000000', '#FFFFFF', 'M');
+    if (!raw) return;
+    qCanvas = raw;
+    const tgt = document.getElementById('qQrTarget');
+    tgt.innerHTML = '';
+    const d = raw.cloneNode();
+    d.getContext('2d').drawImage(raw, 0, 0);
+    tgt.appendChild(d);
+    document.getElementById('qResult').classList.add('vis');
+  }
+
+  function dlQ(fmt) {
+    if (!qCanvas) return;
+    if (fmt === 'svg') { dlSVG(qCanvas, 'leprQR.svg'); return; }
+    qCanvas.toBlob(b => {
+      const u = URL.createObjectURL(b);
+      const a = document.createElement('a'); a.href = u; a.download = 'leprQR.png'; a.click();
+      URL.revokeObjectURL(u);
+    });
+  }
+  function cpQ() {
+    if (!qCanvas) return;
+    qCanvas.toBlob(b => navigator.clipboard.write([new ClipboardItem({'image/png':b})]).then(()=>toast('Copied!')));
+  }
+
+  /* ═══════════════════════════════════════
+     STUDIO MODE
+  ═══════════════════════════════════════ */
+  async function studioGen() {
+    const data = buildData(currentCT);
+    if (!data) { toast('Enter some content first!'); return; }
+
+    const p    = PALETTES[palIdx];
+    const size = parseInt(document.getElementById('rSz').value);
+
+    let canvas = await makeQR(data, size, p.fg, p.bg, currentEC);
+    if (!canvas) { toast('Generation failed — try shorter content.'); return; }
+
+    // Apply rounded style if chosen
+    if (shape === 'rounded') {
+      canvas = applyRounded(canvas, p.fg, p.bg);
+    }
+
+    // Overlay logo
+    canvas = await applyLogo(canvas, parseInt(document.getElementById('rLg').value), document.getElementById('lPad').checked);
+
+    // Render
+    const tgt = document.getElementById('qrTarget');
+    tgt.innerHTML = '';
+    const d = document.createElement('canvas');
+    d.width = canvas.width; d.height = canvas.height;
+    d.style.display = 'block'; d.style.borderRadius = '8px';
+    d.getContext('2d').drawImage(canvas, 0, 0);
+    tgt.appendChild(d);
+    stCanvas = canvas;
+
+    refreshLabels();
+    document.getElementById('dimBadge').textContent = `${size} × ${size} px`;
+    document.getElementById('stEmpty').style.display = 'none';
+    document.getElementById('stResult').classList.add('vis');
+    document.getElementById('dlBar').style.display = 'block';
+  }
+
+  function refreshLabels() {
+    const above = document.getElementById('lAbove').value;
+    const below = document.getElementById('lBelow').value;
+    const fs    = document.getElementById('rLF').value + 'px';
+    // Pick label colors from palette
+    const p     = PALETTES[palIdx];
+    const style = `color:${p.fg};background:${p.bg};font-size:${fs};padding:5px 16px;border-radius:20px;`;
+    const aEl   = document.getElementById('stLblAbove');
+    aEl.textContent = above; aEl.style.cssText = style; aEl.classList.toggle('vis', !!above);
+    const bEl   = document.getElementById('stLblBelow');
+    bEl.textContent = below; bEl.style.cssText = style; bEl.classList.toggle('vis', !!below);
+  }
+
+  /* ═══════════════════════════════════════
+     LOGO
+  ═══════════════════════════════════════ */
+  function handleLogo(e) {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      logoData = ev.target.result;
+      document.getElementById('lThumb').src = logoData;
+      document.getElementById('lFname').textContent = f.name;
+      document.getElementById('lLoaded').classList.add('vis');
+      document.getElementById('lZone').style.display = 'none';
+    };
+    r.readAsDataURL(f);
+  }
+  function removeLogo() {
+    logoData = null;
+    document.getElementById('lFile').value = '';
+    document.getElementById('lLoaded').classList.remove('vis');
+    document.getElementById('lZone').style.display = 'block';
+  }
+
+  /* ═══════════════════════════════════════
+     DOWNLOADS
+  ═══════════════════════════════════════ */
+  function buildDlCanvas() {
+    if (!stCanvas) return null;
+    const scale  = parseInt(document.getElementById('dlSc').value);
+    const above  = document.getElementById('lAbove').value;
+    const below  = document.getElementById('lBelow').value;
+    const p      = PALETTES[palIdx];
+    const W      = stCanvas.width * scale;
+    const H      = stCanvas.height * scale;
+    const lblH   = 44 * scale;
+    const totalH = H + (above ? lblH : 0) + (below ? lblH : 0);
+    const out    = document.createElement('canvas');
+    out.width = W; out.height = totalH;
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, totalH);
+    let y = 0;
+    if (above) {
+      ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, lblH);
+      ctx.fillStyle = p.fg;
+      const fs = parseInt(document.getElementById('rLF').value) * scale;
+      ctx.font = `bold ${fs}px Inter,sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(above, W/2, lblH/2);
+      y = lblH;
+    }
+    ctx.drawImage(stCanvas, 0, y, W, H);
+    if (below) {
+      const by = y + H;
+      ctx.fillStyle = p.bg; ctx.fillRect(0, by, W, lblH);
+      ctx.fillStyle = p.fg;
+      const fs = parseInt(document.getElementById('rLF').value) * scale;
+      ctx.font = `bold ${fs}px Inter,sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(below, W/2, by + lblH/2);
+    }
+    return out;
+  }
+
+  function stDl(fmt) {
+    const out = buildDlCanvas();
+    if (!out) { toast('Generate a QR code first!'); return; }
+    if (fmt === 'svg') { dlSVG(out, 'leprQR.svg'); return; }
+    const mime = fmt === 'webp' ? 'image/webp' : 'image/png';
+    out.toBlob(b => {
+      const u = URL.createObjectURL(b);
+      const a = document.createElement('a'); a.href = u; a.download = `leprQR.${fmt}`; a.click();
+      URL.revokeObjectURL(u);
+      toast('Downloaded!');
+    }, mime);
+  }
+
+  function stCopy() {
+    const out = buildDlCanvas();
+    if (!out) { toast('Generate first!'); return; }
+    out.toBlob(b => navigator.clipboard.write([new ClipboardItem({'image/png':b})]).then(()=>toast('Copied!')));
+  }
+
+  function dlSVG(canvas, name) {
+    const W = canvas.width, H = canvas.height;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><image width="${W}" height="${H}" href="${canvas.toDataURL('image/png')}"/></svg>`;
+    const blob = new Blob([svg], {type:'image/svg+xml'});
+    const u = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = u; a.download = name; a.click();
+    URL.revokeObjectURL(u);
+    toast('Downloaded SVG!');
+  }
+
+  /* ═══════════════════════════════════════
+     TOAST
+  ═══════════════════════════════════════ */
+  function toast(msg) {
+    document.querySelectorAll('.toast').forEach(e => e.remove());
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<i class="fa-solid fa-check" style="color:var(--accent)"></i> ${msg}`;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.cssText += 'opacity:0;transition:opacity .3s;'; setTimeout(() => t.remove(), 300); }, 2200);
+  }
+  </script>
+</body>
+</html>
