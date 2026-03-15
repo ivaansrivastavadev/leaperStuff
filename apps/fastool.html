@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fastool</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+/* ── App shell overrides ── */
+html, body {
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* style.css sets min-height:100vh — override for app layout */
+  min-height: unset;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 52px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: rgba(26,24,20,0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  font-family: var(--font);
+}
+.logo em { color: var(--accent); font-style: normal; }
+
+.tb-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; }
+
+/* size pills */
+.size-wrap {
+  display: flex;
+  background: var(--bg-elevated);
+  border-radius: var(--r-pill);
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.sz {
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  font-family: var(--font);
+  transition: all var(--dur-fast) var(--ease);
+  white-space: nowrap;
+}
+.sz.on { background: var(--accent); color: var(--text-on-accent); }
+.sz:not(.on):hover { color: var(--text-primary); }
+
+.tb-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* Styles button */
+.styles-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all var(--dur-fast) var(--ease);
+  white-space: nowrap;
+}
+.styles-btn:hover { border-color: var(--accent); color: var(--accent); }
+.styles-btn.active { border-color: rgba(245,166,35,0.4); color: var(--accent); background: var(--accent-subtle); }
+
+.style-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); display:none; }
+.styles-btn.active .style-dot { display:block; }
+
+/* hide badge on very small screens */
+@media(max-width:480px){ .tb-badge { display:none; } }
+
+/* ── MAIN SPLIT ── */
+.split {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── LEFT PANEL ── */
+.lp {
+  width: 360px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--bg-base);
+  transition: transform 0.3s var(--ease);
+}
+
+.blk {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.blk-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.blk textarea {
+  width: 100%;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 13px;
+  font-size: 13px;
+  font-family: var(--font);
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+.blk textarea::placeholder { color: var(--text-tertiary); }
+.blk textarea:hover { border-color: var(--border-strong); }
+.blk textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,0.13); }
+
+/* btn-primary */
+.btn-p {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; margin-top: 10px;
+  padding: 10px 20px;
+  background: var(--accent); color: var(--text-on-accent);
+  border: 2px solid var(--accent);
+  border-radius: var(--r-pill);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+.btn-p:hover:not(:disabled) { background: transparent; color: var(--accent); }
+.btn-p:active:not(:disabled) { transform: scale(0.97); }
+.btn-p:disabled { opacity: 0.38; cursor: not-allowed; }
+
+/* btn-outlined */
+.btn-o {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; margin-top: 8px;
+  padding: 10px 20px;
+  background: transparent; color: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: var(--r-pill);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+.btn-o:hover:not(:disabled) { background: var(--accent); color: var(--text-on-accent); }
+.btn-o:active:not(:disabled) { transform: scale(0.97); }
+.btn-o:disabled { opacity: 0.38; cursor: not-allowed; }
+
+/* dots loader */
+.dots { display:inline-flex; gap:3px; }
+.dots s { display:block; width:4px; height:4px; background:currentColor; border-radius:50%; animation:bop .8s infinite; }
+.dots s:nth-child(2){animation-delay:.15s} .dots s:nth-child(3){animation-delay:.3s}
+@keyframes bop{0%,80%,100%{transform:scale(1);opacity:.4}40%{transform:scale(1.5);opacity:1}}
+
+/* style indicator */
+.style-ind {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px;
+  border-radius: var(--r-md);
+  background: var(--accent-subtle);
+  border: 1px solid rgba(245,166,35,0.22);
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.style-ind.show { display: flex; }
+.style-ind button {
+  margin-left: auto; background: none; border: none;
+  color: var(--text-tertiary); cursor: pointer; font-size: 12px;
+  padding: 0 2px; transition: color var(--dur-fast) var(--ease); line-height:1;
+}
+.style-ind button:hover { color: var(--error); }
+
+/* history */
+.hist-blk { padding:10px 16px; border-bottom:1px solid var(--border); flex-shrink:0; display:none; }
+.hist-list { display:flex; flex-direction:column; gap:4px; max-height:88px; overflow-y:auto; }
+.hchip {
+  font-size:12px; color:var(--text-tertiary);
+  background:var(--bg-elevated); border:1px solid var(--border);
+  border-radius:var(--r-sm); padding:4px 10px; cursor:pointer;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  transition:all var(--dur-fast) var(--ease); font-family:var(--font);
+}
+.hchip:hover { border-color:var(--border-strong); color:var(--text-primary); background:var(--bg-overlay); }
+.hchip.cur { border-color:rgba(245,166,35,.4); color:var(--accent); background:var(--accent-subtle); }
+
+/* code pane */
+.cpane { flex:1; display:none; flex-direction:column; min-height:0; overflow:hidden; }
+.cbar {
+  display:flex; align-items:center; gap:6px;
+  padding:6px 13px; background:var(--bg-surface); border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.mac{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mr{background:#ff5f56}.my{background:#ffbd2e}.mg{background:#27c93f}
+.fname{font-size:11px;color:var(--text-tertiary);letter-spacing:.3px;flex:1;margin-left:4px;}
+
+.tbtn {
+  background:transparent; border:1.5px solid var(--border); color:var(--text-tertiary);
+  font-family:var(--font); font-size:11px; font-weight:600;
+  padding:3px 10px; border-radius:var(--r-pill); cursor:pointer;
+  letter-spacing:.3px; transition:all var(--dur-fast) var(--ease); white-space:nowrap;
+}
+.tbtn:hover { border-color:var(--accent); color:var(--accent); }
+.tbtn.ok { border-color:var(--success); color:var(--success); }
+
+pre {
+  flex:1; padding:14px 16px; overflow:auto;
+  font-family:'JetBrains Mono','Fira Code',monospace; font-size:12px; line-height:1.75;
+  color:var(--text-secondary); background:var(--bg-base);
+  white-space:pre-wrap; word-break:break-all; min-height:0;
+}
+
+.cblink { display:inline-block; width:2px; height:1em; background:var(--accent); vertical-align:text-bottom; animation:blink .65s infinite; margin-left:1px; }
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.ebar {
+  padding:10px 16px; font-size:12px; color:var(--error);
+  background:var(--error-subtle); border-top:1.5px solid rgba(244,67,54,.25);
+  display:none; flex-shrink:0;
+}
+
+/* ── RESIZE ── */
+.drag { width:4px; cursor:col-resize; background:transparent; flex-shrink:0; transition:background var(--dur-fast) var(--ease); z-index:10; }
+.drag:hover,.drag.on { background:var(--accent); }
+
+/* ── RIGHT PANEL ── */
+.rp { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+.pbar {
+  display:flex; align-items:center; gap:10px;
+  padding:6px 14px; background:var(--bg-surface); border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.plbl { font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); }
+.pacts { margin-left:auto; display:flex; gap:7px; }
+
+.rbtn {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:5px 14px; background:var(--accent); color:var(--text-on-accent);
+  border:2px solid var(--accent); border-radius:var(--r-pill);
+  font-family:var(--font); font-size:11px; font-weight:700; letter-spacing:.3px;
+  cursor:pointer; transition:all var(--dur-fast) var(--ease);
+}
+.rbtn:hover:not(:disabled){ background:transparent; color:var(--accent); }
+.rbtn:disabled{ opacity:.38; cursor:not-allowed; }
+
+.pph {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:12px; background:var(--bg-base);
+}
+.phico{font-size:2.4rem;opacity:.15;}
+.phtxt{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-tertiary);}
+
+iframe#preview { flex:1; width:100%; border:none; display:none; background:#fff; }
+
+/* ── FULLSCREEN ── */
+.fso{position:fixed;inset:0;background:#000;z-index:1000;display:none;flex-direction:column;}
+.fso.open{display:flex;}
+.fsbar{display:flex;align-items:center;gap:12px;padding:8px 18px;background:var(--bg-surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+.fstitle{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-tertiary);flex:1;}
+.fscls{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;background:transparent;border:1.5px solid var(--border);color:var(--text-secondary);font-family:var(--font);font-size:11px;font-weight:600;border-radius:var(--r-pill);cursor:pointer;transition:all var(--dur-fast) var(--ease);}
+.fscls:hover{border-color:var(--error);color:var(--error);}
+#fsframe{flex:1;width:100%;border:none;background:#fff;}
+
+/* ── MOBILE: stacked layout ── */
+@media(max-width:700px){
+  .drag { display:none; }
+
+  .split {
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .lp {
+    width: 100% !important;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    /* don't let code pane collapse lp infinitely */
+    max-height: none;
+    overflow: visible;
+    flex-shrink: 0;
+  }
+
+  .cpane {
+    max-height: 260px;
+  }
+
+  pre { font-size: 11px; }
+
+  .rp {
+    min-height: 300px;
+    flex: none;
+    height: 50dvh;
+  }
+
+  iframe#preview { display: block !important; min-height: 260px; }
+
+  /* topbar: hide size labels, show compact pills */
+  .sz { padding: 4px 8px; font-size: 10px; }
+  .topbar { gap: 8px; padding: 0 12px; }
+  .logo { font-size: 16px; }
+}
+
+/* ══════════════════════════════════════
+   STYLES MODAL
+══════════════════════════════════════ */
+.modal-bg {
+  position:fixed; inset:0;
+  background:rgba(10,9,7,0.82);
+  z-index:500; display:none;
+  align-items:center; justify-content:center;
+  padding:20px;
+}
+.modal-bg.open { display:flex; }
+
+.modal {
+  background:var(--bg-surface);
+  border:1px solid var(--border-strong);
+  border-radius:var(--r-xl);
+  padding:24px;
+  width:100%; max-width:500px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.55);
+  animation:slideup 200ms cubic-bezier(0.34,1.56,0.64,1);
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+@keyframes slideup{from{transform:translateY(22px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.modal-title { font-size:17px; font-weight:800; letter-spacing:-0.3px; color:var(--text-primary); font-family:var(--font); }
+.modal-x {
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg-elevated);border:none;cursor:pointer;
+  color:var(--text-secondary);font-size:14px;font-family:var(--font);
+  transition:all var(--dur-fast) var(--ease);
+}
+.modal-x:hover{background:var(--error-subtle);color:var(--error);}
+
+.modal-desc {
+  font-size:12px;color:var(--text-tertiary);margin-bottom:16px;line-height:1.6;
+  font-family:var(--font);
+}
+.modal-desc code{background:var(--bg-elevated);color:var(--accent);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:11px;}
+
+/* mode tabs */
+.mode-tabs { display:flex; gap:5px; margin-bottom:14px; flex-wrap:wrap; }
+.mtab {
+  padding:5px 14px; border-radius:var(--r-pill);
+  font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  cursor:pointer;border:1.5px solid var(--border);color:var(--text-tertiary);
+  background:transparent;font-family:var(--font);
+  transition:all var(--dur-fast) var(--ease);
+}
+.mtab.on{background:var(--accent);color:var(--text-on-accent);border-color:var(--accent);}
+.mtab:not(.on):hover{color:var(--text-primary);border-color:var(--border-strong);}
+
+.mode-panel{display:none;}
+.mode-panel.show{display:block;}
+
+.mode-hint{font-size:12px;color:var(--text-tertiary);margin-bottom:10px;line-height:1.55;font-family:var(--font);}
+.mode-hint strong{color:var(--text-secondary);}
+
+.modal .blk-ta {
+  width:100%;
+  background:var(--bg-input);
+  color:var(--text-primary);
+  border:1.5px solid var(--border);
+  border-radius:var(--r-md);
+  padding:10px 13px;
+  font-size:12px;
+  font-family:monospace;
+  line-height:1.6;
+  resize:vertical;
+  min-height:90px;
+  outline:none;
+  transition:border-color var(--dur-fast) var(--ease);
+}
+.modal .blk-ta::placeholder{color:var(--text-tertiary);}
+.modal .blk-ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,0.13);}
+
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap;}
+
+.mbtn{
+  padding:9px 20px;border-radius:var(--r-pill);
+  font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all var(--dur-fast) var(--ease);border:2px solid;
+}
+.mbtn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border);}
+.mbtn-ghost:hover{color:var(--text-primary);border-color:var(--border-strong);}
+.mbtn-acc{background:var(--accent);color:var(--text-on-accent);border-color:var(--accent);}
+.mbtn-acc:hover{background:transparent;color:var(--accent);}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">fast<em>ool</em></div>
+  <div class="tb-sep"></div>
+  <div class="size-wrap">
+    <button class="sz on" data-s="ultra-tiny" onclick="pickSize(this)">Ultra Tiny</button>
+    <button class="sz" data-s="tiny" onclick="pickSize(this)">Tiny</button>
+    <button class="sz" data-s="small" onclick="pickSize(this)">Small</button>
+  </div>
+  <div class="tb-right">
+    <button class="styles-btn" id="stylesBtn" onclick="openModal()">
+      <div class="style-dot"></div>
+      🎨 Styles
+    </button>
+    <span class="wf-chip wf-chip-accent tb-badge" style="font-size:10px;padding:3px 10px;">⚡ Login needed!</span>
+  </div>
+</div>
+
+<!-- SPLIT -->
+<div class="split">
+
+  <!-- LEFT -->
+  <div class="lp" id="lp">
+
+    <div class="blk">
+      <div class="blk-label">// describe your project</div>
+      <div class="style-ind" id="styleInd">
+        <span id="styleIndTxt">✦ Wafflent DS</span>
+        <button onclick="clearStyles()" title="Clear">✕</button>
+      </div>
+      <textarea id="pIn" rows="4" placeholder="e.g. countdown timer, hex color picker, password strength checker…"></textarea>
+      <button class="btn-p" id="genBtn" onclick="generate()">
+        <div id="genInner">⚡ Generate Code</div>
+      </button>
+    </div>
+
+    <div class="blk" id="followBlock" style="display:none">
+      <div class="blk-label">// follow-up edit</div>
+      <textarea id="fIn" rows="3" placeholder="e.g. make the button red, add dark mode, animate the title…"></textarea>
+      <button class="btn-o" id="fBtn" onclick="followUp()">
+        <div id="fInner">↩ Apply Edit</div>
+      </button>
+    </div>
+
+    <div class="hist-blk" id="histBlk">
+      <div class="blk-label">// version history</div>
+      <div class="hist-list" id="histList"></div>
+    </div>
+
+    <div class="cpane" id="cpane">
+      <div class="cbar">
+        <div class="mac mr"></div><div class="mac my"></div><div class="mac mg"></div>
+        <span class="fname" id="fname">output.html</span>
+        <button class="tbtn" id="cpBtn" onclick="doCopy()">Copy</button>
+      </div>
+      <pre id="codeOut"></pre>
+    </div>
+
+    <div class="ebar" id="ebar"></div>
+  </div>
+
+  <!-- RESIZE (desktop only) -->
+  <div class="drag" id="drag"></div>
+
+  <!-- RIGHT: preview -->
+  <div class="rp">
+    <div class="pbar">
+      <span class="plbl">// live preview</span>
+      <div class="pacts">
+        <button class="rbtn" id="runBtn" onclick="runCode()" disabled>▶ Run</button>
+        <button class="tbtn" id="fsBtn" onclick="openFS()" style="display:none">⛶ Fullscreen</button>
+      </div>
+    </div>
+    <div class="pph" id="pph">
+      <div class="phico">⚡</div>
+      <div class="phtxt">generate code to preview</div>
+    </div>
+    <iframe id="preview" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+  </div>
+</div>
+
+<!-- FULLSCREEN -->
+<div class="fso" id="fso">
+  <div class="fsbar">
+    <span class="fstitle">fastool · fullscreen preview</span>
+    <button class="fscls" onclick="closeFS()">✕ Exit</button>
+  </div>
+  <iframe id="fsframe" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+</div>
+
+<!-- STYLES MODAL -->
+<div class="modal-bg" id="modalBg" onclick="onBgClick(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">🎨 Style Settings</div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-desc">
+      Choose how the AI should style generated code. Use <code>{CSS}</code> to inject raw CSS,
+      <code>{SCSS}</code> for SCSS variables, describe a vibe, or keep the default Wafflent look.
+      Dark mode is always forced unless you mention "light".
+    </div>
+
+    <div class="mode-tabs">
+      <button class="mtab on" data-m="wafflent" onclick="pickMode(this)">Wafflent</button>
+      <button class="mtab" data-m="describe" onclick="pickMode(this)">Describe</button>
+      <button class="mtab" data-m="css" onclick="pickMode(this)">{CSS}</button>
+      <button class="mtab" data-m="scss" onclick="pickMode(this)">{SCSS}</button>
+    </div>
+
+    <div class="mode-panel show" id="panel-wafflent">
+      <div class="mode-hint"><strong>Default.</strong> Warm dark bg (#1A1814), orange-yellow accent (#F5A623), Inter font, pill buttons, rounded cards. Material You feel. Dark mode forced.</div>
+    </div>
+
+    <div class="mode-panel" id="panel-describe">
+      <div class="mode-hint"><strong>Describe a vibe.</strong> E.g. "brutalist monospace neon green on black", "minimal white Apple-like", "retro terminal amber". Dark mode forced unless you say "light".</div>
+      <textarea class="blk-ta" id="descIn" rows="3" placeholder="e.g. glassmorphism dark purple, neon cyberpunk, clean minimal white…"></textarea>
+    </div>
+
+    <div class="mode-panel" id="panel-css">
+      <div class="mode-hint"><strong>Raw CSS.</strong> Paste CSS variables or rules. The AI uses these as the style foundation.</div>
+      <textarea class="blk-ta" id="cssIn" rows="6" placeholder=":root { --accent: #00ff88; --bg: #0a0a0a; --text: #f0f0f0; }&#10;body { font-family: 'Space Mono', monospace; }"></textarea>
+    </div>
+
+    <div class="mode-panel" id="panel-scss">
+      <div class="mode-hint"><strong>SCSS variables.</strong> The AI will compile these into inline CSS in the output.</div>
+      <textarea class="blk-ta" id="scssIn" rows="6" placeholder="$accent: #7c3aed;&#10;$bg: #0f0f1a;&#10;$text: #e2e8f0;&#10;$radius: 12px;&#10;$font: 'Poppins', sans-serif;"></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="mbtn mbtn-ghost" onclick="clearStyles()">Clear</button>
+      <button class="mbtn mbtn-acc" onclick="saveStyles()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── state ── */
+let size = 'ultra-tiny', code = '', hist = [], busy = false;
+let styleMode = 'wafflent', styleValue = '';
+
+/* ── Wafflent description for AI ── */
+const WAFFLENT = `STYLE RULES — use the Wafflent Design System aesthetic:
+- Dark background: #1A1814 (body bg), #22201A (surface), #2C2920 (elevated), #35322A (overlay)
+- Accent: #F5A623 (buttons, links, highlights, focus rings)
+- Text: #F0EDE6 (primary), #A09A8E (secondary), #6B6559 (tertiary)
+- Border: rgba(240,237,230,0.10) subtle, rgba(240,237,230,0.20) strong
+- Font: Import Inter from Google Fonts. Use it everywhere.
+- Radius: 8px sm, 14px md, 20px lg, 28px xl, 9999px pill
+- Buttons: pill-shaped. Filled = accent bg + dark text. Outlined = transparent + accent border.
+- Inputs: border-radius 14px, dark bg, accent focus ring (box-shadow 0 0 0 3px rgba(245,166,35,0.13))
+- Transitions: 120ms cubic-bezier(0.2,0,0,1)
+- Spacing: generous padding, clean hierarchy`;
+
+/* ── system prompt builder ── */
+const SIZE_TARGET = {
+  'ultra-tiny': 'Target 20–40 lines. Ultra minimal, single purpose.',
+  'tiny':       'Target 40–80 lines. Minimal but clean.',
+  'small':      'Target 80–150 lines. Well-structured.'
+};
+
+function styleBlock() {
+  const descLow = styleMode === 'describe' ? styleValue.toLowerCase() : '';
+  const wantsLight = /\b(light|white|bright)\b/.test(descLow);
+  const darkRule = wantsLight
+    ? '// User requested light mode — use light backgrounds.'
+    : 'FORCE DARK MODE. Always use dark backgrounds. Never white or light backgrounds unless explicitly requested.';
+
+  if (styleMode === 'wafflent') return WAFFLENT + '\n' + darkRule;
+  if (styleMode === 'describe') return `STYLE: "${styleValue}". Build all CSS inline.\n${darkRule}`;
+  if (styleMode === 'css')      return `STYLE: Use this CSS as the base:\n\`\`\`css\n${styleValue}\n\`\`\`\n${darkRule}`;
+  if (styleMode === 'scss')     return `STYLE: Compile these SCSS vars into inline CSS:\n\`\`\`scss\n${styleValue}\n\`\`\`\n${darkRule}`;
+  return darkRule;
+}
+
+function buildSys(isEdit) {
+  return `You are a frontend HTML code generator. Output ONLY a raw self-contained HTML file.
+
+ABSOLUTE RULES:
+1. Response must be a complete HTML file. Start with <!DOCTYPE html>, end with </html>.
+2. ZERO text outside the HTML. No explanations, no "Sure!", no markdown, no backticks, no code fences.
+3. Use only HTML + inline <style> CSS + inline <script> JS. One file, no external stylesheets.
+4. ${SIZE_TARGET[size]}
+${isEdit ? '5. You are editing existing code. Output the complete updated file.\n' : ''}
+${styleBlock()}`;
+}
+
+/* ── size ── */
+function pickSize(el) {
+  document.querySelectorAll('.sz').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  size = el.dataset.s;
+}
+
+/* ── modal ── */
+function openModal() { document.getElementById('modalBg').classList.add('open'); }
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
+function onBgClick(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
+
+function pickMode(el) {
+  document.querySelectorAll('.mtab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  styleMode = el.dataset.m;
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('show'));
+  document.getElementById('panel-' + styleMode).classList.add('show');
+}
+
+function saveStyles() {
+  if (styleMode === 'describe') styleValue = document.getElementById('descIn').value.trim();
+  else if (styleMode === 'css')  styleValue = document.getElementById('cssIn').value.trim();
+  else if (styleMode === 'scss') styleValue = document.getElementById('scssIn').value.trim();
+  else styleValue = '';
+  updateInd();
+  closeModal();
+}
+
+function clearStyles() {
+  styleMode = 'wafflent'; styleValue = '';
+  ['descIn','cssIn','scssIn'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.querySelectorAll('.mtab').forEach(t => t.classList.remove('on'));
+  document.querySelector('.mtab[data-m="wafflent"]').classList.add('on');
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('show'));
+  document.getElementById('panel-wafflent').classList.add('show');
+  updateInd();
+  closeModal();
+}
+
+function updateInd() {
+  const isCustom = styleMode !== 'wafflent' && styleValue;
+  const labels = {
+    wafflent: '✦ Wafflent DS',
+    describe: `✦ "${styleValue.slice(0,28)}${styleValue.length>28?'…':''}"`,
+    css:      '✦ Custom CSS',
+    scss:     '✦ Custom SCSS'
+  };
+  document.getElementById('styleIndTxt').textContent = isCustom ? labels[styleMode] : labels.wafflent;
+  document.getElementById('styleInd').classList.add('show');
+  document.getElementById('stylesBtn').classList.toggle('active', !!isCustom);
+}
+
+/* ── generate ── */
+async function generate() {
+  const prompt = document.getElementById('pIn').value.trim();
+  if (!prompt || busy) return;
+  startBusy('genBtn','genInner','Generating');
+  clearErr(); showCpane();
+  const out = document.getElementById('codeOut');
+  out.innerHTML = '';
+  const cur = mkcur(); out.appendChild(cur);
+  code = '';
+  try {
+    const res = await puter.ai.chat(
+      `Build this as a self-contained HTML file. Project: ${prompt}`,
+      { model: 'gpt-4o-mini', stream: true, system_prompt: buildSys(false) }
+    );
+    for await (const chunk of res) {
+      const t = chunk?.text || '';
+      if (t) { code += t; out.insertBefore(document.createTextNode(t), cur); }
+    }
+    cur.remove();
+    code = extractHTML(code);
+    out.textContent = code;
+    setFname(code);
+    pushHist(prompt, code);
+    enableRun();
+    document.getElementById('followBlock').style.display = 'block';
+  } catch(e) { cur.remove(); showErr(e.message||'Generation failed.'); }
+  stopBusy('genBtn','genInner','⚡ Generate Again');
+}
+
+/* ── follow-up ── */
+async function followUp() {
+  const edit = document.getElementById('fIn').value.trim();
+  if (!edit || busy || !code) return;
+  startBusy('fBtn','fInner','Applying');
+  clearErr();
+  const out = document.getElementById('codeOut');
+  out.innerHTML = '';
+  const cur = mkcur(); out.appendChild(cur);
+  let nc = '';
+  try {
+    const res = await puter.ai.chat(
+      `Existing code:\n${code}\n\nInstruction: ${edit}\n\nOutput the full updated HTML now.`,
+      { model: 'gpt-4o-mini', stream: true, system_prompt: buildSys(true) }
+    );
+    for await (const chunk of res) {
+      const t = chunk?.text || '';
+      if (t) { nc += t; out.insertBefore(document.createTextNode(t), cur); }
+    }
+    cur.remove();
+    nc = extractHTML(nc);
+    out.textContent = nc; code = nc;
+    setFname(code);
+    pushHist('edit: '+edit, code);
+    document.getElementById('fIn').value = '';
+    enableRun();
+  } catch(e) { cur.remove(); showErr(e.message||'Edit failed.'); }
+  stopBusy('fBtn','fInner','↩ Apply Edit');
+}
+
+/* ── run / fullscreen ── */
+function runCode() {
+  if (!code) return;
+  document.getElementById('pph').style.display = 'none';
+  const f = document.getElementById('preview');
+  f.style.display = 'block'; f.srcdoc = code;
+  document.getElementById('fsBtn').style.display = '';
+}
+function openFS() {
+  if (!code) return;
+  document.getElementById('fsframe').srcdoc = code;
+  document.getElementById('fso').classList.add('open');
+}
+function closeFS() { document.getElementById('fso').classList.remove('open'); }
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeFS(); });
+
+/* ── copy ── */
+function doCopy() {
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(() => {
+    const b = document.getElementById('cpBtn');
+    b.textContent='Copied!'; b.classList.add('ok');
+    setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok');},1800);
+  });
+}
+
+/* ── history ── */
+function pushHist(label, c) {
+  hist.push({ label: label.length>44?label.slice(0,44)+'…':label, code:c });
+  renderHist();
+}
+function renderHist() {
+  const blk = document.getElementById('histBlk');
+  const list = document.getElementById('histList');
+  if (hist.length < 2) { blk.style.display='none'; return; }
+  blk.style.display='block'; list.innerHTML='';
+  hist.forEach((h,i)=>{
+    const c=document.createElement('div');
+    c.className='hchip'+(i===hist.length-1?' cur':'');
+    c.textContent=`v${i+1}: ${h.label}`;
+    c.onclick=()=>restoreHist(i);
+    list.appendChild(c);
+  });
+  list.scrollTop=list.scrollHeight;
+}
+function restoreHist(i) {
+  code=hist[i].code;
+  document.getElementById('codeOut').textContent=code;
+  setFname(code); enableRun();
+  document.querySelectorAll('.hchip').forEach((c,idx)=>c.classList.toggle('cur',idx===i));
+}
+
+/* ── helpers ── */
+function mkcur(){ const c=document.createElement('span');c.className='cblink';return c; }
+function extractHTML(s){
+  const m=s.match(/<(!DOCTYPE|html)[\s>]/i);
+  if(m) s=s.slice(s.indexOf(m[0]));
+  const end=s.toLowerCase().lastIndexOf('</html>');
+  if(end!==-1) s=s.slice(0,end+7);
+  return s.trim();
+}
+function setFname(c){ document.getElementById('fname').textContent=(c.includes('<!DOCTYPE')||c.includes('<html'))?'output.html':'output.js'; }
+function enableRun(){ document.getElementById('runBtn').disabled=false; runCode(); }
+function showCpane(){ const p=document.getElementById('cpane'); p.style.display='flex'; p.style.flexDirection='column'; }
+function showErr(m){ const b=document.getElementById('ebar'); b.style.display='block'; b.textContent='⚠ '+m; }
+function clearErr(){ document.getElementById('ebar').style.display='none'; }
+function startBusy(bId,iId,lbl){
+  busy=true;
+  document.getElementById(bId).disabled=true;
+  document.getElementById(iId).innerHTML=`<span>${lbl}</span><div class="dots"><s></s><s></s><s></s></div>`;
+}
+function stopBusy(bId,iId,lbl){
+  busy=false;
+  document.getElementById(bId).disabled=false;
+  document.getElementById(iId).innerHTML=`<span>${lbl}</span>`;
+}
+
+/* ── keyboard ── */
+document.getElementById('pIn').addEventListener('keydown', e => {
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) generate();
+});
+document.getElementById('fIn').addEventListener('keydown', e => {
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) followUp();
+});
+
+/* ── resize handle (desktop) ── */
+const drag=document.getElementById('drag'), lp=document.getElementById('lp');
+let dragging=false,sx=0,sw=0;
+drag.addEventListener('mousedown',e=>{
+  dragging=true;sx=e.clientX;sw=lp.offsetWidth;
+  drag.classList.add('on');
+  document.body.style.userSelect='none';document.body.style.cursor='col-resize';
+});
+document.addEventListener('mousemove',e=>{
+  if(!dragging)return;
+  lp.style.width=Math.min(Math.max(sw+e.clientX-sx,260),640)+'px';
+});
+document.addEventListener('mouseup',()=>{
+  if(!dragging)return;
+  dragging=false;drag.classList.remove('on');
+  document.body.style.userSelect='';document.body.style.cursor='';
+});
+
+/* ── puter init ── */
+document.getElementById('genBtn').disabled=true;
+document.getElementById('genInner').innerHTML='Loading engine…';
+window.onPuterReady=function(){
+  document.getElementById('genBtn').disabled=false;
+  document.getElementById('genInner').innerHTML='⚡ Generate Code';
+};
+window.onPuterFail=function(){
+  showErr('Failed to load Puter.js. Check your connection and refresh.');
+};
+
+// init indicator
+updateInd();
+</script>
+<script src="https://js.puter.com/v2/" onload="window.onPuterReady()" onerror="window.onPuterFail()"></script>
+</body>
+</html>
