@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-194ZHCENMF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-194ZHCENMF');
+</script>
+<!-- EnD -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TimerCAVA — LeaperStuff</title>
+  <link rel="icon" type="image/png" href="/assets/roundedlogo.gif" />
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    :root {
+      --bg: #0d0d14;
+      --surface: rgba(20,20,32,0.82);
+      --surface-solid: #14141f;
+      --accent: #4CAF50;
+      --accent-hover: #45a049;
+      --warn: #FFC107;
+      --danger: #F44336;
+      --text: #e8e8f0;
+      --text-dim: #9090a8;
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+      --font: 'Press Start 2P', monospace;
+      --dur: all 0.3s ease;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Canvas background ─── */
+    #cava-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ─── Top bar ─── */
+    #topbar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #topbar-left { display: flex; align-items: center; gap: 10px; }
+    #topbar-title { font-size: 10px; letter-spacing: 0.1em; color: var(--accent); }
+    #topbar-subtitle { font-size: 7px; color: var(--text-dim); margin-top: 2px; font-family: monospace; }
+
+    .top-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 7px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--dur);
+      letter-spacing: 0.05em;
+    }
+    .top-btn:hover { background: rgba(255,255,255,0.13); }
+    .top-btn.active { background: rgba(76,175,80,0.18); border-color: var(--accent); color: var(--accent); }
+
+    /* ─── Center stage ─── */
+    #stage {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── Timer card ─── */
+    #timer-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 36px 28px;
+      width: 380px;
+      max-width: 92vw;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+
+    /* ─── Mode tabs ─── */
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .mode-tab {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--text-dim);
+      font-family: var(--font);
+      font-size: 7px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--dur);
+      letter-spacing: 0.05em;
+    }
+    .mode-tab.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(76,175,80,0.12);
+    }
+
+    /* ─── Timer display ─── */
+    .timer-wrap {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 0 auto 20px;
+    }
+
+    .ring-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      position: absolute;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    .ring-prog {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(var(--ring-color, var(--accent)) 0%, transparent 0%);
+      position: absolute;
+      transition: background 0.5s ease;
+    }
+
+    .ring-inner {
+      position: absolute;
+      inset: 14px;
+      border-radius: 50%;
+      background: var(--surface-solid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #timer-text {
+      font-size: 22px;
+      color: var(--text);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Timer input ─── */
+    .time-input {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 9px;
+      padding: 10px 14px;
+      width: 200px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 16px;
+      transition: var(--dur);
+    }
+    .time-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
+    .time-input::placeholder { color: var(--text-dim); }
+
+    /* ─── Buttons ─── */
+    .main-btn {
+      font-family: var(--font);
+      font-size: 9px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 24px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      transition: var(--dur);
+      letter-spacing: 0.05em;
+      margin: 4px;
+    }
+    .main-btn:hover { background: var(--accent-hover); }
+    .main-btn.warn { background: var(--warn); color: #111; border-radius: 999px; }
+    .main-btn.paused-state { background: var(--danger); border-radius: 64px; }
+
+    .sec-btn {
+      font-family: var(--font);
+      font-size: 7px;
+      padding: 8px 16px;
+      border: 1.5px solid var(--danger);
+      background: transparent;
+      color: var(--danger);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--dur);
+      margin: 4px;
+    }
+    .sec-btn:hover { background: var(--danger); color: #fff; }
+
+    .lap-btn-el {
+      font-family: var(--font);
+      font-size: 7px;
+      padding: 8px 16px;
+      border: 1.5px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--dur);
+      margin: 4px;
+    }
+    .lap-btn-el:hover { background: var(--accent); color: #fff; }
+
+    .hidden { display: none !important; }
+
+    /* ─── Stopwatch ─── */
+    #sw-time {
+      font-size: 18px;
+      margin: 24px 0 20px;
+      color: var(--text);
+      letter-spacing: 0.04em;
+    }
+
+    #lap-list {
+      margin-top: 14px;
+      max-height: 130px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: left;
+      scrollbar-width: thin;
+    }
+    .lap-item {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 7px;
+      color: var(--text-dim);
+    }
+    .lap-item:last-child { border-bottom: none; }
+
+    /* ─── Alert overlay ─── */
+    #alert-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+    #alert-box {
+      background: var(--surface-solid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 360px;
+      width: 90vw;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    #alert-title { font-size: 14px; margin-bottom: 20px; color: var(--text); }
+    #alert-input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 16px;
+      font-family: var(--font);
+      font-size: 9px;
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      text-align: center;
+      outline: none;
+    }
+
+    /* ─── Settings drawer ─── */
+    #settings-panel {
+      position: fixed;
+      top: 0; right: -340px;
+      width: 320px;
+      height: 100%;
+      background: var(--surface-solid);
+      border-left: 1px solid var(--border);
+      z-index: 100;
+      overflow-y: auto;
+      padding: 20px;
+      transition: right 0.3s ease;
+      scrollbar-width: thin;
+    }
+    #settings-panel.open { right: 0; }
+    #settings-panel h2 { font-size: 10px; color: var(--accent); margin-bottom: 20px; letter-spacing: 0.08em; }
+    #settings-panel h3 { font-size: 8px; color: var(--text-dim); margin: 18px 0 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .srow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .srow label {
+      font-size: 7px;
+      color: var(--text-dim);
+      font-family: var(--font);
+      flex-shrink: 0;
+    }
+    .srow input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .srow input[type="number"],
+    .srow input[type="text"],
+    .srow select {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 7px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      width: 70px;
+      outline: none;
+    }
+    .srow select { width: auto; }
+    .srow input[type="color"] {
+      width: 34px;
+      height: 28px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+
+    .stoggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stoggle label { font-size: 7px; color: var(--text-dim); font-family: var(--font); }
+
+    /* simple toggle switch */
+    .toggle-sw { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .toggle-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-sw span {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid var(--border);
+    }
+    .toggle-sw span::before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      top: 2px; left: 2px;
+      background: var(--text-dim);
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .toggle-sw input:checked + span { background: rgba(76,175,80,0.3); border-color: var(--accent); }
+    .toggle-sw input:checked + span::before { transform: translateX(16px); background: var(--accent); }
+
+    #settings-close {
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 8px;
+      cursor: pointer;
+      transition: var(--dur);
+    }
+    #settings-close:hover { background: var(--accent-hover); }
+
+    .sval { font-size: 7px; color: var(--text-dim); min-width: 28px; text-align: right; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ CAVA Canvas (full-screen background) ═══════════ -->
+<canvas id="cava-canvas"></canvas>
+
+<!-- ═══════════ Top bar ═══════════ -->
+<div id="topbar">
+  <div id="topbar-left">
+    <a href="../apps/tools.html" style="color:var(--accent);font-size:9px;text-decoration:none;font-family:var(--font);letter-spacing:0.05em;">← Back</a>
+    <div>
+      <div id="topbar-title">TimerCAVA</div>
+      <div id="topbar-subtitle">by leaperStuff</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="top-btn" id="cava-src-mic">🎤 Mic</button>
+    <button class="top-btn" id="cava-src-tab">🖥 Tab</button>
+    <button class="top-btn" id="cava-src-stop">⏹ Stop</button>
+    <button class="top-btn" id="settings-open-btn">⚙ Settings</button>
+  </div>
+</div>
+
+<!-- ═══════════ Center: Timer card ═══════════ -->
+<div id="stage">
+  <div id="timer-card">
+
+    <!-- Mode tabs -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="timer">Timer</button>
+      <button class="mode-tab" data-mode="stopwatch">Stopwatch</button>
+    </div>
+
+    <!-- ── Timer mode ── -->
+    <div id="timer-section">
+      <div class="timer-wrap">
+        <div class="ring-bg"></div>
+        <div class="ring-prog" id="ring-prog"></div>
+        <div class="ring-inner">
+          <div id="timer-text">00:00</div>
+        </div>
+      </div>
+      <div>
+        <input type="text" class="time-input" id="timer-input" placeholder="e.g. 1:30, 90s, 2 min" />
+      </div>
+      <div>
+        <button class="main-btn" id="timer-toggle">Start</button>
+        <button class="sec-btn hidden" id="timer-stop">Stop</button>
+      </div>
+    </div>
+
+    <!-- ── Stopwatch mode ── -->
+    <div id="sw-section" class="hidden">
+      <div id="sw-time">00:00:00.00</div>
+      <div>
+        <button class="main-btn" id="sw-toggle">Start</button>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="lap-btn-el hidden" id="sw-lap">Lap</button>
+        <button class="sec-btn hidden" id="sw-stop">Stop</button>
+      </div>
+      <div id="lap-list" class="hidden"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ Alert overlay ═══════════ -->
+<div id="alert-overlay">
+  <div id="alert-box">
+    <div id="alert-title">Time's Up!</div>
+    <input type="text" id="alert-input" class="hidden" placeholder="Type STOP to confirm" />
+    <div>
+      <button class="main-btn" id="alert-ok">OK</button>
+      <button class="main-btn paused-state hidden" id="alert-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ Settings panel ═══════════ -->
+<div id="settings-panel">
+  <h2>Settings</h2>
+
+  <div class="stoggle">
+    <label class="toggle-sw">
+      <input type="checkbox" id="s-cava-enabled" checked />
+      <span></span>
+    </label>
+    <label for="s-cava-enabled">CAVA Visualizer</label>
+  </div>
+
+  <h3>Visualizer</h3>
+
+  <div class="srow">
+    <label>Mode</label>
+    <select id="s-orient">
+      <option value="vertical">Vertical</option>
+      <option value="radial">Radial</option>
+      <option value="horizontal">Horizontal</option>
+    </select>
+  </div>
+
+  <div class="srow">
+    <label>Bars</label>
+    <input type="range" id="s-bars" min="16" max="256" value="80" />
+    <span class="sval" id="s-bars-val">80</span>
+  </div>
+
+  <div class="srow">
+    <label>Gain</label>
+    <input type="range" id="s-gain" min="0.5" max="5" step="0.1" value="1.5" />
+    <span class="sval" id="s-gain-val">1.5</span>
+  </div>
+
+  <div class="srow">
+    <label>Smooth</label>
+    <input type="range" id="s-smooth" min="0" max="0.99" step="0.01" value="0.75" />
+    <span class="sval" id="s-smooth-val">0.75</span>
+  </div>
+
+  <div class="srow">
+    <label>Spacing</label>
+    <input type="range" id="s-spacing" min="0" max="12" step="0.5" value="2" />
+    <span class="sval" id="s-spacing-val">2</span>
+  </div>
+
+  <div class="srow">
+    <label>Cap height</label>
+    <input type="range" id="s-cap" min="0" max="20" step="1" value="4" />
+    <span class="sval" id="s-cap-val">4</span>
+  </div>
+
+  <div class="srow">
+    <label>Radius</label>
+    <input type="range" id="s-radius" min="0" max="20" step="1" value="4" />
+    <span class="sval" id="s-radius-val">4</span>
+  </div>
+
+  <div class="srow">
+    <label>Scale</label>
+    <input type="range" id="s-scale" min="0.2" max="2" step="0.05" value="0.9" />
+    <span class="sval" id="s-scale-val">0.9</span>
+  </div>
+
+  <div class="srow">
+    <label>Color 1</label>
+    <input type="color" id="s-g1" value="#4ade80" />
+  </div>
+  <div class="srow">
+    <label>Color 2</label>
+    <input type="color" id="s-g2" value="#22d3ee" />
+  </div>
+
+  <div class="srow">
+    <label>BG Opacity</label>
+    <input type="range" id="s-bgop" min="0" max="1" step="0.05" value="0.92" />
+    <span class="sval" id="s-bgop-val">0.92</span>
+  </div>
+
+  <h3>Timer</h3>
+  <div class="srow">
+    <label>Stop text</label>
+    <input type="text" id="s-stop-text" value="STOP" maxlength="20" style="width:100px;" />
+  </div>
+
+  <h3>Presets</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="top-btn" id="preset-neon">Neon</button>
+    <button class="top-btn" id="preset-ocean">Ocean</button>
+    <button class="top-btn" id="preset-radial">Radial</button>
+  </div>
+
+  <button id="settings-close">Close</button>
+</div>
+
+<script>
+/* ─────────────────────────────────
+   CAVA visualizer engine
+───────────────────────────────── */
+const canvas  = document.getElementById('cava-canvas');
+const ctx     = canvas.getContext('2d', { alpha: false });
+
+let audioCtx   = null;
+let analyser   = null;
+let gainNode   = null;
+let sourceNode = null;
+let streamRef  = null;
+let dataArray  = null;
+let animId     = null;
+let cavaEnabled = true;
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = Math.floor(window.innerWidth  * dpr);
+  canvas.height = Math.floor(window.innerHeight * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+function ensureCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = parseFloat(document.getElementById('s-gain').value);
+    analyser.smoothingTimeConstant = parseFloat(document.getElementById('s-smooth').value);
+    analyser.fftSize = 2048;
+    analyser.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+  }
+}
+
+function disconnectSrc() {
+  try { if (sourceNode) sourceNode.disconnect(); } catch(e) {}
+  sourceNode = null;
+}
+
+function stopStream() {
+  if (animId) cancelAnimationFrame(animId);
+  disconnectSrc();
+  if (streamRef) { streamRef.getTracks().forEach(t=>t.stop()); streamRef = null; }
+  clearCanvas();
+}
+
+function connectStream(stream) {
+  ensureCtx();
+  disconnectSrc();
+  sourceNode = audioCtx.createMediaStreamSource(stream);
+  sourceNode.connect(analyser);
+  setupData();
+  startRender();
+}
+
+function setupData() {
+  if (!analyser) return;
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+}
+
+function getBarValue(i, barCount) {
+  if (!dataArray) return 0;
+  const fc = dataArray.length;
+  const fs = Math.floor(Math.pow(2, (i/barCount) * Math.log2(Math.max(2,fc))));
+  const fe = Math.floor(Math.pow(2, ((i+1)/barCount) * Math.log2(Math.max(2,fc))));
+  let sum=0, cnt=0;
+  for(let b=Math.max(0,fs); b<Math.min(fc,Math.max(fs,fe+1)); b++) { sum+=dataArray[b]; cnt++; }
+  return cnt ? sum/cnt : 0;
+}
+
+function clearCanvas() {
+  const W = canvas.width/(window.devicePixelRatio||1);
+  const H = canvas.height/(window.devicePixelRatio||1);
+  ctx.fillStyle = '#0d0d14';
+  ctx.fillRect(0,0,W,H);
+}
+
+function startRender() {
+  if (!analyser) return;
+  if (animId) cancelAnimationFrame(animId);
+
+  const draw = () => {
+    animId = requestAnimationFrame(draw);
+    if (!cavaEnabled) { clearCanvas(); return; }
+
+    analyser.getByteFrequencyData(dataArray);
+
+    const barCount  = parseInt(document.getElementById('s-bars').value);
+    const spacingV  = parseFloat(document.getElementById('s-spacing').value);
+    const capH      = parseFloat(document.getElementById('s-cap').value);
+    const radiusV   = parseFloat(document.getElementById('s-radius').value);
+    const orient    = document.getElementById('s-orient').value;
+    const sc        = parseFloat(document.getElementById('s-scale').value);
+    const g1        = document.getElementById('s-g1').value;
+    const g2        = document.getElementById('s-g2').value;
+    const bgOp      = parseFloat(document.getElementById('s-bgop').value);
+
+    const W = canvas.width/(window.devicePixelRatio||1);
+    const H = canvas.height/(window.devicePixelRatio||1);
+
+    ctx.save();
+    ctx.globalAlpha = bgOp;
+    ctx.fillStyle = '#0d0d14';
+    ctx.fillRect(0,0,W,H);
+    ctx.restore();
+
+    if (orient === 'vertical') {
+      const totalSpc = spacingV * (barCount-1);
+      const barW = Math.max(1, (W-totalSpc)/barCount);
+      const grad = ctx.createLinearGradient(0,H,0,0);
+      grad.addColorStop(0, g1); grad.addColorStop(1, g2);
+      ctx.fillStyle = grad;
+      for(let i=0;i<barCount;i++) {
+        const v = getBarValue(i, barCount)/255 * sc;
+        const h = Math.max(0, Math.min(H, v*H));
+        const x = i*(barW+spacingV);
+        const y = H-h;
+        roundRect(ctx, x, y, barW, h, radiusV); ctx.fill();
+        if (capH>0) ctx.fillRect(x, Math.max(0,y-capH), barW, capH);
+      }
+    } else if (orient === 'horizontal') {
+      const totalSpc = spacingV*(barCount-1);
+      const barH = Math.max(1,(H-totalSpc)/barCount);
+      const grad = ctx.createLinearGradient(0,0,W,0);
+      grad.addColorStop(0,g1); grad.addColorStop(1,g2);
+      ctx.fillStyle = grad;
+      for(let i=0;i<barCount;i++) {
+        const v = getBarValue(i,barCount)/255*sc;
+        const w = Math.max(0,Math.min(W,v*W));
+        const y = i*(barH+spacingV);
+        roundRect(ctx,0,y,w,barH,radiusV); ctx.fill();
+        if (capH>0) ctx.fillRect(Math.max(0,w-capH),y,capH,barH);
+      }
+    } else if (orient === 'radial') {
+      const cx=W/2, cy=H/2;
+      const rb = Math.min(W,H)*0.12;
+      const ml = Math.min(W,H)*0.38;
+      const grad = ctx.createLinearGradient(0,0,W,H);
+      grad.addColorStop(0,g1); grad.addColorStop(1,g2);
+      ctx.strokeStyle = grad;
+      ctx.lineCap = 'round';
+      for(let i=0;i<barCount;i++) {
+        const angle = (i/barCount)*Math.PI*2;
+        const v = getBarValue(i,barCount)/255*sc;
+        const len = rb + v*ml;
+        ctx.lineWidth = Math.max(2,(W+H)/400);
+        ctx.beginPath();
+        ctx.moveTo(cx+Math.cos(angle)*rb, cy+Math.sin(angle)*rb);
+        ctx.lineTo(cx+Math.cos(angle)*len, cy+Math.sin(angle)*len);
+        ctx.stroke();
+      }
+    }
+  };
+  draw();
+}
+
+function roundRect(ctx,x,y,w,h,r) {
+  const rad = Math.min(r, Math.min(w,h)/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rad,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rad);
+  ctx.arcTo(x+w,y+h,x,y+h,rad);
+  ctx.arcTo(x,y+h,x,y,rad);
+  ctx.arcTo(x,y,x+w,y,rad);
+  ctx.closePath();
+}
+
+/* Source buttons */
+document.getElementById('cava-src-mic').addEventListener('click', async () => {
+  try {
+    stopStream();
+    const s = await navigator.mediaDevices.getUserMedia({ audio:true, video:false });
+    streamRef = s;
+    connectStream(s);
+    document.getElementById('cava-src-mic').classList.add('active');
+    document.getElementById('cava-src-tab').classList.remove('active');
+  } catch(err) { alert('Microphone access denied: '+(err.message||err)); }
+});
+
+document.getElementById('cava-src-tab').addEventListener('click', async () => {
+  try {
+    stopStream();
+    const s = await navigator.mediaDevices.getDisplayMedia({ audio:true, video:true });
+    streamRef = s;
+    connectStream(s);
+    document.getElementById('cava-src-tab').classList.add('active');
+    document.getElementById('cava-src-mic').classList.remove('active');
+  } catch(err) { alert('Tab capture failed: '+(err.message||err)); }
+});
+
+document.getElementById('cava-src-stop').addEventListener('click', () => {
+  stopStream();
+  document.getElementById('cava-src-mic').classList.remove('active');
+  document.getElementById('cava-src-tab').classList.remove('active');
+});
+
+/* Init AudioCtx on first click */
+window.addEventListener('click', function initOnce() {
+  ensureCtx();
+  if (audioCtx?.state === 'suspended') audioCtx.resume();
+  window.removeEventListener('click', initOnce);
+}, { once: true });
+
+clearCanvas();
+
+/* ─────────────────────────────────
+   Settings sync
+───────────────────────────────── */
+function syncSlider(sliderId, valId) {
+  const s = document.getElementById(sliderId);
+  const v = document.getElementById(valId);
+  v.textContent = s.value;
+  s.addEventListener('input', () => { v.textContent = s.value; });
+}
+syncSlider('s-bars','s-bars-val');
+syncSlider('s-gain','s-gain-val');
+syncSlider('s-smooth','s-smooth-val');
+syncSlider('s-spacing','s-spacing-val');
+syncSlider('s-cap','s-cap-val');
+syncSlider('s-radius','s-radius-val');
+syncSlider('s-scale','s-scale-val');
+syncSlider('s-bgop','s-bgop-val');
+
+document.getElementById('s-gain').addEventListener('input', () => {
+  if (gainNode) gainNode.gain.value = parseFloat(document.getElementById('s-gain').value);
+});
+document.getElementById('s-smooth').addEventListener('input', () => {
+  if (analyser) analyser.smoothingTimeConstant = parseFloat(document.getElementById('s-smooth').value);
+});
+document.getElementById('s-cava-enabled').addEventListener('change', e => {
+  cavaEnabled = e.target.checked;
+  if (!cavaEnabled) clearCanvas();
+});
+
+/* Presets */
+document.getElementById('preset-neon').addEventListener('click', () => {
+  document.getElementById('s-g1').value = '#ff3366';
+  document.getElementById('s-g2').value = '#ffd166';
+  document.getElementById('s-bars').value = 96; document.getElementById('s-bars-val').textContent = 96;
+  document.getElementById('s-smooth').value = 0.6; document.getElementById('s-smooth-val').textContent = '0.6';
+  document.getElementById('s-cap').value = 6; document.getElementById('s-cap-val').textContent = 6;
+  document.getElementById('s-orient').value = 'vertical';
+  if (analyser) analyser.smoothingTimeConstant = 0.6;
+});
+document.getElementById('preset-ocean').addEventListener('click', () => {
+  document.getElementById('s-g1').value = '#6de7ff';
+  document.getElementById('s-g2').value = '#9dffca';
+  document.getElementById('s-bars').value = 48; document.getElementById('s-bars-val').textContent = 48;
+  document.getElementById('s-smooth').value = 0.92; document.getElementById('s-smooth-val').textContent = '0.92';
+  document.getElementById('s-cap').value = 2; document.getElementById('s-cap-val').textContent = 2;
+  document.getElementById('s-orient').value = 'vertical';
+  if (analyser) analyser.smoothingTimeConstant = 0.92;
+});
+document.getElementById('preset-radial').addEventListener('click', () => {
+  document.getElementById('s-g1').value = '#b28cff';
+  document.getElementById('s-g2').value = '#ff9a9e';
+  document.getElementById('s-orient').value = 'radial';
+  document.getElementById('s-bars').value = 128; document.getElementById('s-bars-val').textContent = 128;
+  document.getElementById('s-smooth').value = 0.5; document.getElementById('s-smooth-val').textContent = '0.5';
+  if (analyser) analyser.smoothingTimeConstant = 0.5;
+});
+
+/* Settings open/close */
+const settingsPanel = document.getElementById('settings-panel');
+document.getElementById('settings-open-btn').addEventListener('click', () => settingsPanel.classList.toggle('open'));
+document.getElementById('settings-close').addEventListener('click', () => settingsPanel.classList.remove('open'));
+window.addEventListener('keydown', e => { if (e.key === 'Escape') settingsPanel.classList.remove('open'); });
+
+/* ─────────────────────────────────
+   Mode switching
+───────────────────────────────── */
+const modeTabs     = document.querySelectorAll('.mode-tab');
+const timerSection = document.getElementById('timer-section');
+const swSection    = document.getElementById('sw-section');
+let currentMode = 'timer';
+
+modeTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    modeTabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentMode = tab.dataset.mode;
+    timerSection.classList.toggle('hidden', currentMode !== 'timer');
+    swSection.classList.toggle('hidden', currentMode !== 'stopwatch');
+  });
+});
+
+/* ─────────────────────────────────
+   Timer logic
+───────────────────────────────── */
+let timerDuration  = 0;
+let timerRemaining = 0;
+let timerRunning   = false;
+let timerInterval  = null;
+const ringProg     = document.getElementById('ring-prog');
+const timerText    = document.getElementById('timer-text');
+const timerInput   = document.getElementById('timer-input');
+const timerToggle  = document.getElementById('timer-toggle');
+const timerStop    = document.getElementById('timer-stop');
+
+function parseTime(input) {
+  input = input.toLowerCase().trim();
+  if (input.includes('second')) return parseInt(input)*1000;
+  if (input.includes('minute')) return parseInt(input)*60000;
+  if (input.includes('hour'))   return parseInt(input)*3600000;
+  if (input.includes(':')) {
+    const p = input.split(':');
+    if (p.length===2) return (parseInt(p[0])*60+parseInt(p[1]))*1000;
+    if (p.length===3) return (parseInt(p[0])*3600+parseInt(p[1])*60+parseInt(p[2]))*1000;
+  }
+  if (input.endsWith('s')) return parseInt(input)*1000;
+  if (input.endsWith('m')) return parseInt(input)*60000;
+  return parseInt(input)*1000;
+}
+
+function fmtTimer(ms) {
+  const h = Math.floor(ms/3600000);
+  const m = Math.floor((ms%3600000)/60000);
+  const s = Math.floor((ms%60000)/1000);
+  if (h>0) return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  return `${pad(m)}:${pad(s)}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function updateRing() {
+  const pct = timerDuration ? timerRemaining/timerDuration : 0;
+  let col = pct>0.3 ? '#4CAF50' : pct>0.1 ? '#FFC107' : '#F44336';
+  ringProg.style.background = `conic-gradient(${col} ${(1-pct)*360}deg, transparent 0deg)`;
+  timerText.textContent = fmtTimer(timerRemaining);
+}
+
+function startTimer() {
+  if (timerDuration === 0) {
+    try {
+      timerDuration = parseTime(timerInput.value);
+      if (!timerDuration || timerDuration <= 0) { showAlert('Enter a valid time'); return; }
+    } catch { showAlert('Enter a valid time format'); return; }
+  }
+  timerRemaining = timerDuration;
+  timerRunning = true;
+  timerToggle.textContent = 'Pause';
+  timerToggle.classList.add('warn');
+  timerStop.classList.remove('hidden');
+  timerInput.disabled = true;
+  updateRing();
+  timerInterval = setInterval(() => {
+    timerRemaining -= 1000;
+    if (timerRemaining <= 0) {
+      timerRemaining = 0;
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerToggle.textContent = 'Start';
+      timerToggle.classList.remove('warn','paused-state');
+      timerStop.classList.add('hidden');
+      timerInput.disabled = false;
+      showAlert("Time's Up!", false);
+      playBeep();
+    }
+    updateRing();
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerToggle.textContent = 'Resume';
+  timerToggle.classList.remove('warn');
+  timerToggle.classList.add('paused-state');
+}
+
+function resumeTimer() {
+  timerRunning = true;
+  timerToggle.textContent = 'Pause';
+  timerToggle.classList.remove('paused-state');
+  timerToggle.classList.add('warn');
+  timerInterval = setInterval(() => {
+    timerRemaining -= 1000;
+    if (timerRemaining <= 0) {
+      timerRemaining = 0;
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerToggle.textContent = 'Start';
+      timerToggle.classList.remove('warn','paused-state');
+      timerStop.classList.add('hidden');
+      timerInput.disabled = false;
+      showAlert("Time's Up!", false);
+      playBeep();
+    }
+    updateRing();
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerDuration = 0;
+  timerRemaining = 0;
+  timerToggle.textContent = 'Start';
+  timerToggle.classList.remove('warn','paused-state');
+  timerStop.classList.add('hidden');
+  timerInput.disabled = false;
+  updateRing();
+}
+
+timerToggle.addEventListener('click', () => {
+  if (!timerRunning && timerRemaining === 0) startTimer();
+  else if (timerRunning) pauseTimer();
+  else resumeTimer();
+});
+
+timerStop.addEventListener('click', () => {
+  const stopTxt = document.getElementById('s-stop-text').value.trim();
+  if (stopTxt) showAlert(`Type "${stopTxt}" to stop`, true);
+  else stopTimer();
+});
+
+/* ─────────────────────────────────
+   Stopwatch logic
+───────────────────────────────── */
+let swRunning   = false;
+let swInterval  = null;
+let swTimeMs    = 0;
+let swStart     = 0;
+let swPauseMs   = 0;
+let laps        = [];
+
+const swTime   = document.getElementById('sw-time');
+const swToggle = document.getElementById('sw-toggle');
+const swStop   = document.getElementById('sw-stop');
+const swLap    = document.getElementById('sw-lap');
+const lapList  = document.getElementById('lap-list');
+
+function fmtSW(ms) {
+  const h  = Math.floor(ms/3600000);
+  const m  = Math.floor((ms%3600000)/60000);
+  const s  = Math.floor((ms%60000)/1000);
+  const cs = Math.floor((ms%1000)/10);
+  return `${pad(h)}:${pad(m)}:${pad(s)}.${pad(cs)}`;
+}
+
+function startSW() {
+  swRunning = true;
+  swToggle.textContent = 'Pause';
+  swToggle.classList.add('warn');
+  swStop.classList.remove('hidden');
+  swLap.classList.remove('hidden');
+  if (swPauseMs > 0) {
+    swStart = Date.now() - (swPauseMs - swStart);
+  } else {
+    swStart = Date.now();
+    laps = [];
+    lapList.innerHTML = '';
+    lapList.classList.add('hidden');
+  }
+  swInterval = setInterval(() => {
+    swTimeMs = Date.now() - swStart;
+    swTime.textContent = fmtSW(swTimeMs);
+  }, 10);
+}
+
+function pauseSW() {
+  clearInterval(swInterval);
+  swRunning = false;
+  swToggle.textContent = 'Resume';
+  swToggle.classList.remove('warn');
+  swToggle.classList.add('paused-state');
+  swPauseMs = Date.now();
+}
+
+function stopSW() {
+  clearInterval(swInterval);
+  swRunning = false;
+  swTimeMs = 0; swPauseMs = 0;
+  swToggle.textContent = 'Start';
+  swToggle.classList.remove('warn','paused-state');
+  swStop.classList.add('hidden');
+  swLap.classList.add('hidden');
+  lapList.classList.add('hidden');
+  swTime.textContent = '00:00:00.00';
+}
+
+function addLap() {
+  laps.push(swTimeMs);
+  if (lapList.classList.contains('hidden')) lapList.classList.remove('hidden');
+  const item = document.createElement('div');
+  item.className = 'lap-item';
+  item.textContent = `Lap ${laps.length}: ${fmtSW(swTimeMs)}`;
+  lapList.appendChild(item);
+  lapList.scrollTop = lapList.scrollHeight;
+}
+
+swToggle.addEventListener('click', () => { if (!swRunning) startSW(); else pauseSW(); });
+swStop.addEventListener('click', stopSW);
+swLap.addEventListener('click', addLap);
+
+/* ─────────────────────────────────
+   Alert
+───────────────────────────────── */
+const alertOverlay = document.getElementById('alert-overlay');
+const alertTitle   = document.getElementById('alert-title');
+const alertInput   = document.getElementById('alert-input');
+const alertOk      = document.getElementById('alert-ok');
+const alertCancel  = document.getElementById('alert-cancel');
+
+function showAlert(msg, requireInput=false) {
+  alertTitle.textContent = msg;
+  alertInput.classList.toggle('hidden', !requireInput);
+  alertCancel.classList.toggle('hidden', !requireInput);
+  if (requireInput) { alertInput.value = ''; alertInput.focus(); }
+  alertOverlay.style.display = 'flex';
+}
+function hideAlert() { alertOverlay.style.display = 'none'; }
+
+alertOk.addEventListener('click', () => {
+  if (!alertInput.classList.contains('hidden')) {
+    const stopTxt = document.getElementById('s-stop-text').value.trim().toUpperCase();
+    if (alertInput.value.toUpperCase() === stopTxt) {
+      if (currentMode === 'timer') stopTimer();
+      else stopSW();
+      hideAlert();
+    } else {
+      alertInput.value = '';
+      alertInput.focus();
+    }
+  } else {
+    hideAlert();
+  }
+});
+alertCancel.addEventListener('click', hideAlert);
+
+function playBeep() {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ac.createOscillator();
+    const gn  = ac.createGain();
+    osc.connect(gn); gn.connect(ac.destination);
+    osc.frequency.value = 880; osc.type = 'sine';
+    gn.gain.setValueAtTime(0, ac.currentTime);
+    gn.gain.linearRampToValueAtTime(0.5, ac.currentTime+0.05);
+    gn.gain.linearRampToValueAtTime(0, ac.currentTime+0.5);
+    osc.start(ac.currentTime); osc.stop(ac.currentTime+0.5);
+  } catch(e) {}
+}
+
+/* Keyboard shortcuts */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === ' ') {
+    e.preventDefault();
+    if (currentMode === 'timer') {
+      if (!timerRunning && timerRemaining===0) startTimer();
+      else if (timerRunning) pauseTimer();
+      else resumeTimer();
+    } else {
+      if (!swRunning) startSW(); else pauseSW();
+    }
+  }
+});
+
+/* Init display */
+updateRing();
+</script>
+</body>
+</html>
