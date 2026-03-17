@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-194ZHCENMF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-194ZHCENMF');
+</script>
+<!-- EnD -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="..//assets/roundedlogo.gif" />
+  <title>LeaperStuff — Tools</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    /* ── Tools grid ── */
+    .ls-tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    /* ── Tool card internals ── */
+    .ls-tool-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .ls-tool-card .wf-card-body {
+      flex: 1;
+      margin-top: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
+    .ls-tool-card .wf-btn {
+      margin-top: auto;
+      width: 100%;
+    }
+    .ls-tool-stats {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      text-align: right;
+      margin-top: var(--space-2);
+    }
+
+    /* ── Favourite button ── */
+    .ls-fav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      color: var(--text-tertiary);
+      padding: 0 0 0 8px;
+      transition: color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease-spring);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .ls-fav-btn.active { color: #ef476f; }
+    .ls-fav-btn:hover  { transform: scale(1.2); }
+
+    /* ── Tool icon badge ── */
+    .ls-tool-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--r-lg);
+      background: var(--accent-subtle);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Greeting / name edit ── */
+    .ls-greeting {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .ls-username-display {
+      color: var(--accent);
+      cursor: pointer;
+      border-bottom: 1.5px dashed rgba(245,166,35,0.4);
+      transition: border-color var(--dur-fast);
+      font-weight: 700;
+    }
+    .ls-username-display:hover {
+      border-color: var(--accent);
+    }
+    .ls-edit-hint {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+    }
+
+    /* ── Search ── */
+    .ls-search-wrap {
+      margin: 24px 0;
+      max-width: 480px;
+    }
+
+    /* ── Empty state ── */
+    .ls-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 48px 0;
+      color: var(--text-tertiary);
+    }
+    .ls-empty i { font-size: 36px; margin-bottom: 12px; display: block; opacity: 0.4; }
+
+    /* ── Ad ── */
+    #ad-container { margin: 24px auto; max-width: 728px; }
+
+    /* ── Footer ── */
+    .ls-footer {
+      margin-top: 64px;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav class="wf-navbar">
+    <div class="wf-navbar-inner">
+
+      <a href="../index.html" class="wf-navbar-brand">
+        <img src="..//assets/roundedlogo.gif" alt="LeaperStuff" class="wf-navbar-favicon"
+             onerror="this.style.display='none'">
+        <span class="wf-navbar-name">leaperStuff</span>
+      </a>
+
+      <nav class="wf-navbar-nav">
+        <a href="../index.html" class="wf-navbar-link">About</a>
+      </nav>
+
+    </div>
+  </nav>
+
+  <main style="padding-bottom: 40px;">
+    <div class="wf-container">
+
+      <!-- ═══════════ GREETING HERO ═══════════ -->
+      <section style="padding: 56px 0 8px;">
+        <div class="wf-overline" style="margin-bottom: var(--space-3);">Tools Library</div>
+
+        <div class="ls-greeting">
+          <h1 class="wf-h1" style="font-weight:800;">Hi,</h1>
+          <h1 class="wf-h1" style="font-weight:800;">
+            <span class="ls-username-display" id="username-display" title="Click to change name"></span>
+          </h1>
+          <span class="ls-edit-hint">— click your name to change it</span>
+        </div>
+
+        <p class="wf-body" style="margin-top: var(--space-3);">
+          Your most-used tools automatically move to the top.
+        </p>
+      </section>
+
+      <!-- ═══════════ SEARCH ═══════════ -->
+      <div class="ls-search-wrap">
+        <div class="wf-input-wrapper">
+          <span class="wf-input-icon-left"><i class="fas fa-search" style="font-size:13px;"></i></span>
+          <input
+            id="tool-search"
+            type="search"
+            class="wf-input wf-search has-icon-left"
+            placeholder="Search tools..."
+            autocomplete="off"
+          />
+        </div>
+      </div>
+      
+      <!-- ═══════════ TOOL GRID ═══════════ -->
+      <section id="tool-grid" class="ls-tool-grid"></section>
+
+      <!-- ═══════════ FOOTER ═══════════ -->
+      <footer class="ls-footer">
+        <p>© 2026 LeaperStuff. All rights reserved.</p>
+      </footer>
+
+    </div><!-- /wf-container -->
+  </main>
+
+  <script>
+    /* ─── Tool data ─── */
+    const baseTools = [
+      { id: "zencode",    title: "ZenCodeEdit",    icon: "fa-code",          desc: "The Editor for Peace.",                          link: "https://zencodeedit.vercel.app",       tags: "editor code zen" },
+      { id: "chatgun",    title: "leaperChatGun",  icon: "fa-comments",      desc: "Chat to a friend without login.",                link: "chatgun/leaperchatgun.html",           tags: "chat messaging anonymous" },
+      { id: "cava",       title: "CAVA Web",        icon: "fa-music",         desc: "UnOfficial CAVA Web visualizer.",                link: "cava/cava_web_unofficial.html",        tags: "audio visualizer music" },
+      { id: "infetch",    title: "inFetch",         icon: "fa-terminal",      desc: "Like neofetch but only ASCII.",                  link: "infetch/infetch.html",                 tags: "system fetch terminal" },
+      { id: "visuals",    title: "leprVisuals",     icon: "fa-chart-bar",     desc: "Cool Chart maker for your data.",                link: "visuals/visuals.html",  badge: "Popular", tags: "chart data visuals" },
+      { id: "hypr",       title: "leprHypr",        icon: "fa-desktop",       desc: "Cool Desktop Environment experience.",           link: "hyprlepr.html",         badge: "Linux",   tags: "linux desktop de" },
+      { id: "dash",       title: "leaperDash",      icon: "fa-tachometer-alt",desc: "Quick access dashboard for system info.",        link: "leprdash.html",                        tags: "dashboard stats" },
+      { id: "notes",      title: "leprNotes",       icon: "fa-file-lines",    desc: "A clean and fast notes app.",                   link: "notes/notes.html",                     tags: "notes taking notepad" },
+      { id: "vault",      title: "leprVault",       icon: "fa-vault",         desc: "Secure Encrypter and Decrypter.",                link: "vault.html",                           tags: "encrypt decrypt security" },
+      { id: "mark",       title: "leprMark",        icon: "fa-gauge-high",    desc: "Industrial hardware benchmark test.",            link: "leprmark/leprmark.html", badge: "Extreme", tags: "benchmark stress test gpu cpu" },
+      { id: "wafflent",   title: "Wafflent",        icon: "fa-solid fa-bezier-curve", desc: "Design system for leaperStuff.",        link: "design-system.html",                   tags: "design wafflent waffle leaperdesign material 3 liquid glass" },
+      { id: "materialblast", title: "Material Blast", icon: "fa-solid fa-gamepad", desc: "A fun game where you place blocks and clear lines. <a href='https://t.me/leaperstufftg/30' target='_blank' style='color:var(--accent);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:0.05em;'>⚠ KEEP ANDROID OPEN</a>", link: "games/materialblocks/apk/app-release.apk", badge: "Game", tags: "game games leprgame material blocks materialblocks leprmaterialblocks material-blocks" },
+      { id: "ocr",        title: "leprOCR",         icon: "fa-solid fa-barcode",      desc: "Simple OCR using Tesseract.js.",        link: "OCR.html",              badge: "Scan",    tags: "scan ocr leprocr text to image tool texttoimage" },
+      { id: "qr",         title: "leprQR",          icon: "fa-solid fa-barcode",      desc: "Simple yet powerfull QR Code gen.",     link: "QR.html",               badge: "Scan",    tags: "Scan make scan leprmake leprqrcode qr code barcode" },
+      { id: "todo",       title: "leprTodo",        icon: "fa-solid fa-list",         desc: "Simple yet powerfull Todo List.",       link: "todo.html",             badge: "List",    tags: "todo tasks googletasks reminders lol easteregg" },
+      { id: "fastool",    title: "Fastool",         icon: "fa-solid fa-bolt",         desc: "AI micro-code generator. Build tiny HTML tools fast.", link: "fastool.html", badge: "AI", tags: "ai code generator html tool fast micro puter" },
+      { id: "tempwrite",  title: "TempWrite",       icon: "fa-file-lines",            desc: "Temporary writer.",                     link: "tempwrite.html",        badge: "Writer",  tags: "temp temporary write" },
+      { id: "leprcal",       title: "leprCal",     icon: "fa-calendar-days",         desc: "Calendar + task manager. Tasks from leprTodo sync automatically.", link: "leprcal.html",        badge: "New", tags: "calendar tasks todo schedule reminders" },
+      { id: "leprtimercava", title: "TimerCAVA",   icon: "fa-wave-square",           desc: "LTI timer with CAVA audio visualizer as background.",              link: "leprtimercava.html",  badge: "New", tags: "timer cava visualizer audio music lti stopwatch" }
+    ];
+
+    /* ─── Persistence ─── */
+    let userStats = JSON.parse(localStorage.getItem('leaperStats')) || {};
+    let favorites = JSON.parse(localStorage.getItem('leaperFavs'))  || [];
+
+    const grid   = document.getElementById('tool-grid');
+    const search = document.getElementById('tool-search');
+
+    /* ─── Username (Basic Prompt Dialog) ─── */
+    const usernameDisplay = document.getElementById('username-display');
+
+    function loadUsername() {
+      return localStorage.getItem('leaperUsername') || 'User';
+    }
+    
+    function saveUsername(val) {
+      const clean = val.trim() || 'User';
+      localStorage.setItem('leaperUsername', clean);
+      return clean;
+    }
+    
+    function showUsername() {
+      usernameDisplay.textContent = loadUsername();
+    }
+
+    // Click handler using basic browser prompt dialog
+    usernameDisplay.addEventListener('click', function() {
+      const current = loadUsername();
+      const newName = prompt('Enter your display name:', current);
+      
+      // Only save if user didn't cancel (null) and input is not empty string after trim
+      if (newName !== null) {
+        saveUsername(newName);
+        showUsername();
+      }
+    });
+
+    // Initialize display
+    showUsername();
+
+    /* ─── Tool actions ─── */
+    function handleToolClick(id, url) {
+      userStats[id] = (userStats[id] || 0) + 1;
+      localStorage.setItem('leaperStats', JSON.stringify(userStats));
+      window.location.href = url;
+    }
+    
+    function toggleFav(id, e) {
+      e.stopPropagation();
+      const idx = favorites.indexOf(id);
+      if (idx > -1) favorites.splice(idx, 1);
+      else favorites.push(id);
+      localStorage.setItem('leaperFavs', JSON.stringify(favorites));
+      displayTools(search.value);
+    }
+
+    /* ─── Render ─── */
+    function displayTools(query = '') {
+      grid.innerHTML = '';
+
+      const sorted = [...baseTools].sort((a, b) => {
+        const aFav = favorites.includes(a.id) ? 1 : 0;
+        const bFav = favorites.includes(b.id) ? 1 : 0;
+        if (aFav !== bFav) return bFav - aFav;
+        const aC = userStats[a.id] || 0;
+        const bC = userStats[b.id] || 0;
+        if (aC !== bC) return bC - aC;
+        return a.title.localeCompare(b.title);
+      });
+
+      const filtered = sorted.filter(t =>
+        t.title.toLowerCase().includes(query.toLowerCase()) ||
+        t.tags.toLowerCase().includes(query.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="ls-empty">
+            <i class="fas fa-magnifying-glass"></i>
+            No tools match "<strong>${query}</strong>"
+          </div>`;
+        return;
+      }
+
+      filtered.forEach(t => {
+        const isFav  = favorites.includes(t.id);
+        const clicks = userStats[t.id] || 0;
+
+        const card = document.createElement('div');
+        card.className = 'wf-card wf-card-hover ls-tool-card';
+        card.innerHTML = `
+          <div class="wf-card-header">
+            <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+              <div class="ls-tool-icon"><i class="fas ${t.icon}"></i></div>
+              <div class="wf-card-title" style="margin:0;">${t.title}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              ${t.badge ? `<span class="wf-chip wf-chip-accent" style="font-size:10px; padding:3px 8px;">${t.badge}</span>` : ''}
+              <button
+                class="ls-fav-btn ${isFav ? 'active' : ''}"
+                onclick="toggleFav('${t.id}', event)"
+                title="${isFav ? 'Remove from favourites' : 'Add to favourites'}"
+                aria-label="${isFav ? 'Remove from favourites' : 'Add to favourites'}"
+              ><i class="fas fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="wf-card-body">${t.desc}</div>
+          <button class="wf-btn wf-btn-filled" onclick="handleToolClick('${t.id}', '${t.link}')">
+            Go <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+          </button>
+          ${clicks > 0 ? `<div class="ls-tool-stats">Used ${clicks} time${clicks !== 1 ? 's' : ''}</div>` : ''}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    search.addEventListener('input', e => displayTools(e.target.value));
+    window.onload = () => displayTools();
+  </script>
+</body>
+</html>
