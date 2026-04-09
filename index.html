@@ -1,228 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="/assets/roundedlogo.gif">
-  <title>Leaper — Fast Notes</title>
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goodbye leaperStuff, hello Wafflent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <style>
-    .hp-page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            color: #e4e4e4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            line-height: 1.8;
+        }
 
-    /* Hero */
-    .hp-hero {
-      padding: 96px 0 72px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .hp-hero::before {
-      content: '';
-      position: absolute;
-      top: -80px; left: 50%;
-      transform: translateX(-50%);
-      width: 700px; height: 700px;
-      background: radial-gradient(ellipse at center, rgba(245,166,35,0.08) 0%, transparent 68%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .hp-hero > * { position: relative; z-index: 1; }
+        .container {
+            max-width: 700px;
+            text-align: center;
+            animation: fadeIn 2s ease-in;
+        }
 
-    /* App name */
-    .hp-app-name {
-      font-size: clamp(48px, 8vw, 80px);
-      font-weight: 800;
-      letter-spacing: -3px;
-      line-height: 1;
-      color: var(--text-primary);
-      margin-bottom: var(--space-5);
-    }
-    .hp-app-name span { color: var(--accent); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    /* Pillars */
-    .hp-pillars {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-6);
-      flex-wrap: wrap;
-      margin-bottom: var(--space-10);
-    }
-    .hp-pillar {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      font-size: var(--text-sm);
-      color: var(--text-tertiary);
-      font-weight: 500;
-    }
-    .hp-pillar i { color: var(--accent); font-size: 12px; }
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            color: #9ca3af;
+            text-transform: lowercase;
+        }
 
-    /* CTA row */
-    .hp-cta {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-3);
-      flex-wrap: wrap;
-    }
+        .subtitle {
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: #60a5fa;
+            margin-bottom: 3rem;
+            text-transform: lowercase;
+        }
 
-    /* Features */
-    .hp-features {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-      padding-bottom: 64px;
-    }
-    .hp-feature-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--r-lg);
-      background: var(--accent-subtle);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      margin-bottom: var(--space-4);
-    }
+        .divider {
+            width: 120px;
+            height: 1px;
+            background: rgba(156, 163, 175, 0.3);
+            margin: 2rem auto;
+        }
 
-    /* Footer */
-    .hp-footer {
-      margin-top: auto;
-      padding: 32px 0;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-    .hp-footer p { color: var(--text-tertiary); font-size: var(--text-sm); }
-    .hp-footer p + p { margin-top: 6px; }
-  </style>
+        p {
+            font-size: 1.1rem;
+            color: #d1d5db;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .memory {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid rgba(156, 163, 175, 0.3);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+            font-size: 0.95rem;
+            color: #9ca3af;
+            border-radius: 4px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        a {
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .primary {
+            background: rgba(96, 165, 250, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .primary:hover {
+            background: rgba(96, 165, 250, 0.25);
+            border-color: rgba(96, 165, 250, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .secondary {
+            background: rgba(156, 163, 175, 0.1);
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.2);
+        }
+
+        .secondary:hover {
+            background: rgba(156, 163, 175, 0.15);
+            border-color: rgba(156, 163, 175, 0.3);
+        }
+
+        .farewell {
+            margin-top: 4rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-style: normal;
+        }
+
+        .rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .drop {
+            position: absolute;
+            width: 1px;
+            height: 20px;
+            background: linear-gradient(transparent, rgba(156, 163, 175, 0.1));
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .subtitle {
+                font-size: 1.8rem;
+            }
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="rain" id="rain"></div>
+    
+    <div class="container">
+        <h1>goodbye leaperStuff</h1>
+        <div class="divider"></div>
+        <h2 class="subtitle">hello Wafflent</h2>
 
-<div class="hp-page">
+        <p>Every project has its time, and every ending makes way for something new.</p>
 
-  <!-- NAVBAR -->
-  <nav class="wf-navbar">
-    <div class="wf-navbar-inner">
-      <a href="/" class="wf-navbar-brand">
-        <img src="/assets/roundedlogo.gif" alt="leaperStuff" class="wf-navbar-favicon"
-             onerror="this.style.display='none'">
-        <span class="wf-navbar-name">leaperStuff</span>
-      </a>
+        <div class="memory">
+            leaperStuff was where it all began — a collection of experiments, ideas, and late-night builds. It wasn't perfect, but it was ours. The terminal, the packages, the commands we crafted... they served their purpose.
+        </div>
 
-      <nav class="wf-navbar-nav" id="nav-links">
-        <a href="/app/" class="wf-navbar-link">App</a>
-      </nav>
+        <p>But seasons change, and so do we.</p>
+        
+        <p>Wafflent isn't just another iteration — it's a different path. Secure, peer-to-peer, focused. Built on what we learned, but free from what held us back.</p>
 
-      <div class="wf-navbar-actions">
-        <button class="wf-navbar-hamburger" id="hamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+        <div class="buttons">
+            <a href="https://wafflent.vercel.app" class="primary" id="wafflentLink">Enter Wafflent →</a>
+            <a href="oldoldindex.html" class="secondary">Visit leaperStuff one last time</a>
+        </div>
+
+        <p class="farewell">Thank you for being part of the journey.</p>
     </div>
-  </nav>
 
-  <main style="flex:1;">
-    <div class="wf-container">
+    <script>
+        function createRain() {
+            const rain = document.getElementById('rain');
+            const dropCount = 50;
+            
+            for (let i = 0; i < dropCount; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'drop';
+                drop.style.left = Math.random() * 100 + '%';
+                drop.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                drop.style.animationDelay = Math.random() * 2 + 's';
+                rain.appendChild(drop);
+            }
+        }
 
-      <!-- HERO -->
-      <section class="hp-hero">
-        <span class="wf-hero-eyebrow">Local-first &middot; Open source &middot; Fast</span>
-        <h1 class="hp-app-name">leaper<span>Stuff</span></h1>
-        <p class="wf-hero-desc">
-          A minimal, blazing-fast notes app. Write without friction.
-          Extend with slash commands.
-        </p>
+        document.getElementById('wafflentLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            const wafflentUrl = prompt('Enter Wafflent URL:', 'https://');
+            if (wafflentUrl && wafflentUrl !== 'https://' && wafflentUrl.trim() !== '') {
+                window.location.href = wafflentUrl;
+            }
+        });
 
-        <div class="hp-pillars">
-          <span class="hp-pillar"><i class="fas fa-bolt"></i> Instant typing</span>
-          <span class="hp-pillar"><i class="fas fa-lock"></i> Local-first</span>
-          <span class="hp-pillar"><i class="fas fa-puzzle-piece"></i> Extensible</span>
-          <span class="hp-pillar"><i class="fas fa-ban"></i> No ads</span>
-        </div>
-
-        <div class="hp-cta">
-          <a href="/app/" class="wf-btn wf-btn-filled wf-btn-lg">
-            <i class="fas fa-pen"></i>&nbsp; App
-          </a>
-        </div>
-      </section>
-
-      <!-- FEATURES -->
-      <section id="features" class="hp-features">
-
-        <div class="wf-card wf-card-hover">
-          <div class="hp-feature-icon"><i class="fas fa-bolt"></i></div>
-          <div class="wf-card-header">
-            <div class="wf-card-title">Zero-lag Editor</div>
-          </div>
-          <div class="wf-card-body">
-            DOM-based editor optimised for low-end devices. Typing always feels instant.
-          </div>
-        </div>
-
-        <div class="wf-card wf-card-hover">
-          <div class="hp-feature-icon"><i class="fas fa-eye"></i></div>
-          <div class="wf-card-header">
-            <div class="wf-card-title">Smart Live Preview</div>
-            <span class="wf-chip wf-chip-accent">Default</span>
-          </div>
-          <div class="wf-card-body">
-            Current line stays raw markdown while you type. Everything else renders instantly.
-          </div>
-        </div>
-
-        <div class="wf-card wf-card-hover">
-          <div class="hp-feature-icon"><i class="fas fa-slash"></i></div>
-          <div class="wf-card-header">
-            <div class="wf-card-title">Slash Commands</div>
-            <span class="wf-chip wf-chip-success">Extensible</span>
-          </div>
-          <div class="wf-card-body">
-            Type <code>/canvas</code>, <code>/mermaid</code>, or <code>/ai</code> to insert rich blocks on demand.
-          </div>
-        </div>
-
-        <div class="wf-card wf-card-hover wf-card-accent">
-          <div class="hp-feature-icon"><i class="fas fa-hard-drive"></i></div>
-          <div class="wf-card-header">
-            <div class="wf-card-title">Local-First Storage</div>
-          </div>
-          <div class="wf-card-body">
-            Saves to <code>localStorage</code> instantly. Optional GUN.js sync — push/pull on your terms.
-          </div>
-        </div>
-
-      </section>
-
-    </div>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="hp-footer">
-    <div class="wf-container">
-      <p>&copy; 2026 Leaper. Built by Ivaan Srivastava.</p>
-      <p>
-        <a href="/Legacy/">LeaperStuff legacy tools</a> &nbsp;&middot;&nbsp;
-        <a href="https://github.com/ivaansrivastavadev/leaperStuff">GitHub</a>
-      </p>
-    </div>
-  </footer>
-
-</div>
-
-<script>
-  document.getElementById('hamburger').addEventListener('click', function () {
-    document.getElementById('nav-links').classList.toggle('open');
-  });
-</script>
-
+        createRain();
+    </script>
 </body>
 </html>
