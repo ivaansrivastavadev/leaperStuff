@@ -1,0 +1,40 @@
+    /* ===== LAYOUT SYSTEM ===== */
+    /* Hero section */
+    .hero {
+      text-align: center;
+      margin: 4rem auto;
+      max-width: 700px;
+    }
+
+    /* Features section */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .feature {
+      min-height: 200px;
+    }
+
+    /* Contact section */
+    .contact {
+      margin: 4rem auto;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    /* Brand styling */
+    .brand {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--color1);
+    }

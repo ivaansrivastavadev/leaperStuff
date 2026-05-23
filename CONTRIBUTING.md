@@ -1,4 +1,4 @@
-# Contributing to LeaperINC
+# Contributing to leaperStuff
 
 Thank you for your interest in contributing! We welcome contributions from the community.
 

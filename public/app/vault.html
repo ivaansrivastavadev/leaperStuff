@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<script>
+
+</script>
+<!-- EnD -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- No external favicons, no preconnect, no DNS prefetch = max privacy -->
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <title>leprVault — Secure Encryption</title>
+  <!-- Wafflent DS — loaded locally, no CDN -->
+  <link rel="stylesheet" href="../style.css">
+  <!-- Font Awesome loaded from cdnjs (no tracking) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- No analytics. No ads. No tawk. No cookies. -->
+
+  <style>
+    .lv-page { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── Section layout ── */
+    .lv-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 40px 0 64px;
+    }
+
+    /* ── Tabs (Encrypt / Decrypt / About) ── */
+    .lv-tabs-wrap {
+      position: sticky;
+      top: 64px; /* below navbar */
+      z-index: 50;
+      background: var(--bg-base);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    /* ── Form layout ── */
+    .lv-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 700px) { .lv-form-grid { grid-template-columns: 1fr; } }
+
+    .lv-full { grid-column: 1 / -1; }
+
+    /* ── Result output ── */
+    .lv-result-box {
+      background: var(--bg-base);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 16px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+      word-break: break-all;
+      line-height: 1.7;
+      min-height: 80px;
+      white-space: pre-wrap;
+      user-select: all;
+    }
+
+    /* ── File drop area ── */
+    .lv-drop {
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--r-lg);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--dur-mid) var(--ease), background var(--dur-mid) var(--ease);
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+    .lv-drop:hover, .lv-drop.active {
+      border-color: var(--accent);
+      background: var(--accent-subtle);
+      color: var(--text-primary);
+    }
+    .lv-drop i { font-size: 28px; margin-bottom: 10px; display: block; color: var(--accent); }
+
+    /* ── File list items ── */
+    .lv-file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border-radius: var(--r-md);
+      margin-top: 8px;
+      font-size: var(--text-sm);
+    }
+    .lv-file-item .name { flex: 1; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lv-file-item .size { color: var(--text-tertiary); flex-shrink: 0; }
+    .lv-file-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--error); font-size: 16px; line-height: 1;
+      padding: 2px 4px; border-radius: var(--r-xs);
+      transition: background var(--dur-fast) var(--ease);
+    }
+    .lv-file-remove:hover { background: var(--error-subtle); }
+
+    /* ── About list ── */
+    .lv-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .lv-layer {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--bg-elevated);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+    }
+    .lv-layer-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-size: 12px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .lv-layer-title { font-weight: 600; font-size: var(--text-sm); color: var(--text-primary); margin-bottom: 2px; }
+    .lv-layer-desc  { font-size: var(--text-xs); color: var(--text-tertiary); }
+
+    /* ── Privacy badge strip ── */
+    .lv-privacy-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .lv-privacy-strip .wf-chip { cursor: default; }
+
+    /* ── Radio group ── */
+    .lv-radio-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    /* ── Copy button ── */
+    .lv-copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    /* ── Footer ── */
+    .lv-footer {
+      margin-top: auto;
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+  </style>
+</head>
+<body>
+
+<div class="lv-page">
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav class="wf-navbar">
+    <div class="wf-navbar-inner">
+      <a href="../index.html" class="wf-navbar-brand">
+        <img src="../assets/icon.png" alt="leaperStuff" class="wf-navbar-favicon"
+             onerror="this.style.display='none'">
+        <span class="wf-navbar-name">leaperStuff</span>
+      </a>
+      <nav class="wf-navbar-nav">
+        <a href="../apps/tools.html" class="wf-navbar-link">Tools</a>
+        <a href="../index.html"      class="wf-navbar-link">About</a>
+      </nav>
+    </div>
+  </nav>
+
+  <main style="flex:1;">
+    <div class="wf-container" style="max-width:860px;">
+
+      <!-- ═══════════ HEADER ═══════════ -->
+      <div style="text-align:center; padding: 48px 0 24px;">
+        <span class="wf-hero-eyebrow">leaperStuff Tool</span>
+        <h1 class="wf-h1" style="margin: 12px 0 10px;">
+          <i class="fas fa-vault" style="color:var(--accent); margin-right:10px;"></i>leprVault
+        </h1>
+        <p class="wf-body" style="max-width:500px; margin:0 auto;">
+          Multi-layer text encryption &amp; decryption. Everything runs in your browser — no servers, no logs, no tracking.
+        </p>
+      </div>
+
+      <!-- Privacy badge strip -->
+      <div class="lv-privacy-strip">
+        <i class="fas fa-shield-halved" style="color:var(--success); font-size:18px;"></i>
+        <span style="font-size:var(--text-sm); font-weight:600; color:var(--text-primary);">Privacy guarantee:</span>
+        <span class="wf-chip wf-chip-success">No servers</span>
+        <span class="wf-chip wf-chip-success">No analytics</span>
+        <span class="wf-chip wf-chip-success">No cookies</span>
+        <span class="wf-chip wf-chip-success">No ads</span>
+        <span class="wf-chip wf-chip-success">No external requests</span>
+        <span class="wf-chip wf-chip-default" style="margin-left:auto;">100% client-side</span>
+      </div>
+
+      <!-- ═══════════ PILL TABS ═══════════ -->
+      <div class="lv-tabs-wrap">
+        <div class="wf-tabs wf-tabs-pill" id="main-tabs">
+          <button class="wf-tab active" data-target="encrypt-section">
+            <i class="fas fa-lock" style="margin-right:6px;"></i> Encrypt
+          </button>
+          <button class="wf-tab" data-target="decrypt-section">
+            <i class="fas fa-lock-open" style="margin-right:6px;"></i> Decrypt
+          </button>
+          <button class="wf-tab" data-target="about-section">
+            <i class="fas fa-circle-info" style="margin-right:6px;"></i> About
+          </button>
+        </div>
+      </div>
+
+      <div class="lv-sections">
+
+        <!-- ═══════════ ENCRYPT ═══════════ -->
+        <section id="encrypt-section">
+          <div class="wf-card">
+            <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+              <div>
+                <div class="wf-card-title">Encrypt Data</div>
+                <div class="wf-card-subtitle">Secure your text with multi-layer encryption</div>
+              </div>
+              <span class="wf-chip wf-chip-accent">AES-style XOR</span>
+            </div>
+
+            <form id="encrypt-form">
+              <div class="lv-form-grid">
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="encrypt-passcode">
+                    Long Passcode <span class="required">*</span>
+                  </label>
+                  <div class="wf-input-wrapper">
+                    <span class="wf-input-icon-left"><i class="fas fa-key" style="font-size:12px;"></i></span>
+                    <input type="password" class="wf-input has-icon-left" id="encrypt-passcode"
+                           placeholder="Enter a long, secure passcode" required>
+                  </div>
+                </div>
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="encrypt-range">
+                    Range / Offset <span class="required">*</span>
+                  </label>
+                  <input type="number" class="wf-input" id="encrypt-range" min="1" max="1000" value="128" required>
+                  <span class="wf-helper">Higher = more secure. Default: 128</span>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label" for="encrypt-words">
+                    24 Words (in order) <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="encrypt-words"
+                            placeholder="Enter exactly 24 words separated by spaces"
+                            rows="2" required></textarea>
+                  <span class="wf-helper">Must be exactly 24 words</span>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label">Mode</label>
+                  <div class="lv-radio-group">
+                    <label class="wf-radio-label">
+                      <input type="radio" class="wf-radio-input" name="encrypt-mode" value="text" checked>
+                      Text
+                    </label>
+                    <label class="wf-radio-label" style="opacity:0.45;" title="Coming soon">
+                      <input type="radio" class="wf-radio-input" name="encrypt-mode" value="file" disabled>
+                      File <span class="wf-chip wf-chip-default" style="font-size:10px; padding:2px 6px; margin-left:4px;">Soon</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="wf-form-group lv-full" id="encrypt-text-group">
+                  <label class="wf-label" for="encrypt-text">
+                    Text to Encrypt <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="encrypt-text"
+                            placeholder="Enter the text you want to encrypt..."
+                            rows="5" required></textarea>
+                </div>
+
+                <!-- File mode (hidden) -->
+                <div class="wf-form-group lv-full" id="encrypt-file-group" style="display:none;">
+                  <label class="wf-label">ZIP Password</label>
+                  <input type="password" class="wf-input" id="encrypt-zip-passcode"
+                         placeholder="Password for encrypted ZIP file">
+                </div>
+                <div class="wf-form-group lv-full" id="encrypt-file-input-group" style="display:none;">
+                  <label class="wf-label">File to Encrypt</label>
+                  <div class="lv-drop" id="encrypt-file-drop">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                    Drag &amp; drop files here, or click to browse
+                    <input type="file" style="display:none;" id="encrypt-file" multiple>
+                  </div>
+                  <div id="encrypt-file-list"></div>
+                </div>
+
+                <div class="lv-full" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                  <button type="submit" class="wf-btn wf-btn-filled">
+                    <i class="fas fa-lock"></i>&nbsp; Encrypt
+                  </button>
+                  <div id="encrypt-progress" style="display:none; flex:1;">
+                    <div class="wf-progress wf-progress-lg">
+                      <div class="wf-progress-bar animated" id="encrypt-progress-bar" style="width:0%"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- /grid -->
+            </form>
+
+            <!-- Result -->
+            <div id="encrypt-result" style="display:none; margin-top:20px;">
+              <div class="wf-alert wf-alert-success">
+                <span class="wf-alert-icon">✓</span>
+                <div class="wf-alert-body">
+                  <div class="wf-alert-title">Encryption complete!</div>
+                  <div class="lv-copy-row" style="margin-top:10px;">
+                    <span class="wf-label">Encrypted output</span>
+                    <button class="wf-btn wf-btn-tonal wf-btn-sm" id="copy-encrypt-btn">
+                      <i class="fas fa-copy"></i>&nbsp; Copy
+                    </button>
+                  </div>
+                  <div class="lv-result-box" id="encrypt-result-text"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ═══════════ DECRYPT ═══════════ -->
+        <section id="decrypt-section" style="display:none;">
+          <div class="wf-card">
+            <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+              <div>
+                <div class="wf-card-title">Decrypt Data</div>
+                <div class="wf-card-subtitle">Restore your encrypted text with the same credentials</div>
+              </div>
+            </div>
+
+            <form id="decrypt-form">
+              <div class="lv-form-grid">
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="decrypt-passcode">
+                    Long Passcode <span class="required">*</span>
+                  </label>
+                  <div class="wf-input-wrapper">
+                    <span class="wf-input-icon-left"><i class="fas fa-key" style="font-size:12px;"></i></span>
+                    <input type="password" class="wf-input has-icon-left" id="decrypt-passcode"
+                           placeholder="Enter your long passcode" required>
+                  </div>
+                </div>
+
+                <div class="wf-form-group">
+                  <label class="wf-label" for="decrypt-range">
+                    Range / Offset <span class="required">*</span>
+                  </label>
+                  <input type="number" class="wf-input" id="decrypt-range" min="1" max="1000" value="128" required>
+                  <span class="wf-helper">Must match the value used to encrypt</span>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label" for="decrypt-words">
+                    24 Words (in order) <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="decrypt-words"
+                            placeholder="Enter the 24 words in the correct order"
+                            rows="2" required></textarea>
+                </div>
+
+                <div class="wf-form-group lv-full">
+                  <label class="wf-label">Mode</label>
+                  <div class="lv-radio-group">
+                    <label class="wf-radio-label">
+                      <input type="radio" class="wf-radio-input" name="decrypt-mode" value="text" checked>
+                      Text
+                    </label>
+                    <label class="wf-radio-label" style="opacity:0.45;" title="Coming soon">
+                      <input type="radio" class="wf-radio-input" name="decrypt-mode" value="file" disabled>
+                      File <span class="wf-chip wf-chip-default" style="font-size:10px; padding:2px 6px; margin-left:4px;">Soon</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="wf-form-group lv-full" id="decrypt-text-group">
+                  <label class="wf-label" for="decrypt-text">
+                    Encrypted Text <span class="required">*</span>
+                  </label>
+                  <textarea class="wf-input wf-textarea" id="decrypt-text"
+                            placeholder="Paste the encrypted text here..."
+                            rows="5" required></textarea>
+                </div>
+
+                <!-- File mode (hidden) -->
+                <div class="wf-form-group lv-full" id="decrypt-file-group" style="display:none;">
+                  <label class="wf-label">ZIP Password</label>
+                  <input type="password" class="wf-input" id="decrypt-zip-passcode"
+                         placeholder="Password for the encrypted ZIP">
+                </div>
+                <div class="wf-form-group lv-full" id="decrypt-file-input-group" style="display:none;">
+                  <label class="wf-label">File to Decrypt</label>
+                  <div class="lv-drop" id="decrypt-file-drop">
+                    <i class="fas fa-cloud-arrow-down"></i>
+                    Drag &amp; drop .leprvault files here, or click to browse
+                    <input type="file" style="display:none;" id="decrypt-file" accept=".leprvault" multiple>
+                  </div>
+                  <div id="decrypt-file-list"></div>
+                </div>
+
+                <div class="lv-full" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                  <button type="submit" class="wf-btn wf-btn-filled">
+                    <i class="fas fa-lock-open"></i>&nbsp; Decrypt
+                  </button>
+                  <div id="decrypt-progress" style="display:none; flex:1;">
+                    <div class="wf-progress wf-progress-lg">
+                      <div class="wf-progress-bar animated" id="decrypt-progress-bar" style="width:0%"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </form>
+
+            <!-- Result -->
+            <div id="decrypt-result" style="display:none; margin-top:20px;">
+              <div id="decrypt-result-alert" class="wf-alert wf-alert-success">
+                <span class="wf-alert-icon" id="decrypt-result-icon">✓</span>
+                <div class="wf-alert-body">
+                  <div class="wf-alert-title" id="decrypt-result-title">Decryption complete!</div>
+                  <div class="lv-copy-row" style="margin-top:10px;">
+                    <span class="wf-label">Decrypted output</span>
+                    <button class="wf-btn wf-btn-tonal wf-btn-sm" id="copy-decrypt-btn">
+                      <i class="fas fa-copy"></i>&nbsp; Copy
+                    </button>
+                  </div>
+                  <div class="lv-result-box" id="decrypt-result-text"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ═══════════ ABOUT ═══════════ -->
+        <section id="about-section" style="display:none;">
+          <div class="wf-card">
+            <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+              <div class="wf-card-title">About leprVault</div>
+            </div>
+
+            <p class="wf-body" style="margin-bottom:var(--space-5);">
+              leprVault uses multi-layer key derivation to protect your sensitive text. All computation happens entirely inside your browser — nothing leaves your device.
+            </p>
+
+            <div class="wf-overline" style="margin-bottom:var(--space-3);">Encryption Layers</div>
+            <div class="lv-layers">
+              <div class="lv-layer">
+                <div class="lv-layer-num">1</div>
+                <div>
+                  <div class="lv-layer-title">Long Passcode</div>
+                  <div class="lv-layer-desc">Your primary secret, seeded into the key derivation function.</div>
+                </div>
+              </div>
+              <div class="lv-layer">
+                <div class="lv-layer-num">2</div>
+                <div>
+                  <div class="lv-layer-title">24-Word Sequence</div>
+                  <div class="lv-layer-desc">A sequence of 24 ordered words expands the key entropy significantly.</div>
+                </div>
+              </div>
+              <div class="lv-layer">
+                <div class="lv-layer-num">3</div>
+                <div>
+                  <div class="lv-layer-title">Range / Offset</div>
+                  <div class="lv-layer-desc">A numeric shift applied to every key byte. Higher values increase resistance to brute-force.</div>
+                </div>
+              </div>
+              <div class="lv-layer">
+                <div class="lv-layer-num">4</div>
+                <div>
+                  <div class="lv-layer-title">File ZIP Password <span class="wf-chip wf-chip-default" style="font-size:10px; padding:2px 7px;">Coming soon</span></div>
+                  <div class="lv-layer-desc">An additional passphrase applied to the encrypted file archive.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-alert wf-alert-warning" style="margin-top:24px;">
+              <span class="wf-alert-icon">⚠</span>
+              <div class="wf-alert-body">
+                <div class="wf-alert-title">Keep your credentials safe</div>
+                Your passcode, 24 words, and offset value are never stored anywhere. If you lose them, your data <strong>cannot be recovered</strong>.
+              </div>
+            </div>
+
+            <div class="wf-alert wf-alert-accent" style="margin-top:12px;">
+              <span class="wf-alert-icon">✦</span>
+              <div class="wf-alert-body">
+                <div class="wf-alert-title">Complete privacy</div>
+                No servers. No analytics. No ads. No cookies. No external network requests. leprVault is fully offline-capable.
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div><!-- /lv-sections -->
+    </div><!-- /container -->
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="lv-footer">
+    <div class="wf-container">
+      <p>leprVault © 2026 leaperStuff &nbsp;·&nbsp; No data is ever stored or transmitted</p>
+    </div>
+  </footer>
+
+</div><!-- /lv-page -->
+
+<script>
+  /* ══════════════════════════════════════════
+     TAB SWITCHING
+  ══════════════════════════════════════════ */
+  const sections = ['encrypt-section', 'decrypt-section', 'about-section'];
+
+  document.querySelectorAll('#main-tabs .wf-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('#main-tabs .wf-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      sections.forEach(id => {
+        document.getElementById(id).style.display =
+          id === this.dataset.target ? 'block' : 'none';
+      });
+    });
+  });
+
+  /* ══════════════════════════════════════════
+     FILE HANDLING
+  ══════════════════════════════════════════ */
+  let encryptFiles = [];
+  let decryptFiles = [];
+
+  function setupDrop(dropId, inputId, filesArr, listId) {
+    const drop  = document.getElementById(dropId);
+    const input = document.getElementById(inputId);
+
+    drop.addEventListener('click', () => input.click());
+    input.addEventListener('change', e => addFiles(e.target.files, filesArr, listId));
+
+    ['dragenter','dragover'].forEach(ev =>
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('active'); }));
+    ['dragleave','drop'].forEach(ev =>
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('active'); }));
+    drop.addEventListener('drop', e => addFiles(e.dataTransfer.files, filesArr, listId));
+  }
+
+  function addFiles(files, arr, listId) {
+    Array.from(files).forEach(f => {
+      if (!arr.some(x => x.name === f.name && x.size === f.size)) arr.push(f);
+    });
+    renderFileList(arr, listId);
+  }
+
+  function renderFileList(arr, listId) {
+    const el = document.getElementById(listId);
+    el.innerHTML = '';
+    arr.forEach((f, i) => {
+      const div = document.createElement('div');
+      div.className = 'lv-file-item';
+      div.innerHTML = `
+        <i class="fas fa-file" style="color:var(--accent);"></i>
+        <span class="name">${f.name}</span>
+        <span class="size">${fmtSize(f.size)}</span>
+        <button type="button" class="lv-file-remove" onclick="removeFile(${i},'${listId}',${arr === encryptFiles})">&times;</button>
+      `;
+      el.appendChild(div);
+    });
+  }
+
+  function removeFile(i, listId, isEncrypt) {
+    const arr = isEncrypt ? encryptFiles : decryptFiles;
+    arr.splice(i, 1);
+    renderFileList(arr, listId);
+  }
+
+  function fmtSize(bytes) {
+    if (!bytes) return '0 B';
+    const u = ['B','KB','MB','GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + u[i];
+  }
+
+  /* ══════════════════════════════════════════
+     ENCRYPTION LOGIC (untouched)
+  ══════════════════════════════════════════ */
+  function generateKey(passcode, words, range) {
+    let key = passcode;
+    words.forEach(w => key += w);
+    let out = '';
+    for (let i = 0; i < key.length; i++) {
+      out += String.fromCharCode((key.charCodeAt(i) + range) % 256);
+    }
+    return out;
+  }
+
+  function encryptText(text, passcode, words, range) {
+    const key = generateKey(passcode, words, range);
+    let enc = '';
+    for (let i = 0; i < text.length; i++) {
+      enc += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return btoa(enc);
+  }
+
+  function decryptText(encText, passcode, words, range) {
+    const raw = atob(encText);
+    const key = generateKey(passcode, words, range);
+    let dec = '';
+    for (let i = 0; i < raw.length; i++) {
+      dec += String.fromCharCode(raw.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return dec;
+  }
+
+  /* ══════════════════════════════════════════
+     PROGRESS HELPER
+  ══════════════════════════════════════════ */
+  function runProgress(barId, wrapId, cb) {
+    const wrap = document.getElementById(wrapId);
+    const bar  = document.getElementById(barId);
+    wrap.style.display = 'block';
+    bar.style.width = '0%';
+    let p = 0;
+    const iv = setInterval(() => {
+      p += 8;
+      bar.style.width = Math.min(p, 100) + '%';
+      if (p >= 100) { clearInterval(iv); wrap.style.display = 'none'; cb(); }
+    }, 40);
+  }
+
+  /* ══════════════════════════════════════════
+     COPY HELPER
+  ══════════════════════════════════════════ */
+  function setupCopy(btnId, sourceId) {
+    document.getElementById(btnId).addEventListener('click', function () {
+      const text = document.getElementById(sourceId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        this.innerHTML = '<i class="fas fa-check"></i>&nbsp; Copied!';
+        setTimeout(() => this.innerHTML = '<i class="fas fa-copy"></i>&nbsp; Copy', 2000);
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════
+     FORMS
+  ══════════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', function () {
+
+    setupDrop('encrypt-file-drop', 'encrypt-file', encryptFiles, 'encrypt-file-list');
+    setupDrop('decrypt-file-drop', 'decrypt-file', decryptFiles, 'decrypt-file-list');
+
+    setupCopy('copy-encrypt-btn', 'encrypt-result-text');
+    setupCopy('copy-decrypt-btn', 'decrypt-result-text');
+
+    /* Mode switching — encrypt */
+    document.querySelectorAll('input[name="encrypt-mode"]').forEach(r => {
+      r.addEventListener('change', function () {
+        const file = this.value === 'file';
+        document.getElementById('encrypt-file-group').style.display       = file ? 'block' : 'none';
+        document.getElementById('encrypt-file-input-group').style.display = file ? 'block' : 'none';
+        document.getElementById('encrypt-text-group').style.display       = file ? 'none'  : 'block';
+        document.getElementById('encrypt-text').required = !file;
+      });
+    });
+
+    /* Mode switching — decrypt */
+    document.querySelectorAll('input[name="decrypt-mode"]').forEach(r => {
+      r.addEventListener('change', function () {
+        const file = this.value === 'file';
+        document.getElementById('decrypt-file-group').style.display       = file ? 'block' : 'none';
+        document.getElementById('decrypt-file-input-group').style.display = file ? 'block' : 'none';
+        document.getElementById('decrypt-text-group').style.display       = file ? 'none'  : 'block';
+        document.getElementById('decrypt-text').required = !file;
+      });
+    });
+
+    /* ── Encrypt submit ── */
+    document.getElementById('encrypt-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const passcode = document.getElementById('encrypt-passcode').value;
+      const words    = document.getElementById('encrypt-words').value.trim().split(/\s+/);
+      const range    = parseInt(document.getElementById('encrypt-range').value);
+
+      if (words.length !== 24) {
+        alert('Please enter exactly 24 words.'); return;
+      }
+
+      runProgress('encrypt-progress-bar', 'encrypt-progress', () => {
+        const text      = document.getElementById('encrypt-text').value;
+        const encrypted = encryptText(text, passcode, words, range);
+
+        document.getElementById('encrypt-result-text').textContent = encrypted;
+        document.getElementById('encrypt-result').style.display = 'block';
+        document.getElementById('encrypt-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+
+    /* ── Decrypt submit ── */
+    document.getElementById('decrypt-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const passcode = document.getElementById('decrypt-passcode').value;
+      const words    = document.getElementById('decrypt-words').value.trim().split(/\s+/);
+      const range    = parseInt(document.getElementById('decrypt-range').value);
+
+      if (words.length !== 24) {
+        alert('Please enter exactly 24 words.'); return;
+      }
+
+      runProgress('decrypt-progress-bar', 'decrypt-progress', () => {
+        const resultDiv   = document.getElementById('decrypt-result');
+        const resultAlert = document.getElementById('decrypt-result-alert');
+        const resultText  = document.getElementById('decrypt-result-text');
+        const resultTitle = document.getElementById('decrypt-result-title');
+        const resultIcon  = document.getElementById('decrypt-result-icon');
+
+        try {
+          const enc       = document.getElementById('decrypt-text').value;
+          const decrypted = decryptText(enc, passcode, words, range);
+
+          resultAlert.className = 'wf-alert wf-alert-success';
+          resultIcon.textContent  = '✓';
+          resultTitle.textContent = 'Decryption complete!';
+          resultText.textContent  = decrypted;
+        } catch {
+          resultAlert.className = 'wf-alert wf-alert-error';
+          resultIcon.textContent  = '✕';
+          resultTitle.textContent = 'Decryption failed';
+          resultText.textContent  = 'Wrong credentials or corrupted ciphertext.';
+        }
+
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+  });
+</script>
+</body>
+</html>

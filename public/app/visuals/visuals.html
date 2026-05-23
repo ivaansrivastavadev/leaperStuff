@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<script>
+
+</script>
+<!-- EnD -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>leprVisuals — leaperStuff</title>
+  <link rel="icon" type="image/png" href="../../assets/icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../style.css">
+  <!-- Google Analytics placeholder — add your GA tag here -->
+
+  <style>
+    .lv-page { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── Main layout ── */
+    .lv-wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* ── Toolbar rows ── */
+    .lv-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── Table container ── */
+    .lv-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      margin-top: 16px;
+    }
+    #sheet {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+    #sheet th {
+      background: var(--bg-elevated);
+      color: var(--text-tertiary);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    #sheet td {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    #sheet tbody tr:last-child td { border-bottom: none; }
+    #sheet tbody tr:hover { background: var(--bg-elevated); }
+    #sheet td input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-family: var(--font);
+      font-size: var(--text-sm);
+      width: 100%;
+      padding: 4px 6px;
+      border-radius: var(--r-xs);
+      transition: background var(--dur-fast);
+    }
+    #sheet td input:focus {
+      background: var(--accent-subtle);
+      outline: none;
+    }
+
+    /* ── Chart wrapper ── */
+    #chartWrapper {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 24px;
+      display: none;
+      position: relative;
+    }
+    #chartWrapper.visible { display: block; }
+    #chartCanvas { width: 100% !important; }
+
+    /* ── Custom size inputs ── */
+    #customSizeInputs {
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    #customSizeInputs input { width: 90px; }
+
+    /* ── Download modal ── */
+    .lv-modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(10,9,7,0.75);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .lv-modal-backdrop.open { display: flex; animation: wf-fade-in 200ms; }
+
+    /* ── Footer ── */
+    .lv-footer {
+      margin-top: auto;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+    .lv-footer p + p { margin-top: 6px; }
+  </style>
+</head>
+
+<body>
+<div class="lv-page">
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav class="wf-navbar">
+    <div class="wf-navbar-inner">
+      <a href="../../index.html" class="wf-navbar-brand">
+        <img src="../../assets/icon.png" alt="leaperStuff" class="wf-navbar-favicon"
+             onerror="this.style.display='none'">
+        <span class="wf-navbar-name">leaperStuff</span>
+      </a>
+      <nav class="wf-navbar-nav">
+        <a href="../tools.html"    class="wf-navbar-link">Tools</a>
+        <a href="../../index.html" class="wf-navbar-link">About</a>
+      </nav>
+    </div>
+  </nav>
+
+  <main class="lv-wrap">
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <div style="text-align:center; padding: 16px 0 8px;">
+      <span class="wf-hero-eyebrow">leaperStuff Tool</span>
+      <h1 class="wf-h1" style="margin: 12px 0 10px;">leprVisuals</h1>
+      <p class="wf-body" style="max-width:480px; margin: 0 auto;">
+        Create or upload data — turn it into stunning charts ✨
+      </p>
+    </div>
+
+    <!-- ═══════════ SPREADSHEET ═══════════ -->
+    <div class="wf-card">
+      <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+        <div>
+          <div class="wf-card-title">
+            <i class="fas fa-table" style="color:var(--accent); margin-right:8px;"></i>Spreadsheet
+          </div>
+          <div class="wf-card-subtitle">Enter data manually, load a preset, or upload an XLSX file</div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="lv-toolbar">
+        <button class="wf-btn wf-btn-filled wf-btn-sm"   onclick="addRow()">
+          <i class="fas fa-plus"></i>&nbsp; Add Row
+        </button>
+        <button class="wf-btn wf-btn-outlined wf-btn-sm" onclick="removeRow()">
+          <i class="fas fa-minus"></i>&nbsp; Remove Row
+        </button>
+
+        <div class="wf-select-wrapper" style="min-width:160px;">
+          <select id="presets" class="wf-input wf-input-sm wf-select" onchange="loadPreset()">
+            <option value="">Load preset…</option>
+            <option value="sales">Sales Data</option>
+            <option value="expenses">Monthly Expenses</option>
+            <option value="population">Population by Country</option>
+            <option value="website">Website Traffic</option>
+            <option value="product">Product Ratings</option>
+          </select>
+        </div>
+
+        <button class="wf-btn wf-btn-tonal wf-btn-sm" onclick="downloadSpreadsheet()">
+          <i class="fas fa-download"></i>&nbsp; Download XLSX
+        </button>
+        <button class="wf-btn wf-btn-ghost wf-btn-sm"
+                onclick="document.getElementById('fileInput').click()">
+          <i class="fas fa-upload"></i>&nbsp; Upload XLSX
+        </button>
+        <input type="file" id="fileInput" accept=".xlsx" style="display:none"
+               onchange="handleFileUpload(this.files)">
+      </div>
+
+      <!-- Table -->
+      <div class="lv-table-wrap">
+        <table id="sheet">
+          <thead>
+            <tr><th>Label</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input value="First"></td>
+              <td><input value="1"></td>
+            </tr>
+            <tr>
+              <td><input value="Second"></td>
+              <td><input value="2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════ CHART CONTROLS ═══════════ -->
+    <div class="wf-card">
+      <div class="wf-card-header" style="margin-bottom:var(--space-5);">
+        <div>
+          <div class="wf-card-title">
+            <i class="fas fa-chart-bar" style="color:var(--accent); margin-right:8px;"></i>Chart Generator
+          </div>
+          <div class="wf-card-subtitle">Choose a chart type, set dimensions, then generate</div>
+        </div>
+      </div>
+
+      <div class="lv-toolbar">
+        <!-- Chart type -->
+        <div class="wf-form-group" style="margin:0; min-width:160px;">
+          <div class="wf-select-wrapper">
+            <select id="chartType" class="wf-input wf-input-sm wf-select">
+              <option value="pie">Pie Chart</option>
+              <option value="doughnut">Doughnut Chart</option>
+              <option value="bar" selected>Bar Chart</option>
+              <option value="line">Line Chart</option>
+              <option value="radar">Radar Chart</option>
+              <option value="polarArea">Polar Area</option>
+              <option value="scatter">Scatter Plot</option>
+              <option value="bubble">Bubble Chart</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Chart size -->
+        <div class="wf-form-group" style="margin:0; min-width:150px;">
+          <div class="wf-select-wrapper">
+            <select id="chartSize" class="wf-input wf-input-sm wf-select" onchange="toggleCustomSize()">
+              <option value="window">Window Width</option>
+              <option value="square">Square (1:1)</option>
+              <option value="custom">Custom Size</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Custom size inputs -->
+        <div id="customSizeInputs" style="display:none; gap:8px; align-items:center;">
+          <input type="number" id="customWidth"  class="wf-input wf-input-sm" placeholder="W px" value="800" style="width:80px;">
+          <span class="wf-caption">×</span>
+          <input type="number" id="customHeight" class="wf-input wf-input-sm" placeholder="H px" value="600" style="width:80px;">
+        </div>
+
+        <button class="wf-btn wf-btn-filled" onclick="generateChartFromSheet()">
+          <i class="fas fa-wand-magic-sparkles"></i>&nbsp; Generate Chart
+        </button>
+        <button class="wf-btn wf-btn-outlined" onclick="showScreenshotOptions()">
+          <i class="fas fa-camera"></i>&nbsp; Download
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════ CHART DISPLAY ═══════════ -->
+    <div id="chartWrapper">
+      <canvas id="chartCanvas"></canvas>
+    </div>
+
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="lv-footer">
+    <div class="wf-container">
+      <p>© 2026 leaperStuff — leprVisuals</p>
+      <p>Built with <i class="fas fa-heart" style="color:var(--accent);"></i> by Ivaan Srivastava</p>
+    </div>
+  </footer>
+
+</div><!-- /lv-page -->
+
+<!-- ═══════════ DOWNLOAD MODAL ═══════════ -->
+<div class="lv-modal-backdrop" id="screenshotModal">
+  <div class="wf-modal" style="max-width:400px;">
+    <div class="wf-modal-header">
+      <h2 class="wf-modal-title">Download Chart</h2>
+      <button class="wf-modal-close"
+              onclick="document.getElementById('screenshotModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="wf-modal-body">
+      <div class="wf-form-group" style="margin-bottom:20px;">
+        <div class="wf-label" style="margin-bottom:10px;">Background</div>
+        <div class="wf-radio-group">
+          <label class="wf-radio-label">
+            <input type="radio" class="wf-radio-input" name="bgType" value="white" checked>
+            White background
+          </label>
+          <label class="wf-radio-label">
+            <input type="radio" class="wf-radio-input" name="bgType" value="transparent">
+            Transparent background
+          </label>
+        </div>
+      </div>
+      <div class="wf-form-group">
+        <label class="wf-label" for="marginSize">Margin (px)</label>
+        <input type="number" id="marginSize" class="wf-input" value="20" min="0" max="100"
+               style="max-width:120px;">
+      </div>
+    </div>
+    <div class="wf-modal-footer">
+      <button class="wf-btn wf-btn-ghost"
+              onclick="document.getElementById('screenshotModal').classList.remove('open')">
+        Cancel
+      </button>
+      <button class="wf-btn wf-btn-filled" onclick="takeScreenshot()">
+        <i class="fas fa-download"></i>&nbsp; Download PNG
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/apps/visuals/visuals.js"></script>
+</body>
+</html>
